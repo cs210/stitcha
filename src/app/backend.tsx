@@ -2,32 +2,38 @@ import { useSession, useUser } from '@clerk/nextjs'
 import { createClient } from '@supabase/supabase-js'
 import { useCallback } from 'react'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_KEY!
-
 export default function SignInBackend() {
 	const { session } = useSession()
 	const { user } = useUser()
 
 	// Create a custom supabase client that injects the Clerk Supabase token into the request headers
 	const createClerkSupabaseClient = useCallback(() => {
-		return createClient(supabaseUrl, supabaseKey, {
-			global: {
-				fetch: async (url, options = {}) => {
-					const clerkToken = await session?.getToken({
-						template: 'supabase',
-					})
-
-					const headers = new Headers(options?.headers)
-					headers.set('Authorization', `Bearer ${clerkToken}`)
-
-					return fetch(url, {
-						...options,
-						headers,
-					})
+		return createClient(
+			process.env.NEXT_PUBLIC_SUPABASE_URL!,
+			process.env.NEXT_PUBLIC_SUPABASE_KEY!,
+			{
+				global: {
+					// Get the custom Supabase token from Clerk
+					fetch: async (url, options = {}) => {
+						// The Clerk `session` object has the getToken() method      
+						const clerkToken = await session?.getToken({
+							// Name of the JWT template you created in the Clerk Dashboard ('supabase')
+							template: 'supabase',
+						})
+						
+						// Insert the Clerk Supabase token into the headers
+						const headers = new Headers(options?.headers)
+						headers.set('Authorization', `Bearer ${clerkToken}`)
+						
+						// Call the default fetch
+						return fetch(url, {
+							...options,
+							headers,
+						})
+					},
 				},
 			},
-		})
+		)
 	}, [session])
 
 	// Function to insert user data into Supabase
@@ -37,13 +43,14 @@ export default function SignInBackend() {
 		const supabaseClient = createClerkSupabaseClient()
 
 		try {
-			const { error } = await supabaseClient.from('users').upsert({
-				id: user.id,
+			// user_login is the name of the table in Supabase
+			const { error } = await supabaseClient.from('user_login').upsert({
+				user_id: user.id,
 				email: user.primaryEmailAddress?.emailAddress,
 				first_name: user.firstName,
 				last_name: user.lastName,
 				created_at: user.createdAt,
-				updated_at: new Date().toISOString(),
+				// updated_at: new Date().toISOString(),
 			})
 
 			if (error) {
