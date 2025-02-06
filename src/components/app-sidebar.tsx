@@ -6,7 +6,7 @@ import { NavHeader } from '@/components/nav-header';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
-import { Brain, Settings2, ShoppingCart } from 'lucide-react';
+import { Brain, Kanban, Settings2, ShoppingCart } from 'lucide-react';
 
 const data = [
 	{
@@ -18,6 +18,11 @@ const data = [
 		name: 'Products',
 		url: '/dashboard/products',
 		icon: ShoppingCart,
+	},
+	{
+		name: 'Pipeline',
+		url: '/dashboard/pipeline',
+		icon: Kanban,
 	},
 	{
 		name: 'Settings',
