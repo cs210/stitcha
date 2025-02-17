@@ -6,18 +6,23 @@ import { NavHeader } from '@/components/nav-header';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@/components/ui/sidebar';
-import { House, Settings2, ShoppingCart } from 'lucide-react';
+import { Brain, Kanban, Settings2, ShoppingCart } from 'lucide-react';
 
 const data = [
 	{
-		name: 'Home',
-		url: '/dashboard/home',
-		icon: House,
+		name: 'Stitcha Assistant',
+		url: '/dashboard/stitcha-assistant',
+		icon: Brain,
 	},
 	{
 		name: 'Products',
 		url: '/dashboard/products',
 		icon: ShoppingCart,
+	},
+	{
+		name: 'Pipeline',
+		url: '/dashboard/pipeline',
+		icon: Kanban,
 	},
 	{
 		name: 'Settings',

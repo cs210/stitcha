@@ -1,4 +1,5 @@
 'use client';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icons } from '@/components/ui/icons';
@@ -21,43 +22,6 @@ export default function SignInPage() {
 										<CardDescription>Welcome back! Please sign in to continue</CardDescription>
 									</CardHeader>
 									<CardContent className='grid gap-y-4'>
-										<div className='grid grid-cols-2 gap-x-4'>
-											<Clerk.Connection name='google' asChild>
-												<Button size='sm' variant='outline' type='button' disabled={isGlobalLoading}>
-													<Clerk.Loading scope='provider:google'>
-														{(isLoading) =>
-															isLoading ? (
-																<Icons.spinner className='size-4 animate-spin' />
-															) : (
-																<>
-																	<Icons.google className='mr-2 size-4' />
-																	Google
-																</>
-															)
-														}
-													</Clerk.Loading>
-												</Button>
-											</Clerk.Connection>
-											<Clerk.Connection name='facebook' asChild>
-												<Button size='sm' variant='outline' type='button' disabled={isGlobalLoading}>
-													<Clerk.Loading scope='provider:facebook'>
-														{(isLoading) =>
-															isLoading ? (
-																<Icons.spinner className='size-4 animate-spin' />
-															) : (
-																<>
-																	<Icons.facebook className='mr-2 size-4' />
-																	Facebook
-																</>
-															)
-														}
-													</Clerk.Loading>
-												</Button>
-											</Clerk.Connection>
-										</div>
-										<p className='flex items-center gap-x-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border'>
-											or
-										</p>
 										<Clerk.Field name='identifier' className='space-y-2'>
 											<Clerk.Label asChild>
 												<Label>Email address</Label>
