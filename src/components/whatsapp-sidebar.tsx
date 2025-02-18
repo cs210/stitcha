@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Mic, Paperclip, Send, Smile, ChevronRight, MessageCircle } from "lucide-react"
@@ -45,7 +45,6 @@ export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress }: WhatsAp
     { id: "2", sender: "You", content: "Que tipo de tecido devo usar no vestido?", time: "08:03 am" },
     { id: "3", sender: "Beatriz", content: "Hm... algodão...", time: "08:05 am", isVoice: true, duration: "1:25" },
   ])
-  const [selectedSeamstress, setSelectedSeamstressLocal] = useState(seamstresses[0])
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -66,7 +65,7 @@ export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress }: WhatsAp
     if (!messageInput.trim()) return
 
     try {
-      await sendWhatsAppMessage(selectedSeamstress.phone, messageInput)
+      await sendWhatsAppMessage("group", messageInput)
       const newMessage = {
         id: Date.now().toString(),
         sender: "You",
@@ -98,31 +97,27 @@ export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress }: WhatsAp
       {!isCollapsed && (
         <>
           <div className="p-4 border-b bg-[#075E54] text-gray-300">
-            <h2 className="font-semibold mb-2">
-              <a href="/seamstresses" className="hover:text-white transition-colors">
-                Costureiras (41)
-              </a>
-            </h2>
-            <div className="flex -space-x-2 overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold">Costureiras (41)</h2>
+              <span className="text-sm hover:text-white cursor-pointer transition-colors">View All</span>
+            </div>
+            <div className="flex -space-x-2 overflow-hidden py-2">
               {seamstresses.map((seamstress, index) => (
-                <a key={seamstress.id} href="/seamstresses">
-                  <Avatar
-                    className="border-2 border-[#075E54] cursor-pointer hover:scale-105 transition-transform"
-                    style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
-                    onClick={() => {
-                      setSelectedSeamstressLocal(seamstress)
-                      setSelectedSeamstress(seamstress)
-                    }}
-                  >
-                    <AvatarFallback className="text-black font-semibold">{seamstress.initials}</AvatarFallback>
-                  </Avatar>
-                </a>
+                <Avatar
+                  key={seamstress.id}
+                  className="border-2 border-[#075E54] cursor-pointer hover:scale-105 transition-transform w-10 h-10 flex-shrink-0"
+                  style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
+                  onClick={() => setSelectedSeamstress(seamstress)}
+                >
+                  <AvatarImage src={seamstress.avatar} alt={seamstress.name} />
+                  <AvatarFallback className="text-black font-semibold">{seamstress.initials}</AvatarFallback>
+                </Avatar>
               ))}
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#ECE5DD]">
-            <h3 className="font-semibold text-gray-700">Chat with {selectedSeamstress.name}</h3>
+            <h3 className="font-semibold text-gray-700">Group Chat</h3>
             {messages.map((message) => (
               <div key={message.id} className={`flex gap-2 ${message.sender === "You" ? "flex-row-reverse" : ""}`}>
                 <Avatar className="w-8 h-8">
