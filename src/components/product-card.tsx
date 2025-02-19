@@ -6,8 +6,23 @@ import { Button } from "./ui/button"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
+interface Assignee {
+  name: string
+  avatar: string
+}
+
+interface Product {
+  id: string
+  image: string
+  title: string
+  type: string
+  date: string
+  progress: string
+  assignees: Assignee[]
+}
+
 interface ProductCardProps {
-  product: any
+  product: Product
   index: number
 }
 
@@ -33,7 +48,12 @@ export function ProductCard({ product, index }: ProductCardProps) {
             Edit
           </Button>
           <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
-            <Image src={product.image || "/placeholder.svg"} alt={product.title} fill className="object-cover" />
+            <Image 
+              src={product.image.startsWith('/') ? product.image : `/images/${product.image}`} 
+              alt={product.title} 
+              fill 
+              className="object-cover" 
+            />
           </div>
           <Badge variant="secondary" className="bg-blue-50 text-blue-600">
             {product.type}
@@ -52,9 +72,9 @@ export function ProductCard({ product, index }: ProductCardProps) {
           <div className="flex items-center justify-between text-sm text-gray-500">
             <div>{product.progress}</div>
             <div className="flex -space-x-2">
-              {product.assignees.map((assignee: any, i: number) => (
+              {product.assignees.map((assignee: Assignee, i: number) => (
                 <Avatar key={i} className="border-2 border-white w-6 h-6">
-                  <AvatarImage src={assignee.avatar} />
+                  <AvatarImage src={assignee.avatar.startsWith('/') ? assignee.avatar : `/images/${assignee.avatar}`} />
                   <AvatarFallback>{assignee.name[0]}</AvatarFallback>
                 </Avatar>
               ))}

@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
-import { Avatar, AvatarFallback } from "./ui/avatar"
-import { Label } from "./ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Label } from "@/components/ui/label"
 // Update the import to use the shared seamstresses data
 import { seamstresses } from "@/types/seamstress"
 
@@ -39,3 +39,4 @@ function EditPage() {
 }
 
 export default EditPage
+

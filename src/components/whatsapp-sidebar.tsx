@@ -4,14 +4,15 @@ import { useState, useEffect } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { Mic, Paperclip, Send, Smile, ChevronRight, MessageCircle } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Mic, Paperclip, Send, Smile, X } from "lucide-react"
+// import { cn } from "@/lib/utils"
 import { sendWhatsAppMessage, getWhatsAppMessages } from "@/lib/whatsapp-api"
 import type { Seamstress } from "@/types/seamstress"
 
 interface WhatsAppSidebarProps {
   seamstresses: Seamstress[]
   setSelectedSeamstress: (seamstress: Seamstress) => void
+  onClose: () => void
 }
 
 const avatarColors = [
@@ -37,8 +38,7 @@ const avatarColors = [
   "#FF0000",
 ]
 
-export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress }: WhatsAppSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
+export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress, onClose }: WhatsAppSidebarProps) {
   const [messageInput, setMessageInput] = useState("")
   const [messages, setMessages] = useState([
     { id: "1", sender: "Beatriz", content: "Olá! 👋", time: "04:00 pm" },
@@ -80,100 +80,90 @@ export function WhatsAppSidebar({ seamstresses, setSelectedSeamstress }: WhatsAp
   }
 
   return (
-    <div
-      className={cn(
-        "relative flex flex-col bg-white transition-all duration-300 ease-in-out",
-        isCollapsed ? "w-16" : "w-80",
-        "border-l border-[#25D366]",
-      )}
-    >
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -left-4 top-1/2 transform -translate-y-1/2 bg-[#25D366] text-white p-2 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors"
-      >
-        {isCollapsed ? <MessageCircle className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-      </button>
+    <div className="fixed right-4 bottom-20 w-80 bg-white rounded-lg shadow-xl">
+      <div className="flex justify-between items-center p-4 bg-[#075E54] text-white rounded-t-lg">
+        <h2 className="text-lg font-semibold">WhatsApp</h2>
+        <button onClick={onClose} className="text-gray-100 hover:text-white">
+          <X className="h-5 w-5" />
+        </button>
+      </div>
 
-      {!isCollapsed && (
-        <>
-          <div className="p-4 border-b bg-[#075E54] text-gray-300">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold">Costureiras (41)</h2>
-              <span className="text-sm hover:text-white cursor-pointer transition-colors">View All</span>
-            </div>
-            <div className="flex -space-x-2 overflow-hidden py-2">
-              {seamstresses.map((seamstress, index) => (
-                <Avatar
-                  key={seamstress.id}
-                  className="border-2 border-[#075E54] cursor-pointer hover:scale-105 transition-transform w-10 h-10 flex-shrink-0"
-                  style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
-                  onClick={() => setSelectedSeamstress(seamstress)}
-                >
-                  <AvatarImage src={seamstress.avatar} alt={seamstress.name} />
-                  <AvatarFallback className="text-black font-semibold">{seamstress.initials}</AvatarFallback>
-                </Avatar>
-              ))}
-            </div>
-          </div>
+      <div className="p-4 border-b bg-[#075E54] text-gray-300">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="font-semibold">Costureiras ({seamstresses.length})</h2>
+          <span className="text-sm hover:text-white cursor-pointer transition-colors">View All</span>
+        </div>
+        <div className="flex -space-x-2 overflow-hidden py-2">
+          {seamstresses.map((seamstress, index) => (
+            <Avatar
+              key={seamstress.id}
+              className="border-2 border-[#075E54] cursor-pointer hover:scale-105 transition-transform w-10 h-10 flex-shrink-0"
+              style={{ backgroundColor: avatarColors[index % avatarColors.length] }}
+              onClick={() => setSelectedSeamstress(seamstress)}
+            >
+              <AvatarImage src={seamstress.avatar} alt={seamstress.name} />
+              <AvatarFallback className="text-black font-semibold">{seamstress.initials}</AvatarFallback>
+            </Avatar>
+          ))}
+        </div>
+      </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#ECE5DD]">
-            <h3 className="font-semibold text-gray-700">Group Chat</h3>
-            {messages.map((message) => (
-              <div key={message.id} className={`flex gap-2 ${message.sender === "You" ? "flex-row-reverse" : ""}`}>
-                <Avatar className="w-8 h-8">
-                  <AvatarFallback className="text-black font-semibold">
-                    {message.sender === "You" ? "YO" : message.sender.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className={`rounded-lg p-3 max-w-[80%] ${message.sender === "You" ? "bg-[#DCF8C6]" : "bg-white"}`}>
-                  {message.isVoice ? (
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2 bg-[#DCF8C6] rounded-full p-2">
-                        <div className="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center">
-                          <Mic className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="w-32 h-2 bg-gray-300 rounded-full overflow-hidden">
-                          <div className="w-1/3 h-full bg-[#128C7E] rounded-full" />
-                        </div>
-                        <span className="text-xs font-medium text-gray-600">{message.duration}</span>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1 ml-2 italic">"{message.content.slice(0, 30)}..."</p>
+      <div className="h-[400px] overflow-y-auto p-4 space-y-4 bg-[#ECE5DD]">
+        <h3 className="font-semibold text-gray-700">Group Chat</h3>
+        {messages.map((message) => (
+          <div key={message.id} className={`flex gap-2 ${message.sender === "You" ? "flex-row-reverse" : ""}`}>
+            <Avatar className="w-8 h-8">
+              <AvatarFallback className="text-black font-semibold">
+                {message.sender === "You" ? "YO" : message.sender.slice(0, 2).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className={`rounded-lg p-3 max-w-[80%] ${message.sender === "You" ? "bg-[#DCF8C6]" : "bg-white"}`}>
+              {message.isVoice ? (
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2 bg-[#DCF8C6] rounded-full p-2">
+                    <div className="w-8 h-8 bg-[#25D366] rounded-full flex items-center justify-center">
+                      <Mic className="w-4 h-4 text-white" />
                     </div>
-                  ) : (
-                    <p className="text-gray-700">{message.content}</p>
-                  )}
-                  <div className="text-xs mt-1 text-gray-500">{message.time}</div>
+                    <div className="w-32 h-2 bg-gray-300 rounded-full overflow-hidden">
+                      <div className="w-1/3 h-full bg-[#128C7E] rounded-full" />
+                    </div>
+                    <span className="text-xs font-medium text-gray-600">{message.duration}</span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1 ml-2 italic">"{message.content.slice(0, 30)}..."</p>
                 </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-4 border-t bg-[#F0F2F5]">
-            <div className="flex gap-2">
-              <Button size="icon" variant="ghost">
-                <Paperclip className="w-5 h-5 text-[#128C7E]" />
-              </Button>
-              <Input
-                placeholder="Escreva aqui..."
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                className="flex-1"
-              />
-              <Button size="icon" variant="ghost">
-                <Smile className="w-5 h-5 text-[#128C7E]" />
-              </Button>
-              <Button size="icon" variant="ghost" onClick={handleSendMessage}>
-                {messageInput ? (
-                  <Send className="w-5 h-5 text-[#128C7E]" />
-                ) : (
-                  <Mic className="w-5 h-5 text-[#128C7E]" />
-                )}
-              </Button>
+              ) : (
+                <p className="text-gray-700">{message.content}</p>
+              )}
+              <div className="text-xs mt-1 text-gray-500">{message.time}</div>
             </div>
           </div>
-        </>
-      )}
+        ))}
+      </div>
+
+      <div className="p-4 border-t bg-[#F0F2F5] rounded-b-lg">
+        <div className="flex gap-2">
+          <Button size="icon" variant="ghost">
+            <Paperclip className="w-5 h-5 text-[#128C7E]" />
+          </Button>
+          <Input
+            placeholder="Escreva aqui..."
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
+            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            className="flex-1"
+          />
+          <Button size="icon" variant="ghost">
+            <Smile className="w-5 h-5 text-[#128C7E]" />
+          </Button>
+          <Button size="icon" variant="ghost" onClick={handleSendMessage}>
+            {messageInput ? (
+              <Send className="w-5 h-5 text-[#128C7E]" />
+            ) : (
+              <Mic className="w-5 h-5 text-[#128C7E]" />
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

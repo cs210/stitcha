@@ -1,20 +1,31 @@
+// 'use client';
+
+// import { useUser } from "@clerk/nextjs";
+// import { useRouter } from "next/navigation";
+// import { useEffect } from "react";
+
+// export default function RootPage() {
+// 	const { user, isLoaded } = useUser();
+// 	const router = useRouter();
+
+// 	useEffect(() => {
+// 		if (isLoaded) {
+// 			if (user) {
+// 				router.push('/kanban');
+// 			} else {
+// 				router.push('/sign-in');
+// 			}
+// 		}
+// 	}, [isLoaded, user, router]);
+
+// 	// Show loading state or nothing while checking auth
+// 	return null;
+// }
+
 'use server';
 
-import { redirect } from 'next/navigation';
-import { KanbanBoard } from "@/components/kanban-board"
-import { SearchHeader } from "@/components/search-header"
+import { redirect } from "next/navigation";
 
-
-// TODO: Change this to be stitcha-assistant
 export default async function RootPage() {
-  if (window.location.pathname === '/kanban') {
-    return (
-      <div className="flex flex-col h-screen">
-        <SearchHeader />
-        <KanbanBoard />
-      </div>
-    );
-  }
-  
-  redirect('/dashboard/settings');
+	redirect('/sign-in');
 }

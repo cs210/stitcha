@@ -27,31 +27,31 @@ const seamstresses: Seamstress[] = [
     id: "1",
     name: "Alice",
     avatar:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.28.17%E2%80%AFPM-lhmofAmlP9fWWqKwmzOBqimGsC6DO0.png",
+      "/images/seamstress-1.jpeg",
   },
   {
     id: "2",
-    name: "Bob",
+    name: "Josephine",
     avatar:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.28.17%E2%80%AFPM-lhmofAmlP9fWWqKwmzOBqimGsC6DO0.png",
+      "/images/seamstress-2.jpeg",
   },
   {
     id: "3",
     name: "Carol",
     avatar:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.28.17%E2%80%AFPM-lhmofAmlP9fWWqKwmzOBqimGsC6DO0.png",
+      "/images/seamstress-3.jpeg",
   },
   {
     id: "4",
-    name: "Dave",
+    name: "Beatriz",
     avatar:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.28.17%E2%80%AFPM-lhmofAmlP9fWWqKwmzOBqimGsC6DO0.png",
+      "/images/profile.png",
   },
   {
     id: "5",
     name: "Eve",
     avatar:
-      "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.28.17%E2%80%AFPM-lhmofAmlP9fWWqKwmzOBqimGsC6DO0.png",
+      "/images/profile.png",
   },
 ]
 
@@ -59,9 +59,8 @@ const initialProducts: Record<string, Product[]> = {
   paraFazer: [
     {
       id: "2",
-      title: "Prototypes for a Bag",
-      image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.38.28%E2%80%AFPM-gRtMrytoozFdTrv3bWn5pyCTs2gGlL.png",
+      title: "Prototypes for a Bag", 
+      image: "/images/tote.png",
       type: "Research",
       date: "Aug 20, 2021",
       assignees: [seamstresses[2]],
@@ -71,7 +70,7 @@ const initialProducts: Record<string, Product[]> = {
       id: "3",
       title: "Brown Fluffy Blanket",
       image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%2012.51.17%E2%80%AFPM-4Gu7bsXIxuTsf00RR7VVpTuvZp6gXw.png",
+        "/images/blanket.png",
       type: "Content",
       date: "Aug 16, 2021",
       assignees: [seamstresses[3], seamstresses[4]],
@@ -83,7 +82,7 @@ const initialProducts: Record<string, Product[]> = {
       id: "4",
       title: "Black Plain T-Shirt",
       image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.38.33%E2%80%AFPM-lnH6pOFAskR2J81qU4OIvM1KP3YL8t.png",
+        "/images/shirt.png",
       type: "Design",
       date: "Aug 20, 2021",
       assignees: [seamstresses[0], seamstresses[2]],
@@ -95,7 +94,7 @@ const initialProducts: Record<string, Product[]> = {
       id: "5",
       title: "Red Long-Sleeve Shirt",
       image:
-        "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Screenshot%202025-02-16%20at%201.38.24%E2%80%AFPM-ZNKrb8byLRYSaJLV8hPlZLiNtMfWVk.png",
+        "/images/sweater.png",
       type: "Content",
       date: "Aug 16, 2021",
       assignees: [seamstresses[1], seamstresses[4]],

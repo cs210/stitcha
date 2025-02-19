@@ -1,49 +1,74 @@
-import { BookOpen, Settings, FileText, Users, LayoutGrid } from "lucide-react"
+'use client'
+
+import { Users } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { LayoutGridIcon, Settings2Icon, LogOut } from "lucide-react"
+import { useClerk } from "@clerk/nextjs"
 
 export function Sidebar() {
-  const pathname = usePathname()
+	const pathname = usePathname()
+	const { signOut } = useClerk()
 
-  return (
-    <div className="w-16 bg-gray-100 flex flex-col items-center py-4 border-r">
-      <Link href="/" className="mb-8">
-        <h1 className="font-bold text-xl">S</h1>
-      </Link>
-      <nav className="flex flex-col gap-4">
-        <Link href="/" className={cn("p-3 rounded-lg hover:bg-gray-200", pathname === "/" && "bg-primary text-white")}>
-          <LayoutGrid className="w-5 h-5" />
-        </Link>
-        <Link
-          href="/documents"
-          className={cn("p-3 rounded-lg hover:bg-gray-200", pathname === "/documents" && "bg-primary text-white")}
-        >
-          <FileText className="w-5 h-5" />
-        </Link>
-        <Link
-          href="/seamstresses"
-          className={cn("p-3 rounded-lg hover:bg-gray-200", pathname === "/seamstresses" && "bg-primary text-white")}
-        >
-          <Users className="w-5 h-5" />
-        </Link>
-        <Link
-          href="/docs"
-          className={cn("p-3 rounded-lg hover:bg-gray-200", pathname === "/docs" && "bg-primary text-white")}
-        >
-          <BookOpen className="w-5 h-5" />
-        </Link>
-        <Link
-          href="/settings"
-          className={cn(
-            "p-3 rounded-lg hover:bg-gray-200",
-            pathname === "/settings" && "bg-primary text-white mt-auto",
-          )}
-        >
-          <Settings className="w-5 h-5" />
-        </Link>
-      </nav>
-    </div>
-  )
+	// const handleSignOut = async () => {
+	// 	try {
+	// 		await signOut()
+	// 		// Let Clerk handle the redirect after sign out
+	// 	} catch (error) {
+	// 		console.error('Error signing out:', error)
+	// 	}
+	// }
+
+	return (
+		<div className="flex h-full w-[72px] flex-col items-center border-r px-3 py-4">
+			<div className="flex flex-col gap-4">
+				<Link href="/kanban">
+					<Button 
+						variant="ghost" 
+						size="icon" 
+						className={cn(
+							"h-10 w-10",
+							pathname === "/kanban" && "bg-primary text-white"
+						)}
+					>
+						<LayoutGridIcon className="h-5 w-5" />
+					</Button>
+				</Link>
+				<Link href="/seamstresses">
+					<Button 
+						variant="ghost" 
+						size="icon" 
+						className={cn(
+							"h-10 w-10",
+							pathname === "/seamstresses" && "bg-primary text-white"
+						)}
+					>
+						<Users className="h-5 w-5" />
+					</Button>
+				</Link>
+				<Link href="/dashboard/settings">
+					<Button 
+						variant="ghost" 
+						size="icon" 
+						className={cn(
+							"h-10 w-10",
+							pathname === "/dashboard/settings" && "bg-primary text-white"
+						)}
+					>
+						<Settings2Icon className="h-5 w-5" />
+					</Button>
+				</Link>
+				<Button 
+					variant="ghost" 
+					size="icon" 
+					className="h-10 w-10"
+					onClick={() => signOut({ redirectUrl: '/' })}
+				>
+					<LogOut className="h-5 w-5" />
+				</Button>
+			</div>
+		</div>
+	)
 }
-

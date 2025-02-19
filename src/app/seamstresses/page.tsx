@@ -8,31 +8,6 @@ import { seamstresses } from "@/types/seamstress"
 export default function SeamstressesPage() {
   return (
     <div className="flex h-screen bg-[#F8F7FD]">
-      {/* Left Sidebar */}
-      <div className="w-16 bg-white border-r flex flex-col items-center py-6">
-        <div className="mb-8">
-          <h1 className="font-bold text-xl text-indigo-600">S</h1>
-        </div>
-        <nav className="flex flex-col gap-6">
-          <Button variant="ghost" size="icon" className="rounded-lg">
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor">
-              <path d="M4 6h16M4 12h16M4 18h16" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-lg">
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" strokeWidth="2" />
-              <circle cx="9" cy="7" r="4" strokeWidth="2" />
-            </svg>
-          </Button>
-          <Button variant="ghost" size="icon" className="rounded-lg">
-            <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor">
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" strokeWidth="2" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" strokeWidth="2" />
-            </svg>
-          </Button>
-        </nav>
-      </div>
 
       {/* Main Content */}
       <div className="flex-1 overflow-auto">

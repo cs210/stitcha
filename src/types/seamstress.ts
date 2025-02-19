@@ -5,7 +5,7 @@ export const seamstresses = [
       location: "Sao Paolo",
       phone: "(+55) 369 258 147",
       email: "bsilva@gmail.com",
-      avatar: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Unknown-Oi1q4oiod26bFgtkarEFkYqpJZSymg.jpeg", // Updated Beatriz's photo
+      avatar: "/images/seamstress-1.jpeg",
       initials: "BS",
     },
     {
@@ -14,7 +14,7 @@ export const seamstresses = [
       location: "Rio de Janeiro",
       phone: "(+55) 369 258 147",
       email: "aoliviera@gmail.com",
-      avatar: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Unknown-2-JuvLlFSfWZtK9iCJ4FWfeVHK0fUKUe.jpeg",
+      avatar: "/images/seamstress-2.jpeg",
       initials: "AO",
     },
     {
@@ -23,7 +23,7 @@ export const seamstresses = [
       location: "Sao Paolo",
       phone: "(+55) 369 258 147",
       email: "dcosta@gmail.com",
-      avatar: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Unknown-1-iBPwaHXLY69wxoX7mxYXmQtTrREwEl.jpeg",
+      avatar: "/images/seamstress-3.jpeg",
       initials: "DC",
     },
   ]
