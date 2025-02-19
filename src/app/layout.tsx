@@ -1,30 +1,80 @@
+'use client'
+
 import { MyRuntimeProvider } from '@/app/MyRuntimeProvider';
-import { ThemeProvider } from '@/components/theme-provider';
-import { ClerkProvider } from '@clerk/nextjs';
-import type { Metadata } from 'next';
+import { ClerkProvider, useUser } from '@clerk/nextjs';
 import './globals.css';
 
-// TODO: How can we update this based on the language
-export const metadata: Metadata = {
-	title: 'Stitcha',
-	description: 'Get stitching.',
-};
+import type { ReactNode } from "react"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { Sidebar } from "@/components/sidebar"
+import { WhatsAppSidebar } from "@/components/whatsapp-sidebar"
+import { useState, useEffect } from "react"
+import { seamstresses } from "@/types/seamstress"
+import { MessageCircle } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+
+const inter = Inter({ subsets: ["latin"] })
+
+function MainContent({ children }: { children: ReactNode }) {
+	const { user, isLoaded } = useUser();
+
+	console.log("Clerk user",user);
+	const pathname = usePathname();
+	const router = useRouter();
+
+	console.log("Pathname",pathname);
+
+	const [, setSelectedSeamstress] = useState(seamstresses[0]);
+	const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false);
+	
+	const isSignInPage = pathname?.includes('sign-in');
+
+	useEffect(() => {
+		if (isLoaded && user && isSignInPage) {
+			router.push('/kanban');
+		}
+	}, [isLoaded, user, isSignInPage, router]);
+	
+	if (isSignInPage) {
+		return <div className="min-h-screen">{children}</div>;
+	}
+	
+	return (
+		<div className="flex h-screen">
+			<Sidebar />
+			<main className="flex-1 overflow-hidden">{children}</main>
+			<div className="fixed right-4 bottom-4">
+				<button
+					onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}
+					className="bg-[#25D366] text-white p-3 rounded-full shadow-lg hover:bg-[#128C7E] transition-colors"
+				>
+					<MessageCircle className="w-6 h-6" />
+				</button>
+			</div>
+			{isWhatsAppOpen && (
+				<WhatsAppSidebar 
+					seamstresses={seamstresses} 
+					setSelectedSeamstress={setSelectedSeamstress}
+					onClose={() => setIsWhatsAppOpen(false)}
+				/>
+			)}
+		</div>
+	);
+}
 
 export default function RootLayout({
 	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
+}: {
+	children: ReactNode;
+}) {
 	return (
 		<ClerkProvider>
 			<MyRuntimeProvider>
 				<html lang='en' suppressHydrationWarning>
-					<head />
-					<body>
-						<ThemeProvider attribute='class' defaultTheme='system' enableSystem disableTransitionOnChange>
-							{children}
-						</ThemeProvider>
-					</body>
+				<body className={inter.className}>
+					<MainContent>{children}</MainContent>
+				</body>
 				</html>
 			</MyRuntimeProvider>
 		</ClerkProvider>
