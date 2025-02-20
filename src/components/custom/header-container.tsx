@@ -1,14 +1,15 @@
-import { Separator } from '../ui/separator';
+import { Separator } from "../ui/separator";
 
-export function HeaderContainer({
-	children,
-}: Readonly<{
-	children: React.ReactNode;
-}>) {
-	return (
-		<div>
-			{children}
-			<Separator className='mt-2' />
-		</div>
-	);
+interface HeaderContainerProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export function HeaderContainer({ children, className }: HeaderContainerProps) {
+  return (
+    <div className={className}>
+      {children}
+      <Separator className="mt-2" />
+    </div>
+  );
 }
