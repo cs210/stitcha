@@ -12,9 +12,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useClerk } from "@clerk/nextjs";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { signOut } = useClerk();
 
   // const handleSignOut = async () => {
   // 	try {
