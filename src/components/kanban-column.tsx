@@ -15,7 +15,7 @@ interface KanbanColumnProps {
 
 export function KanbanColumn({ title, id, products, seamstresses, onAssign, onDelete }: KanbanColumnProps) {
   return (
-    <div className="flex flex-col min-w-[350px] max-w-[350px]">
+    <div className="flex flex-col min-w-[350px] max-w-[350px] h-full">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">{title}</h2>
         <div className="flex gap-1">
@@ -32,7 +32,7 @@ export function KanbanColumn({ title, id, products, seamstresses, onAssign, onDe
           <div 
             {...provided.droppableProps} 
             ref={provided.innerRef} 
-            className="space-y-4 min-h-[200px] overflow-y-auto max-h-[calc(100vh-12rem)] p-1"
+            className="flex-1 space-y-4"
           >
             {products.map((product, index) => (
               <ProductCard

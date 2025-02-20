@@ -95,244 +95,278 @@ const createNewProduct = (): Product => ({
 	}),
 	assignees: [],
 	progress: '0/8',
-	description: '',
-	quantity: '0',
 });
 
+// Update the STATUS_MAPPING to have reverse mapping as well
+const STATUS_MAPPING = {
+	paraFazer: 'Not Started',
+	emAndamento: 'In Progress',
+	revisao: 'Done'
+} as const;
+
+const REVERSE_STATUS_MAPPING = {
+	'Not Started': 'paraFazer',
+	'In Progress': 'emAndamento',
+	'Done': 'revisao'
+} as const;
+
 export function KanbanBoard() {
-  const router = useRouter()
-  const [products, setProducts] = useState<Record<string, Product[]>>({
-    paraFazer: [],
-    emAndamento: [],
-    revisao: []
-  })
+	const router = useRouter()
+	const [products, setProducts] = useState<Record<string, Product[]>>({
+		paraFazer: [],
+		emAndamento: [],
+		revisao: []
+	})
 
-  // Fetch products from Supabase on mount
-  useEffect(() => {
-    const fetchProducts = async () => {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-      
-      if (error) {
-        console.error('Error fetching products:', error)
-        return
-      }
+	// Fetch products from Supabase on mount
+	useEffect(() => {
+		const fetchProducts = async () => {
+			const { data, error } = await supabase
+				.from('products')
+				.select('*')
+			
+			if (error) {
+				console.error('Error fetching products:', error)
+				return
+			}
 
-      // Organize products by status
-      const organized = data.reduce((acc, product) => {
-        const status = product.status || 'paraFazer'
-        return {
-          ...acc,
-          [status]: [...(acc[status] || []), {
-            id: product.id,
-            title: product.name || "Untitled",
-            // Handle both Supabase Storage URLs and local images
-            image: product.image_url,
-              // ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/${product.image_url}`
-              // : "/images/tote.png",
-            type: product.type || "Prototype",
-            date: new Date(product.created_at).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
-            }),
-            assignees: product.assignees || [],
-            progress: product.progress || "0/8",
-            description: product.description || "",
-            quantity: product.quantity?.toString() || "0"
-          }]
-        }
-      }, {
-        paraFazer: [],
-        emAndamento: [],
-        revisao: []
-      })
+			// Map status to column IDs
+			const getColumnId = (progress_level: string) => {
+				return REVERSE_STATUS_MAPPING[progress_level as keyof typeof REVERSE_STATUS_MAPPING] || 'paraFazer';
+			}
 
-      setProducts(organized)
-    }
+			// Organize products by status, ensuring we use the correct ID from Supabase
+			const organized = data.reduce((acc, product) => {
+				const columnId = getColumnId(product.progress_level)
+				return {
+					...acc,
+					[columnId]: [...(acc[columnId] || []), {
+						id: product.id.toString(), // Ensure ID is a string and from Supabase
+						title: product.name || "Untitled",
+						image: product.image_url,
+						type: product.type || "Prototype",
+						date: new Date(product.created_at).toLocaleDateString('en-US', {
+							month: 'short',
+							day: 'numeric',
+							year: 'numeric'
+						}),
+						assignees: product.assignees || [],
+						progress: product.progress_level || "Not Started",
+						description: product.description || "",
+						quantity: product.quantity?.toString() || "0"
+					}]
+				}
+			}, {
+				paraFazer: [],
+				emAndamento: [],
+				revisao: []
+			})
 
-    fetchProducts()
+			setProducts(organized)
+		}
 
-    // Subscribe to changes
-    const channel = supabase
-      .channel('products_changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'products' 
-      }, () => {
-        fetchProducts()
-      })
-      .subscribe()
+		fetchProducts()
 
-    return () => {
-      channel.unsubscribe()
-    }
-  }, [])
+		// Subscribe to changes
+		const channel = supabase
+			.channel('products_changes')
+			.on('postgres_changes', { 
+				event: '*', 
+				schema: 'public', 
+				table: 'products' 
+			}, () => {
+				fetchProducts()
+			})
+			.subscribe()
 
-  const onDragEnd = async (result: DropResult) => {
-    const { source, destination, draggableId } = result
-    if (!destination) return
+		return () => {
+			channel.unsubscribe()
+		}
+	}, [])
 
-    const newProducts = { ...products }
-    const sourceColumn = [...newProducts[source.droppableId]]
-    const destColumn = [...newProducts[destination.droppableId]]
-    const [removed] = sourceColumn.splice(source.index, 1)
-    destColumn.splice(destination.index, 0, removed)
+	const onDragEnd = async (result: DropResult) => {
+		const { source, destination, draggableId } = result
+		if (!destination) return
 
-    const updated = {
-      ...newProducts,
-      [source.droppableId]: sourceColumn,
-      [destination.droppableId]: destColumn,
-    }
+		const newProducts = { ...products }
+		const sourceColumn = [...newProducts[source.droppableId]]
+		const destColumn = [...newProducts[destination.droppableId]]
+		const [removed] = sourceColumn.splice(source.index, 1)
+		destColumn.splice(destination.index, 0, removed)
 
-    // Update local state
-    setProducts(updated)
+		const updated = {
+			...newProducts,
+			[source.droppableId]: sourceColumn,
+			[destination.droppableId]: destColumn,
+		}
 
-    // Update Supabase
-    try {
-      await supabase
-        .from('products')
-        .update({ status: destination.droppableId })
-        .eq('id', draggableId)
-    } catch (error) {
-      console.error('Error updating product status:', error)
-      // Optionally revert the state if the update fails
-      setProducts(newProducts)
-    }
-  }
+		// Update local state
+		setProducts(updated)
 
-  const deleteProduct = async (productId: string) => {
-    try {
-      await supabase
-        .from('products')
-        .delete()
-        .eq('id', productId)
+		// Update Supabase with new status
+		try {
+			const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING]
+			console.log(newStatus)
+      console.log(draggableId)
+			await supabase
+				.from('products')
+				.update({ 
+					progress_level: newStatus 
+				})
+				.eq('id', draggableId)
+		} catch (error) {
+			console.error('Error updating product status:', error)
+			setProducts(newProducts)
+		}
+	}
 
-      setProducts((prevProducts) => {
-        const updatedProducts = { ...prevProducts }
-        for (const columnId in updatedProducts) {
-          updatedProducts[columnId] = updatedProducts[columnId].filter(
-            (product) => product.id !== productId
-          )
-        }
-        return updatedProducts
-      })
-    } catch (error) {
-      console.error('Error deleting product:', error)
-    }
-  }
+	const deleteProduct = async (productId: string) => {
+		try {
+			console.log('Deleting product with ID:', productId)
+			const { error } = await supabase
+				.from('products')
+				.delete()
+				.eq('id', productId)  // Don't convert to number, keep as string UUID
 
-  const addNewProduct = async () => {
-    const defaultImage = "default-product.png" // Store a default image in your Supabase storage
-    
-    const newProduct = {
-      name: "Untitled",
-      image_url: defaultImage,
-      type: "Prototype",
-      status: "paraFazer",
-      created_at: new Date().toISOString(),
-      assignees: [],
-      progress: "0/8",
-      description: "",
-      quantity: 0
-    }
+			if (error) {
+				console.error('Supabase delete error:', error)
+				throw error
+			}
 
-    try {
-      const { data, error } = await supabase
-        .from('products')
-        .insert(newProduct)
-        .select()
-        .single()
+			// If successful, update local state
+			setProducts((prevProducts) => {
+				const updatedProducts = { ...prevProducts }
+				for (const columnId in updatedProducts) {
+					updatedProducts[columnId] = updatedProducts[columnId].filter(
+						(product) => product.id !== productId
+					)
+				}
+				return updatedProducts
+			})
+		} catch (error) {
+			console.error('Error deleting product:', error)
+			alert('Failed to delete product')
+		}
+	}
 
-      if (error) throw error
+	const addNewProduct = async () => {
+		const defaultImage = "default-product.png"
+		
+		const newProduct = {
+			name: "Untitled",
+			image_url: defaultImage,
+			type: "Prototype",
+			progress_level: "Not Started",
+			created_at: new Date().toISOString(),
+			assignees: [],
+			progress: "0/8",
+			description: "",
+			quantity: 0
+		}
 
-      router.push(`/edit/${data.id}`)
-    } catch (error) {
-      console.error('Error creating product:', error)
-    }
-  }
+		try {
+			const { data, error } = await supabase
+				.from('products')
+				.insert(newProduct)
+				.select()
+				.single()
 
-  const assignSeamstress = async (productId: string, seamstress: Seamstress) => {
-    try {
-      // Find the product to update its assignees
-      let productToUpdate = null
-      for (const column of Object.values(products)) {
-        const found = column.find(p => p.id === productId)
-        if (found) {
-          productToUpdate = found
-          break
-        }
-      }
+			if (error) throw error
+			router.push(`/edit/${data.id}`)
+		} catch (error) {
+			console.error('Error creating product:', error)
+		}
+	}
 
-      if (!productToUpdate) return
+	const assignSeamstress = async (productId: string, seamstress: Seamstress) => {
+		try {
+			// Find the product to update its assignees
+			let productToUpdate = null
+			for (const column of Object.values(products)) {
+				const found = column.find(p => p.id === productId)
+				if (found) {
+					productToUpdate = found
+					break
+				}
+			}
 
-      // Create new assignees array without duplicates
-      const newAssignees = productToUpdate.assignees.some(a => a.id === seamstress.id)
-        ? productToUpdate.assignees
-        : [...productToUpdate.assignees, seamstress]
+			if (!productToUpdate) return
 
-      // Update Supabase
-      const { error } = await supabase
-        .from('products')
-        .update({ assignees: newAssignees })
-        .eq('id', productId)
+			// Create new assignees array without duplicates
+			const newAssignees = productToUpdate.assignees.some(a => a.id === seamstress.id)
+				? productToUpdate.assignees
+				: [...productToUpdate.assignees, seamstress]
 
-      if (error) throw error
+			// Update Supabase
+			const { error } = await supabase
+				.from('products')
+				.update({ assignees: newAssignees })
+				.eq('id', productId)
 
-      // Update local state
-      setProducts(prevProducts => {
-        const updatedProducts = { ...prevProducts }
-        for (const columnId in updatedProducts) {
-          updatedProducts[columnId] = updatedProducts[columnId].map(product => 
-            product.id === productId
-              ? { ...product, assignees: newAssignees }
-              : product
-          )
-        }
-        return updatedProducts
-      })
-    } catch (error) {
-      console.error('Error assigning seamstress:', error)
-    }
-  }
+			if (error) throw error
+
+			// Update local state
+			setProducts(prevProducts => {
+				const updatedProducts = { ...prevProducts }
+				for (const columnId in updatedProducts) {
+					updatedProducts[columnId] = updatedProducts[columnId].map(product => 
+						product.id === productId
+							? { ...product, assignees: newAssignees }
+							: product
+					)
+				}
+				return updatedProducts
+			})
+		} catch (error) {
+			console.error('Error assigning seamstress:', error)
+		}
+	}
 
 	return (
-		<div className='h-[calc(100vh-2rem)] p-6 flex flex-col'>
-			<div className='mb-6 flex items-center justify-between'>
-				<h1 className='text-2xl font-bold'>Produtos</h1>
-				<Button size='default' variant='ghost' className='rounded-full hover:bg-primary hover:text-white px-6' onClick={addNewProduct}>
-					<Plus className='h-5 w-5 mr-2' />
-					Add Product
-				</Button>
+		<div className="h-screen flex flex-col">
+			<div className="p-6 pb-2">
+				<div className="flex items-center justify-between">
+					<h1 className="text-2xl font-bold">Produtos</h1>
+					<Button 
+						size="default"
+						variant="ghost" 
+						className="rounded-full hover:bg-primary hover:text-white px-6"
+						onClick={addNewProduct}
+					>
+						<Plus className="h-5 w-5 mr-2" />
+						Add Product
+					</Button>
+				</div>
 			</div>
+
 			<DragDropContext onDragEnd={onDragEnd}>
-				<div className='flex gap-6 overflow-x-auto pb-4 min-h-0 flex-1'>
-					<KanbanColumn
-						title='Para Fazer'
-						id='paraFazer'
-						products={products.paraFazer}
-						seamstresses={seamstresses}
-						onAssign={assignSeamstress}
-						onDelete={deleteProduct}
-					/>
-					<KanbanColumn
-						title='Em Andamento'
-						id='emAndamento'
-						products={products.emAndamento}
-						seamstresses={seamstresses}
-						onAssign={assignSeamstress}
-						onDelete={deleteProduct}
-					/>
-					<KanbanColumn
-						title='Revisão'
-						id='revisao'
-						products={products.revisao}
-						seamstresses={seamstresses}
-						onAssign={assignSeamstress}
-						onDelete={deleteProduct}
-					/>
+				<div className="flex-1 overflow-x-auto">
+					<div className="flex gap-6 p-6 pt-0 h-full">
+						<KanbanColumn
+							title="Not Started"
+							id="paraFazer"
+							products={products.paraFazer}
+							seamstresses={seamstresses}
+							onAssign={assignSeamstress}
+							onDelete={deleteProduct}
+						/>
+						<KanbanColumn
+							title="In Progress"
+							id="emAndamento"
+							products={products.emAndamento}
+							seamstresses={seamstresses}
+							onAssign={assignSeamstress}
+							onDelete={deleteProduct}
+						/>
+						<KanbanColumn
+							title="Done"
+							id="revisao"
+							products={products.revisao}
+							seamstresses={seamstresses}
+							onAssign={assignSeamstress}
+							onDelete={deleteProduct}
+						/>
+					</div>
 				</div>
 			</DragDropContext>
 		</div>

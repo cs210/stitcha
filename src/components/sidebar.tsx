@@ -18,15 +18,6 @@ export function Sidebar() {
   const pathname = usePathname();
   const { signOut } = useClerk();
 
-  // const handleSignOut = async () => {
-  // 	try {
-  // 		await signOut()
-  // 		// Let Clerk handle the redirect after sign out
-  // 	} catch (error) {
-  // 		console.error('Error signing out:', error)
-  // 	}
-  // }
-
   return (
     <div className="flex h-full w-[72px] flex-col items-center border-r px-3 py-4">
       <div className="flex flex-col gap-4">
@@ -69,8 +60,11 @@ export function Sidebar() {
         <Button
           variant="ghost"
           size="icon"
-          className="h-10 w-10"
-          onClick={() => signOut({ redirectUrl: "/" })}
+          className={cn(
+            "h-10 w-10",
+            "hover:bg-primary hover:text-white"
+          )}
+          onClick={() => signOut({ redirectUrl: "/sign-in" })}
         >
           <LogOut className="h-5 w-5" />
         </Button>
