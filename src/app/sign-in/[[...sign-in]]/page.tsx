@@ -7,19 +7,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import * as Clerk from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
+import Image from 'next/image';
 
 export default function SignInPage() {
 	return (
-		<div className='grid w-full grow items-center px-4 sm:justify-center'>
+		<div className='min-h-screen flex items-center justify-center'>
 			<SignIn.Root>
 				<Clerk.Loading>
 					{(isGlobalLoading) => (
 						<>
 							<SignIn.Step name='start'>
-								<Card className='w-full sm:w-96'>
+								<Card className='w-full max-w-sm mx-auto'>
 									<CardHeader className='text-center'>
+										{/* <div className="flex justify-center pb-4">
+											<Image src='/images/logo.png' alt='Stitcha' width={100} height={100} />
+										</div> */}
 										<CardTitle>Sign in to Stitcha</CardTitle>
-										<CardDescription>Welcome back! Please sign in to continue</CardDescription>
+										<CardDescription>Welcome back! Please sign in to continue.</CardDescription>
 									</CardHeader>
 									<CardContent className='grid gap-y-4'>
 										<Clerk.Field name='identifier' className='space-y-2'>
