@@ -6,6 +6,7 @@ import { ClipboardIcon, LayoutGridIcon, LogOut, Settings2Icon, ShoppingCart, Use
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { UserButton } from '@clerk/nextjs';
 
 export function Sidebar() {
 	const pathname = usePathname();
@@ -20,8 +21,21 @@ export function Sidebar() {
 	};
 
 	return (
-		<div className='flex h-full w-[72px] flex-col items-center border-r px-3 py-4'>
+		<div className='flex h-full w-[72px] flex-col items-center border-r px-3 py-5'>
 			<div className='flex flex-col gap-4'>
+        <TooltipProvider>
+					<Tooltip>
+						<TooltipTrigger>
+              <UserButton/> 
+							{/* <Button variant='ghost' size='icon' className={cn('h-10 w-10', pathname === '/sign-in/[[...sign-in]]' && 'bg-primary text-white')} asChild>
+								<LogOut className='h-5 w-5' />
+							</Button> */}
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Sign out</p>
+						</TooltipContent>
+					</Tooltip>
+				</TooltipProvider>
 				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger>
@@ -89,18 +103,6 @@ export function Sidebar() {
 						</TooltipTrigger>
 						<TooltipContent>
 							<p>Settings</p>
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger>
-							<Button variant='ghost' size='icon' className='h-10 w-10' onClick={handleSignOut} asChild>
-								<LogOut className='h-5 w-5' />
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Sign out</p>
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
