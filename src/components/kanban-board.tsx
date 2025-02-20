@@ -1,26 +1,12 @@
 "use client"
 
 import { DragDropContext } from "@hello-pangea/dnd"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { KanbanColumn } from "./kanban-column"
 import { Plus } from "lucide-react"
 import { Button } from "./ui/button"
-
-type Seamstress = {
-  id: string
-  name: string
-  avatar: string
-}
-
-type Product = {
-  id: string
-  title: string
-  image: string
-  type: string
-  date: string
-  assignees: Seamstress[]
-  progress: string
-}
+import type { DropResult } from "@hello-pangea/dnd"
+import type { Product, Seamstress } from "@/types/kanban"
 
 const seamstresses: Seamstress[] = [
   {
@@ -55,13 +41,13 @@ const seamstresses: Seamstress[] = [
   },
 ]
 
-const initialProducts: Record<string, Product[]> = {
+export const initialProducts: Record<string, Product[]> = {
   paraFazer: [
     {
       id: "2",
       title: "Prototypes for a Bag", 
       image: "/images/tote.png",
-      type: "Research",
+      type: "Prototype",
       date: "Aug 20, 2021",
       assignees: [seamstresses[2]],
       progress: "0/8",
@@ -71,7 +57,7 @@ const initialProducts: Record<string, Product[]> = {
       title: "Brown Fluffy Blanket",
       image:
         "/images/blanket.png",
-      type: "Content",
+      type: "Prototype",
       date: "Aug 16, 2021",
       assignees: [seamstresses[3], seamstresses[4]],
       progress: "0/8",
@@ -83,7 +69,7 @@ const initialProducts: Record<string, Product[]> = {
       title: "Black Plain T-Shirt",
       image:
         "/images/shirt.png",
-      type: "Design",
+      type: "Prototype",
       date: "Aug 20, 2021",
       assignees: [seamstresses[0], seamstresses[2]],
       progress: "0/8",
@@ -95,7 +81,7 @@ const initialProducts: Record<string, Product[]> = {
       title: "Red Long-Sleeve Shirt",
       image:
         "/images/sweater.png",
-      type: "Content",
+      type: "Prototype",
       date: "Aug 16, 2021",
       assignees: [seamstresses[1], seamstresses[4]],
       progress: "0/8",
@@ -104,22 +90,59 @@ const initialProducts: Record<string, Product[]> = {
 }
 
 export function KanbanBoard() {
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState<Record<string, Product[]>>(initialProducts)
 
-  const onDragEnd = (result: any) => {
+  // Load initial state from localStorage
+  useEffect(() => {
+    const savedProducts = localStorage.getItem('kanbanProducts')
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts))
+    }
+  }, [])
+
+  // Listen for changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'kanbanProducts' && e.newValue) {
+        setProducts(JSON.parse(e.newValue))
+      }
+    }
+
+    // Also listen for custom events for same-window updates
+    const handleCustomEvent = () => {
+      const savedProducts = localStorage.getItem('kanbanProducts')
+      if (savedProducts) {
+        setProducts(JSON.parse(savedProducts))
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('productUpdated', handleCustomEvent)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('productUpdated', handleCustomEvent)
+    }
+  }, [])
+
+  const onDragEnd = (result: DropResult) => {
     const { source, destination } = result
     if (!destination) return
 
-    const sourceColumn = products[source.droppableId]
-    const destColumn = products[destination.droppableId]
+    const newProducts = { ...products }
+    const sourceColumn = [...newProducts[source.droppableId]]
+    const destColumn = [...newProducts[destination.droppableId]]
     const [removed] = sourceColumn.splice(source.index, 1)
     destColumn.splice(destination.index, 0, removed)
 
-    setProducts({
-      ...products,
+    const updated = {
+      ...newProducts,
       [source.droppableId]: sourceColumn,
       [destination.droppableId]: destColumn,
-    })
+    }
+
+    setProducts(updated)
+    localStorage.setItem('kanbanProducts', JSON.stringify(updated))
   }
 
   const assignSeamstress = (productId: string, seamstress: Seamstress) => {
@@ -139,7 +162,7 @@ export function KanbanBoard() {
   }
 
   return (
-    <div className="flex-1 overflow-x-auto p-6">
+    <div className="h-[calc(100vh-2rem)] p-6 flex flex-col">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Produtos</h1>
         <Button size="icon" variant="ghost" className="rounded-full">
@@ -147,7 +170,7 @@ export function KanbanBoard() {
         </Button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6">
+        <div className="flex gap-6 overflow-x-auto pb-4 min-h-0 flex-1">
           <KanbanColumn
             title="Para Fazer"
             id="paraFazer"

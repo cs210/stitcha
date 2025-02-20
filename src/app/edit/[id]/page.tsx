@@ -9,86 +9,163 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { seamstresses } from "@/types/seamstress"
 import Image from "next/image"
-import { useState, ChangeEvent, useRef } from "react"
+import { useState, ChangeEvent, useRef, use } from "react"
 import { useRouter } from "next/navigation"
-import { Clock, User, Upload } from "lucide-react"
+import { Clock, User, Upload, ArrowLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { initialProducts } from "@/components/kanban-board"
 
-interface EditFormData {
-  title: string;
-  seamstress: string;
-  description: string;
-  quantity: string;
-  type: string;
-  date: string;
-  image: string;
-  technicalSheets: string[];
+interface Product {
+  id: string
+  title: string
+  image: string
+  type: string
+  date: string
+  assignees: Array<{
+    id: string
+    name: string
+    avatar: string
+  }>
+  progress: string
+  description?: string
+  quantity?: string
+  technicalSheets?: string[]
 }
 
-export default function EditPage({ params }: { params: { id: string } }) {
-  const router = useRouter();
-  const imageInputRef = useRef<HTMLInputElement>(null);
-  const techSheetsInputRef = useRef<HTMLInputElement>(null);
+interface EditFormData extends Omit<Product, 'id' | 'assignees' | 'progress'> {
+  seamstress: string
+}
+
+interface EditPageProps {
+  params: Promise<{ id: string }>
+}
+
+export default function EditPage({ params }: EditPageProps) {
+  const { id } = use(params)
+  const router = useRouter()
+  const imageInputRef = useRef<HTMLInputElement>(null)
+  const techSheetsInputRef = useRef<HTMLInputElement>(null)
   
-  const [formData, setFormData] = useState<EditFormData>({
-    title: "Green Reusable Tote Bag",
-    seamstress: "",
-    description: "",
-    quantity: "",
-    type: "Prototype",
-    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-    image: "/images/tote.png",
-    technicalSheets: []
-  });
+  // Find the product in all columns
+  const findProduct = () => {
+    const columns = ['paraFazer', 'emAndamento', 'revisao']
+    let foundProduct: Product | null = null
+    
+    columns.forEach(column => {
+      const products = JSON.parse(localStorage.getItem('kanbanProducts') || '{}')
+      const columnProducts = products[column] || initialProducts[column]
+      const product = columnProducts.find((p: Product) => p.id === id)
+      if (product) foundProduct = product
+    })
+    
+    return foundProduct
+  }
 
-  const [imagePreview, setImagePreview] = useState(formData.image);
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [formData, setFormData] = useState<EditFormData>(() => {
+    const product = findProduct()
+    if (!product) {
+      router.push('/kanban')
+      return {
+        title: "",
+        seamstress: "",
+        description: "",
+        quantity: "",
+        type: "",
+        date: new Date().toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        }),
+        image: "",
+        technicalSheets: []
+      }
+    }
 
-  const selectedSeamstress = seamstresses.find(s => s.id.toString() === formData.seamstress);
+    return {
+      title: product.title,
+      seamstress: product.assignees[0]?.id || "",
+      description: product.description || "",
+      quantity: product.quantity || "",
+      type: product.type,
+      date: product.date,
+      image: product.image,
+      technicalSheets: product.technicalSheets || []
+    }
+  })
+
+  const [imagePreview, setImagePreview] = useState(formData.image)
+  const [selectedFiles, setSelectedFiles] = useState<string[]>([])
+
+  const selectedSeamstress = seamstresses.find(s => s.id.toString() === formData.seamstress)
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>, isProductImage: boolean) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
       if (file.size > 300000) { // 300KB limit
-        alert("File size should be less than 300KB");
-        return;
+        alert("File size should be less than 300KB")
+        return
       }
 
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        const base64String = reader.result as string;
+        const base64String = reader.result as string
         if (isProductImage) {
-          setImagePreview(base64String);
-          setFormData(prev => ({ ...prev, image: base64String }));
+          setImagePreview(base64String)
+          setFormData(prev => ({ ...prev, image: base64String }))
         } else {
-          const fileName = file.name;
-          setSelectedFiles(prev => [...prev, fileName]);
+          const fileName = file.name
+          setSelectedFiles(prev => [...prev, fileName])
           setFormData(prev => ({
             ...prev,
             technicalSheets: [...prev.technicalSheets, base64String]
-          }));
+          }))
         }
-      };
-      reader.readAsDataURL(file);
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleSave = async () => {
     try {
-      const existingProducts = JSON.parse(localStorage.getItem('products') || '{}');
-      existingProducts[params.id] = {
-        ...existingProducts[params.id],
-        ...formData,
-      };
-      localStorage.setItem('products', JSON.stringify(existingProducts));
-      router.push('/kanban');
+      const columns = ['paraFazer', 'emAndamento', 'revisao']
+      const products = JSON.parse(localStorage.getItem('kanbanProducts') || '{}')
+      
+      columns.forEach(column => {
+        const columnProducts = products[column] || initialProducts[column]
+        const productIndex = columnProducts.findIndex((p: Product) => p.id === id)
+        
+        if (productIndex !== -1) {
+          const selectedSeamstress = seamstresses.find(s => s.id === formData.seamstress)
+          columnProducts[productIndex] = {
+            ...columnProducts[productIndex],
+            ...formData,
+            assignees: selectedSeamstress ? [selectedSeamstress] : columnProducts[productIndex].assignees
+          }
+        }
+      })
+
+      localStorage.setItem('kanbanProducts', JSON.stringify(products))
+      router.push('/kanban')
+      window.dispatchEvent(new Event('storage'))
     } catch (error) {
-      console.error('Error saving changes:', error);
+      console.error('Error saving changes:', error)
     }
-  };
+  }
 
   return (
     <div className="container mx-auto p-6">
+      <div className="flex items-center gap-4 mb-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => router.back()}
+          className="rounded-full"
+        >
+          <ArrowLeft className="h-4 w-4" />
+        </Button>
+        <h1 className="text-2xl font-bold">Edit Product</h1>
+      </div>
+      
       <div className="grid grid-cols-2 gap-6">
         {/* Left Column - Product Preview */}
         <div>
@@ -264,6 +341,6 @@ export default function EditPage({ params }: { params: { id: string } }) {
         </div>
       </div>
     </div>
-  );
+  )
 }
 

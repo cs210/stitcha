@@ -1,25 +1,11 @@
 import { Draggable } from "@hello-pangea/dnd"
-import { Clock, User } from "lucide-react"
+import { Clock, User, Pencil } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-
-interface Assignee {
-  name: string
-  avatar: string
-}
-
-interface Product {
-  id: string
-  image: string
-  title: string
-  type: string
-  date: string
-  progress: string
-  assignees: Assignee[]
-}
+import type { Product } from "@/types/kanban"
 
 interface ProductCardProps {
   product: Product
@@ -42,10 +28,10 @@ export function ProductCard({ product, index }: ProductCardProps) {
           <Button
             size="sm"
             variant="ghost"
-            className="absolute top-1 right-1 text-gray-400 hover:text-gray-600 px-2 py-1"
+            className="absolute top-1 right-1 text-gray-400 hover:text-gray-600"
             onClick={() => router.push(`/edit/${product.id}`)}
           >
-            Edit
+            <Pencil className="h-4 w-4" />
           </Button>
           <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
             <Image 
@@ -55,7 +41,7 @@ export function ProductCard({ product, index }: ProductCardProps) {
               className="object-cover" 
             />
           </div>
-          <Badge variant="secondary" className="bg-blue-50 text-blue-600">
+          <Badge variant="secondary" className="bg-orange-100 text-orange-600">
             {product.type}
           </Badge>
           <h3 className="font-medium">{product.title}</h3>
@@ -64,22 +50,29 @@ export function ProductCard({ product, index }: ProductCardProps) {
               <Clock className="w-4 h-4" />
               {product.date}
             </div>
-            <div className="flex items-center gap-1">
-              <User className="w-4 h-4" />
-              <span>{assignedSeamstress.name}</span>
-            </div>
+            {assignedSeamstress && (
+              <div className="flex items-center gap-1">
+                <User className="w-4 h-4" />
+                <span>{assignedSeamstress.name}</span>
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <div>{product.progress}</div>
+            <div>{product.quantity ? `${product.quantity} units` : product.progress}</div>
             <div className="flex -space-x-2">
-              {product.assignees.map((assignee: Assignee, i: number) => (
+              {product.assignees.map((assignee, i) => (
                 <Avatar key={i} className="border-2 border-white w-6 h-6">
-                  <AvatarImage src={assignee.avatar.startsWith('/') ? assignee.avatar : `/images/${assignee.avatar}`} />
+                  <AvatarImage 
+                    src={assignee.avatar.startsWith('/') ? assignee.avatar : `/images/${assignee.avatar}`} 
+                  />
                   <AvatarFallback>{assignee.name[0]}</AvatarFallback>
                 </Avatar>
               ))}
             </div>
           </div>
+          {product.description && (
+            <p className="text-sm text-gray-500">{product.description}</p>
+          )}
         </div>
       )}
     </Draggable>
