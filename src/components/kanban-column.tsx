@@ -39,8 +39,6 @@ export function KanbanColumn({ title, id, products, seamstresses, onAssign, onDe
                 key={product.id}
                 product={product}
                 index={index}
-                seamstresses={seamstresses}
-                onAssign={onAssign}
                 onDelete={onDelete}
               />
             ))}

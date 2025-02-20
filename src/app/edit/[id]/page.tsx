@@ -1,38 +1,23 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useUser } from "@clerk/nextjs"
 import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { seamstresses } from "@/types/seamstress"
 import Image from "next/image"
-import { useState, ChangeEvent, useRef, use } from "react"
+import { useState, ChangeEvent, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Clock, User, Upload, ArrowLeft } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { initialProducts } from "@/components/kanban-board"
+import type { Product } from "@/types/kanban"
+import { Card } from "@/components/ui/card"
+import { use } from "react"
 
-interface Product {
-  id: string
-  title: string
-  image: string
-  type: string
-  date: string
-  assignees: Array<{
-    id: string
-    name: string
-    avatar: string
-  }>
-  progress: string
-  description?: string
-  quantity?: string
-  technicalSheets?: string[]
-}
-
-interface EditFormData extends Omit<Product, 'id' | 'assignees' | 'progress'> {
+interface EditFormData extends Product {
   seamstress: string
 }
 
@@ -52,7 +37,7 @@ export default function EditPage({ params }: EditPageProps) {
     let product = null
 
     // Search for the product in all columns
-    for (const column of Object.values(savedProducts)) {
+    for (const column of Object.values(savedProducts) as Product[][]) {
       const found = column.find((p: Product) => p.id === id)
       if (found) {
         product = found

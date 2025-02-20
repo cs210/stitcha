@@ -19,9 +19,9 @@ export default function SignInPage() {
 							<SignIn.Step name='start'>
 								<Card className='w-full max-w-sm mx-auto'>
 									<CardHeader className='text-center'>
-										<div className="flex justify-center pb-4">
+										{/* <div className="flex justify-center pb-4">
 											<Image src='/images/logo.png' alt='Stitcha' width={100} height={100} />
-										</div>
+										</div> */}
 										<CardTitle>Sign in to Stitcha</CardTitle>
 										<CardDescription>Welcome back! Please sign in to continue.</CardDescription>
 									</CardHeader>
