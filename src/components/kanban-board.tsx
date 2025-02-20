@@ -8,6 +8,7 @@ import { Button } from "./ui/button"
 import type { DropResult } from "@hello-pangea/dnd"
 import type { Product, Seamstress } from "@/types/kanban"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase"
 
 const seamstresses: Seamstress[] = [
   {
@@ -108,43 +109,78 @@ const createNewProduct = (): Product => ({
 
 export function KanbanBoard() {
   const router = useRouter()
-  const [products, setProducts] = useState<Record<string, Product[]>>(initialProducts)
+  const [products, setProducts] = useState<Record<string, Product[]>>({
+    paraFazer: [],
+    emAndamento: [],
+    revisao: []
+  })
 
-  // Load initial state from localStorage
+  // Fetch products from Supabase on mount
   useEffect(() => {
-    const savedProducts = localStorage.getItem('kanbanProducts')
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts))
-    }
-  }, [])
-
-  // Listen for changes in localStorage
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'kanbanProducts' && e.newValue) {
-        setProducts(JSON.parse(e.newValue))
+    const fetchProducts = async () => {
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+      
+      if (error) {
+        console.error('Error fetching products:', error)
+        return
       }
+
+      // Organize products by status
+      const organized = data.reduce((acc, product) => {
+        const status = product.status || 'paraFazer'
+        return {
+          ...acc,
+          [status]: [...(acc[status] || []), {
+            id: product.id,
+            title: product.name || "Untitled",
+            // Handle both Supabase Storage URLs and local images
+            image: product.image_url,
+              // ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/products/${product.image_url}`
+              // : "/images/tote.png",
+            type: product.type || "Prototype",
+            date: new Date(product.created_at).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric'
+            }),
+            assignees: product.assignees || [],
+            progress: product.progress || "0/8",
+            description: product.description || "",
+            quantity: product.quantity?.toString() || "0"
+          }]
+        }
+      }, {
+        paraFazer: [],
+        emAndamento: [],
+        revisao: []
+      })
+
+      setProducts(organized)
     }
 
-    // Also listen for custom events for same-window updates
-    const handleCustomEvent = () => {
-      const savedProducts = localStorage.getItem('kanbanProducts')
-      if (savedProducts) {
-        setProducts(JSON.parse(savedProducts))
-      }
-    }
+    fetchProducts()
 
-    window.addEventListener('storage', handleStorageChange)
-    window.addEventListener('productUpdated', handleCustomEvent)
-    
+    // Subscribe to changes
+    const channel = supabase
+      .channel('products_changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'products' 
+      }, () => {
+        fetchProducts()
+      })
+      .subscribe()
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange)
-      window.removeEventListener('productUpdated', handleCustomEvent)
+      channel.unsubscribe()
     }
   }, [])
 
-  const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result
+  const onDragEnd = async (result: DropResult) => {
+    const { source, destination, draggableId } = result
     if (!destination) return
 
     const newProducts = { ...products }
@@ -159,56 +195,115 @@ export function KanbanBoard() {
       [destination.droppableId]: destColumn,
     }
 
+    // Update local state
     setProducts(updated)
-    localStorage.setItem('kanbanProducts', JSON.stringify(updated))
+
+    // Update Supabase
+    try {
+      await supabase
+        .from('products')
+        .update({ status: destination.droppableId })
+        .eq('id', draggableId)
+    } catch (error) {
+      console.error('Error updating product status:', error)
+      // Optionally revert the state if the update fails
+      setProducts(newProducts)
+    }
   }
 
-  const assignSeamstress = (productId: string, seamstress: Seamstress) => {
-    setProducts((prevProducts) => {
-      const updatedProducts = { ...prevProducts }
-      for (const column of Object.values(updatedProducts)) {
-        const product = column.find((p) => p.id === productId)
-        if (product) {
-          if (!product.assignees.some((a) => a.id === seamstress.id)) {
-            product.assignees = [...product.assignees, seamstress]
-          }
+  const deleteProduct = async (productId: string) => {
+    try {
+      await supabase
+        .from('products')
+        .delete()
+        .eq('id', productId)
+
+      setProducts((prevProducts) => {
+        const updatedProducts = { ...prevProducts }
+        for (const columnId in updatedProducts) {
+          updatedProducts[columnId] = updatedProducts[columnId].filter(
+            (product) => product.id !== productId
+          )
+        }
+        return updatedProducts
+      })
+    } catch (error) {
+      console.error('Error deleting product:', error)
+    }
+  }
+
+  const addNewProduct = async () => {
+    const defaultImage = "default-product.png" // Store a default image in your Supabase storage
+    
+    const newProduct = {
+      name: "Untitled",
+      image_url: defaultImage,
+      type: "Prototype",
+      status: "paraFazer",
+      created_at: new Date().toISOString(),
+      assignees: [],
+      progress: "0/8",
+      description: "",
+      quantity: 0
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('products')
+        .insert(newProduct)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      router.push(`/edit/${data.id}`)
+    } catch (error) {
+      console.error('Error creating product:', error)
+    }
+  }
+
+  const assignSeamstress = async (productId: string, seamstress: Seamstress) => {
+    try {
+      // Find the product to update its assignees
+      let productToUpdate = null
+      for (const column of Object.values(products)) {
+        const found = column.find(p => p.id === productId)
+        if (found) {
+          productToUpdate = found
           break
         }
       }
-      return updatedProducts
-    })
-  }
 
-  const deleteProduct = (productId: string) => {
-    setProducts((prevProducts) => {
-      const updatedProducts = { ...prevProducts }
-      
-      // Find and remove the product from its column
-      for (const columnId in updatedProducts) {
-        updatedProducts[columnId] = updatedProducts[columnId].filter(
-          (product) => product.id !== productId
-        )
-      }
+      if (!productToUpdate) return
 
-      // Save to localStorage
-      localStorage.setItem('kanbanProducts', JSON.stringify(updatedProducts))
-      return updatedProducts
-    })
-  }
+      // Create new assignees array without duplicates
+      const newAssignees = productToUpdate.assignees.some(a => a.id === seamstress.id)
+        ? productToUpdate.assignees
+        : [...productToUpdate.assignees, seamstress]
 
-  const addNewProduct = () => {
-    const newProduct = createNewProduct()
-    setProducts(prevProducts => {
-      const updated = {
-        ...prevProducts,
-        paraFazer: [...prevProducts.paraFazer, newProduct]
-      }
-      localStorage.setItem('kanbanProducts', JSON.stringify(updated))
-      return updated
-    })
+      // Update Supabase
+      const { error } = await supabase
+        .from('products')
+        .update({ assignees: newAssignees })
+        .eq('id', productId)
 
-    // Redirect to edit page immediately
-    router.push(`/edit/${newProduct.id}`)
+      if (error) throw error
+
+      // Update local state
+      setProducts(prevProducts => {
+        const updatedProducts = { ...prevProducts }
+        for (const columnId in updatedProducts) {
+          updatedProducts[columnId] = updatedProducts[columnId].map(product => 
+            product.id === productId
+              ? { ...product, assignees: newAssignees }
+              : product
+          )
+        }
+        return updatedProducts
+      })
+    } catch (error) {
+      console.error('Error assigning seamstress:', error)
+    }
   }
 
   return (

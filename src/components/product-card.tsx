@@ -46,10 +46,12 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
           </div>
           <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
             <Image 
-              src={product.image.startsWith('/') ? product.image : `/images/${product.image}`} 
-              alt={product.title} 
-              fill 
-              className="object-cover" 
+              src={product.image}
+              alt={product.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={index < 2}
             />
           </div>
           <Badge variant="secondary" className="bg-orange-100 text-orange-600">
