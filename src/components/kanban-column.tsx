@@ -10,9 +10,10 @@ interface KanbanColumnProps {
   products: Product[]
   seamstresses: Seamstress[]
   onAssign: (productId: string, seamstress: Seamstress) => void
+  onDelete: (productId: string) => void
 }
 
-export function KanbanColumn({ title, id, products, seamstresses, onAssign }: KanbanColumnProps) {
+export function KanbanColumn({ title, id, products, seamstresses, onAssign, onDelete }: KanbanColumnProps) {
   return (
     <div className="flex flex-col min-w-[350px] max-w-[350px]">
       <div className="flex items-center justify-between mb-4">
@@ -40,6 +41,7 @@ export function KanbanColumn({ title, id, products, seamstresses, onAssign }: Ka
                 index={index}
                 seamstresses={seamstresses}
                 onAssign={onAssign}
+                onDelete={onDelete}
               />
             ))}
             {provided.placeholder}

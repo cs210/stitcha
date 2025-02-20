@@ -32,12 +32,12 @@ export default function SeamstressesPage() {
         {/* Main Content Area */}
         <main className="p-6">
           <div className="max-w-7xl mx-auto">
-            <h1 className="text-2xl font-bold mb-8">Seamstresses</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <h1 className="text-2xl font-bold mb-8">Costureiras</h1>
+            <div className="flex flex-wrap gap-6">
               {seamstresses.map((seamstress) => (
                 <div
                   key={seamstress.id}
-                  className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow w-[300px]"
                 >
                   <div className="flex flex-col items-center text-center mb-6">
                     <div className="w-32 h-32 rounded-full overflow-hidden mb-4">

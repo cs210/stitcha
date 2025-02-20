@@ -7,6 +7,7 @@ import { Plus } from "lucide-react"
 import { Button } from "./ui/button"
 import type { DropResult } from "@hello-pangea/dnd"
 import type { Product, Seamstress } from "@/types/kanban"
+import { useRouter } from "next/navigation"
 
 const seamstresses: Seamstress[] = [
   {
@@ -44,7 +45,7 @@ const seamstresses: Seamstress[] = [
 export const initialProducts: Record<string, Product[]> = {
   paraFazer: [
     {
-      id: "2",
+      id: "product_1",
       title: "Prototypes for a Bag", 
       image: "/images/tote.png",
       type: "Prototype",
@@ -53,7 +54,7 @@ export const initialProducts: Record<string, Product[]> = {
       progress: "0/8",
     },
     {
-      id: "3",
+      id: "product_2",
       title: "Brown Fluffy Blanket",
       image:
         "/images/blanket.png",
@@ -65,7 +66,7 @@ export const initialProducts: Record<string, Product[]> = {
   ],
   emAndamento: [
     {
-      id: "4",
+      id: "product_3",
       title: "Black Plain T-Shirt",
       image:
         "/images/shirt.png",
@@ -77,7 +78,7 @@ export const initialProducts: Record<string, Product[]> = {
   ],
   revisao: [
     {
-      id: "5",
+      id: "product_4",
       title: "Red Long-Sleeve Shirt",
       image:
         "/images/sweater.png",
@@ -89,7 +90,24 @@ export const initialProducts: Record<string, Product[]> = {
   ],
 }
 
+const createNewProduct = (): Product => ({
+  id: `product_${Date.now()}`,
+  title: "Untitled",
+  image: "/images/tote.png",
+  type: "Prototype",
+  date: new Date().toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  }),
+  assignees: [],
+  progress: "0/8",
+  description: "",
+  quantity: "0"
+})
+
 export function KanbanBoard() {
+  const router = useRouter()
   const [products, setProducts] = useState<Record<string, Product[]>>(initialProducts)
 
   // Load initial state from localStorage
@@ -161,12 +179,50 @@ export function KanbanBoard() {
     })
   }
 
+  const deleteProduct = (productId: string) => {
+    setProducts((prevProducts) => {
+      const updatedProducts = { ...prevProducts }
+      
+      // Find and remove the product from its column
+      for (const columnId in updatedProducts) {
+        updatedProducts[columnId] = updatedProducts[columnId].filter(
+          (product) => product.id !== productId
+        )
+      }
+
+      // Save to localStorage
+      localStorage.setItem('kanbanProducts', JSON.stringify(updatedProducts))
+      return updatedProducts
+    })
+  }
+
+  const addNewProduct = () => {
+    const newProduct = createNewProduct()
+    setProducts(prevProducts => {
+      const updated = {
+        ...prevProducts,
+        paraFazer: [...prevProducts.paraFazer, newProduct]
+      }
+      localStorage.setItem('kanbanProducts', JSON.stringify(updated))
+      return updated
+    })
+
+    // Redirect to edit page immediately
+    router.push(`/edit/${newProduct.id}`)
+  }
+
   return (
     <div className="h-[calc(100vh-2rem)] p-6 flex flex-col">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Produtos</h1>
-        <Button size="icon" variant="ghost" className="rounded-full">
-          <Plus className="h-4 w-4" />
+        <Button 
+          size="default"
+          variant="ghost"
+          className="rounded-full hover:bg-primary hover:text-white px-6"
+          onClick={addNewProduct}
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Add Product
         </Button>
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -177,6 +233,7 @@ export function KanbanBoard() {
             products={products.paraFazer}
             seamstresses={seamstresses}
             onAssign={assignSeamstress}
+            onDelete={deleteProduct}
           />
           <KanbanColumn
             title="Em Andamento"
@@ -184,6 +241,7 @@ export function KanbanBoard() {
             products={products.emAndamento}
             seamstresses={seamstresses}
             onAssign={assignSeamstress}
+            onDelete={deleteProduct}
           />
           <KanbanColumn
             title="Revisão"
@@ -191,6 +249,7 @@ export function KanbanBoard() {
             products={products.revisao}
             seamstresses={seamstresses}
             onAssign={assignSeamstress}
+            onDelete={deleteProduct}
           />
         </div>
       </DragDropContext>

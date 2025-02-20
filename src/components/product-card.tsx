@@ -1,5 +1,5 @@
 import { Draggable } from "@hello-pangea/dnd"
-import { Clock, User, Pencil } from "lucide-react"
+import { Clock, User, Pencil, Trash2 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import { Badge } from "./ui/badge"
 import { Button } from "./ui/button"
@@ -10,9 +10,10 @@ import type { Product } from "@/types/kanban"
 interface ProductCardProps {
   product: Product
   index: number
+  onDelete: (productId: string) => void
 }
 
-export function ProductCard({ product, index }: ProductCardProps) {
+export function ProductCard({ product, index, onDelete }: ProductCardProps) {
   const router = useRouter()
   const assignedSeamstress = product.assignees[0]
 
@@ -23,16 +24,26 @@ export function ProductCard({ product, index }: ProductCardProps) {
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
-          className="bg-white rounded-lg shadow p-4 pt-10 space-y-4 relative"
+          className="bg-white rounded-lg shadow p-4 pt-10 space-y-4 relative group"
         >
-          <Button
-            size="sm"
-            variant="ghost"
-            className="absolute top-1 right-1 text-gray-400 hover:text-gray-600"
-            onClick={() => router.push(`/edit/${product.id}`)}
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
+          <div className="absolute top-1 right-1 flex gap-1">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-gray-400 hover:text-gray-600"
+              onClick={() => router.push(`/edit/${product.id}`)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-gray-400 hover:text-red-600"
+              onClick={() => onDelete(product.id)}
+            >
+              <Trash2 className="h-4 w-4" />
+            </Button>
+          </div>
           <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
             <Image 
               src={product.image.startsWith('/') ? product.image : `/images/${product.image}`} 

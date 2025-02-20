@@ -46,50 +46,34 @@ export default function EditPage({ params }: EditPageProps) {
   const imageInputRef = useRef<HTMLInputElement>(null)
   const techSheetsInputRef = useRef<HTMLInputElement>(null)
   
-  // Find the product in all columns
-  const findProduct = () => {
-    const columns = ['paraFazer', 'emAndamento', 'revisao']
-    let foundProduct: Product | null = null
-    
-    columns.forEach(column => {
-      const products = JSON.parse(localStorage.getItem('kanbanProducts') || '{}')
-      const columnProducts = products[column] || initialProducts[column]
-      const product = columnProducts.find((p: Product) => p.id === id)
-      if (product) foundProduct = product
-    })
-    
-    return foundProduct
-  }
+  const [formData, setFormData] = useState(() => {
+    // Check if this is a new product from localStorage
+    const savedProducts = JSON.parse(localStorage.getItem('kanbanProducts') || '{}')
+    let product = null
 
-  const [formData, setFormData] = useState<EditFormData>(() => {
-    const product = findProduct()
-    if (!product) {
-      router.push('/kanban')
-      return {
-        title: "",
-        seamstress: "",
-        description: "",
-        quantity: "",
-        type: "",
-        date: new Date().toLocaleDateString('en-US', { 
-          month: 'short', 
-          day: 'numeric', 
-          year: 'numeric' 
-        }),
-        image: "",
-        technicalSheets: []
+    // Search for the product in all columns
+    for (const column of Object.values(savedProducts)) {
+      const found = column.find((p: Product) => p.id === id)
+      if (found) {
+        product = found
+        break
       }
     }
 
+    // If product is found, use its data, otherwise use default values
     return {
-      title: product.title,
-      seamstress: product.assignees[0]?.id || "",
-      description: product.description || "",
-      quantity: product.quantity || "",
-      type: product.type,
-      date: product.date,
-      image: product.image,
-      technicalSheets: product.technicalSheets || []
+      title: product?.title || "Untitled",
+      seamstress: product?.assignees[0]?.id || "",
+      description: product?.description || "",
+      quantity: product?.quantity || "0",
+      type: product?.type || "Prototype",
+      date: product?.date || new Date().toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }),
+      image: product?.image || "/images/tote.png",
+      technicalSheets: product?.technicalSheets || []
     }
   })
 
