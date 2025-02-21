@@ -6,7 +6,6 @@ import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { fetchProducts } from '@/lib/supabase'; // ✅ Import API function
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -33,9 +32,12 @@ export default function ProductPage() {
 
 	useEffect(() => {
 		async function getProducts() {
-			const data = await fetchProducts(); // ✅ Fetch from supabase.ts
+			const response = await fetch('/api/products');
+			const data = await response.json();
+
 			setProducts(data);
 		}
+
 		getProducts();
 	}, []);
 

@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import * as Clerk from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
-import Image from 'next/image';
 
 export default function SignInPage() {
 	return (
@@ -19,9 +18,6 @@ export default function SignInPage() {
 							<SignIn.Step name='start'>
 								<Card className='w-full max-w-sm mx-auto'>
 									<CardHeader className='text-center'>
-										{/* <div className="flex justify-center pb-4">
-											<Image src='/images/logo.png' alt='Stitcha' width={100} height={100} />
-										</div> */}
 										<CardTitle>Sign in to Stitcha</CardTitle>
 										<CardDescription>Welcome back! Please sign in to continue.</CardDescription>
 									</CardHeader>

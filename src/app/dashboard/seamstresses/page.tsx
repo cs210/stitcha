@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { fetchUsers } from '@/lib/supabase';
 import { Bell, Mail, Phone, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -13,12 +12,14 @@ export default function SeamstressesPage() {
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
 	useEffect(() => {
-		async function getUsers() {
-			const data = await fetchUsers(); // ✅ Fetch from supabase.ts
+		async function getSeamstresses() {
+			const response = await fetch('/api/users');
+			const data = await response.json();
 
 			setSeamstresses(data);
 		}
-		getUsers();
+
+		getSeamstresses();
 	}, []);
 
 	return (

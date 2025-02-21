@@ -1,32 +1,23 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { ClipboardIcon, LayoutGridIcon, LogOut, Settings2Icon, ShoppingCart, Users } from 'lucide-react';
+import { cn } from '@/lib/utils/utils';
+import { UserButton } from '@clerk/nextjs';
+import { ClipboardIcon, LayoutGridIcon, Settings2Icon, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { UserButton } from '@clerk/nextjs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 export function Sidebar() {
 	const pathname = usePathname();
 
-	const handleSignOut = async () => {
-		try {
-			// await signOut()
-			// Let Clerk handle the redirect after sign out
-		} catch (error) {
-			console.error('Error signing out:', error);
-		}
-	};
-
 	return (
 		<div className='flex h-full w-[72px] flex-col items-center border-r px-3 py-5'>
 			<div className='flex flex-col gap-4'>
-        <TooltipProvider>
+				<TooltipProvider>
 					<Tooltip>
 						<TooltipTrigger>
-              <UserButton/> 
+							<UserButton />
 							{/* <Button variant='ghost' size='icon' className={cn('h-10 w-10', pathname === '/sign-in/[[...sign-in]]' && 'bg-primary text-white')} asChild>
 								<LogOut className='h-5 w-5' />
 							</Button> */}
