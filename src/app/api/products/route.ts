@@ -1,10 +1,14 @@
-import { supabase } from '@/lib/utils/supabase';
+'use server';
+
+import { createClerkSupabaseClientSsr } from '@/lib/utils/supabase';
 import { NextResponse } from 'next/server';
+
+const client = await createClerkSupabaseClientSsr();
 
 // Fetch products from Supabase
 export async function GET() {
 	try {
-		const { data: products, error } = await supabase.from('products').select();
+		const { data: products, error } = await client.from('products').select();
 
 		if (error) {
 			throw error;

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import * as Clerk from '@clerk/elements/common';
 import * as SignIn from '@clerk/elements/sign-in';
 
-export default function SignInPage() {
+export default function Page() {
 	return (
 		<div className='min-h-screen flex items-center justify-center'>
 			<SignIn.Root>

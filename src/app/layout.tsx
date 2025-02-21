@@ -1,6 +1,5 @@
 'use client';
 
-import { MyRuntimeProvider } from '@/app/MyRuntimeProvider';
 import { ClerkProvider, useUser } from '@clerk/nextjs';
 import './globals.css';
 
@@ -45,13 +44,11 @@ function RootContent({ children }: { children: ReactNode }) {
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
 		<ClerkProvider>
-			<MyRuntimeProvider>
-				<html lang='en' suppressHydrationWarning>
-					<body className={inter.className}>
-						<RootContent>{children}</RootContent>
-					</body>
-				</html>
-			</MyRuntimeProvider>
+			<html lang='en' suppressHydrationWarning>
+				<body className={inter.className}>
+					<RootContent>{children}</RootContent>
+				</body>
+			</html>
 		</ClerkProvider>
 	);
 }

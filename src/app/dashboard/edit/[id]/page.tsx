@@ -16,7 +16,7 @@ interface EditPageProps {
 	params: Promise<{ id: string }>;
 }
 
-export default function EditPage({ params }: EditPageProps) {
+export default function Page({ params }: EditPageProps) {
 	const { id } = use(params);
 	const router = useRouter();
 	const imageInputRef = useRef<HTMLInputElement>(null);

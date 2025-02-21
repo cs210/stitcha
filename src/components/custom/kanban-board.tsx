@@ -1,6 +1,5 @@
 'use client';
 
-import { supabase } from '@/lib/utils/supabase';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Plus } from 'lucide-react';
@@ -47,12 +46,12 @@ export function KanbanBoard() {
 	// Fetch products from Supabase on mount
 	useEffect(() => {
 		const fetchProducts = async () => {
-			const { data, error } = await supabase.from('products').select('*');
+			// const { data, error } = await supabase.from('products').select('*');
 
-			if (error) {
-				console.error('Error fetching products:', error);
-				return;
-			}
+			// if (error) {
+			// 	console.error('Error fetching products:', error);
+			// 	return;
+			// }
 
 			// Map status to column IDs
 			const getColumnId = (progress_level: string) => {
@@ -60,62 +59,62 @@ export function KanbanBoard() {
 			};
 
 			// Organize products by status, ensuring we use the correct ID from Supabase
-			const organized = data.reduce(
-				(acc, product) => {
-					const columnId = getColumnId(product.progress_level);
-					return {
-						...acc,
-						[columnId]: [
-							...(acc[columnId] || []),
-							{
-								id: product.id.toString(), // Ensure ID is a string and from Supabase
-								title: product.name || 'Untitled',
-								image: product.image_url,
-								type: product.type || 'Prototype',
-								date: new Date(product.created_at).toLocaleDateString('en-US', {
-									month: 'short',
-									day: 'numeric',
-									year: 'numeric',
-								}),
-								assignees: product.assignees || [],
-								progress: product.progress_level || 'Not Started',
-								description: product.description || '',
-								quantity: product.quantity?.toString() || '0',
-							},
-						],
-					};
-				},
-				{
-					paraFazer: [],
-					emAndamento: [],
-					revisao: [],
-				}
-			);
+			// const organized = data.reduce(
+			// 	(acc, product) => {
+			// 		const columnId = getColumnId(product.progress_level);
+			// 		return {
+			// 			...acc,
+			// 			[columnId]: [
+			// 				...(acc[columnId] || []),
+			// 				{
+			// 					id: product.id.toString(), // Ensure ID is a string and from Supabase
+			// 					title: product.name || 'Untitled',
+			// 					image: product.image_url,
+			// 					type: product.type || 'Prototype',
+			// 					date: new Date(product.created_at).toLocaleDateString('en-US', {
+			// 						month: 'short',
+			// 						day: 'numeric',
+			// 						year: 'numeric',
+			// 					}),
+			// 					assignees: product.assignees || [],
+			// 					progress: product.progress_level || 'Not Started',
+			// 					description: product.description || '',
+			// 					quantity: product.quantity?.toString() || '0',
+			// 				},
+			// 			],
+			// 		};
+			// 	},
+			// 	{
+			// 		paraFazer: [],
+			// 		emAndamento: [],
+			// 		revisao: [],
+			// 	}
+			// );
 
-			setProducts(organized);
+			// setProducts(organized);
 		};
 
 		fetchProducts();
 
 		// Subscribe to changes
-		const channel = supabase
-			.channel('products_changes')
-			.on(
-				'postgres_changes',
-				{
-					event: '*',
-					schema: 'public',
-					table: 'products',
-				},
-				() => {
-					fetchProducts();
-				}
-			)
-			.subscribe();
+		// const channel = supabase
+		// 	.channel('products_changes')
+		// 	.on(
+		// 		'postgres_changes',
+		// 		{
+		// 			event: '*',
+		// 			schema: 'public',
+		// 			table: 'products',
+		// 		},
+		// 		() => {
+		// 			fetchProducts();
+		// 		}
+		// 	)
+		// 	.subscribe();
 
-		return () => {
-			channel.unsubscribe();
-		};
+		// return () => {
+		// 	channel.unsubscribe();
+		// };
 	}, []);
 
 	const onDragEnd = async (result: DropResult) => {
@@ -138,20 +137,20 @@ export function KanbanBoard() {
 		setProducts(updated);
 
 		// Update Supabase with new status
-		try {
-			const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];
-			console.log(newStatus);
-			console.log(draggableId);
-			await supabase
-				.from('products')
-				.update({
-					progress_level: newStatus,
-				})
-				.eq('id', draggableId);
-		} catch (error) {
-			console.error('Error updating product status:', error);
-			setProducts(newProducts);
-		}
+		// try {
+		// 	const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];
+		// 	console.log(newStatus);
+		// 	console.log(draggableId);
+		// 	await supabase
+		// 		.from('products')
+		// 		.update({
+		// 			progress_level: newStatus,
+		// 		})
+		// 		.eq('id', draggableId);
+		// } catch (error) {
+		// 	console.error('Error updating product status:', error);
+		// 	setProducts(newProducts);
+		// }
 	};
 
 	const deleteProduct = async (productId: string) => {
