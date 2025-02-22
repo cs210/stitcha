@@ -1,4 +1,3 @@
-import type { Product, Seamstress } from '@/lib/types/kanban';
 import { Droppable } from '@hello-pangea/dnd';
 import { MoreHorizontal, Plus } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -7,9 +6,9 @@ import { ProductCard } from './product-card';
 interface KanbanColumnProps {
 	title: string;
 	id: string;
-	products: Product[];
-	seamstresses: Seamstress[];
-	onAssign: (productId: string, seamstress: Seamstress) => void;
+	products: any[];
+	seamstresses: any[];
+	onAssign: (productId: string, seamstress: any) => void;
 	onDelete: (productId: string) => void;
 }
 

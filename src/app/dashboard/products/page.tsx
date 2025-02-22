@@ -5,7 +5,7 @@ import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -42,23 +42,23 @@ export default function ProductPage() {
 	}, []);
 
 	// 🔍 Filter products based on search query
-	const filteredProducts = products.filter((product) =>
-		[product.name, product.system_code, product.barcode].join(' ').toLowerCase().includes(searchQuery.toLowerCase())
-	);
+	// const filteredProducts = products.filter((product) =>
+	// 	[product.name, product.system_code, product.barcode].join(' ').toLowerCase().includes(searchQuery.toLowerCase())
+	// );
 
 	// 🔄 Sort products based on selected column
-	const sortedProducts = [...filteredProducts].sort((a, b) => {
-		if (!sortBy) return 0;
-		let valA = a[sortBy];
-		let valB = b[sortBy];
+	// const sortedProducts = [...filteredProducts].sort((a, b) => {
+	// 	if (!sortBy) return 0;
+	// 	let valA = a[sortBy];
+	// 	let valB = b[sortBy];
 
-		if (sortBy === 'weight') {
-			valA = Number(valA);
-			valB = Number(valB);
-		}
+	// 	if (sortBy === 'weight') {
+	// 		valA = Number(valA);
+	// 		valB = Number(valB);
+	// 	}
 
-		return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
-	});
+	// 	return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
+	// });
 
 	// 🔀 Toggle sorting function
 	const toggleSort = (column: 'name' | 'weight' | 'product_type') => {
@@ -115,7 +115,7 @@ export default function ProductPage() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{sortedProducts.length ? (
+					{/* {sortedProducts.length ? (
 						sortedProducts.map((product) => (
 							<TableRow key={product.id}>
 								<TableCell>
@@ -139,7 +139,7 @@ export default function ProductPage() {
 								No products found.
 							</TableCell>
 						</TableRow>
-					)}
+					)} */}
 				</TableBody>
 			</Table>
 		</div>

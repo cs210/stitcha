@@ -5,7 +5,7 @@ import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -35,22 +35,22 @@ export default function OrdersPage() {
 		getOrders();
 	}, []);
 
-	const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
-	const sortedOrders = [...filteredOrders].sort((a, b) => {
-		if (!sortBy) return 0;
-		let valA = a[sortBy];
-		let valB = b[sortBy];
+	// const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
+	// const sortedOrders = [...filteredOrders].sort((a, b) => {
+	// 	if (!sortBy) return 0;
+	// 	let valA = a[sortBy];
+	// 	let valB = b[sortBy];
 
-		if (sortBy === 'due_date') {
-			valA = new Date(valA).getTime();
-			valB = new Date(valB).getTime();
-		} else if (sortBy === 'order_quantity') {
-			valA = Number(valA);
-			valB = Number(valB);
-		}
+	// 	if (sortBy === 'due_date') {
+	// 		valA = new Date(valA).getTime();
+	// 		valB = new Date(valB).getTime();
+	// 	} else if (sortBy === 'order_quantity') {
+	// 		valA = Number(valA);
+	// 		valB = Number(valB);
+	// 	}
 
-		return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
-	});
+	// 	return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
+	// });
 
 	const toggleSort = (column: 'client' | 'due_date' | 'order_quantity') => {
 		if (sortBy === column) {
@@ -97,7 +97,7 @@ export default function OrdersPage() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{sortedOrders.length ? (
+					{/* {sortedOrders.length ? (
 						sortedOrders.map((order) => (
 							<TableRow key={order.id}>
 								<TableCell>{order.client}</TableCell>
@@ -112,7 +112,7 @@ export default function OrdersPage() {
 								No orders found.
 							</TableCell>
 						</TableRow>
-					)}
+					)} */}
 				</TableBody>
 			</Table>
 		</div>

@@ -2,25 +2,25 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bell, Mail, Phone, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Bell, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
+import { useState } from 'react';
 
 export default function SeamstressesPage() {
-	const [seamstresses, setSeamstresses] = useState<any[]>([]);
+	// const [seamstresses, setSeamstresses] = useState<any[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-	useEffect(() => {
-		async function getSeamstresses() {
-			const response = await fetch('/api/users');
-			const data = await response.json();
+	// useEffect(() => {
+	// 	async function getSeamstresses() {
+	// 		const response = await fetch('/api/users');
+	// 		const data = await response.json();
 
-			setSeamstresses(data);
-		}
+	// 		setSeamstresses(data);
+	// 	}
 
-		getSeamstresses();
-	}, []);
+	// 	getSeamstresses();
+	// }, []);
 
 	return (
 		<div className='flex h-screen bg-[#F8F7FD]'>
@@ -49,7 +49,7 @@ export default function SeamstressesPage() {
 					<div className='max-w-7xl mx-auto'>
 						<h1 className='text-2xl font-bold mb-8'>Seamstresses</h1>
 						<div className='flex flex-wrap gap-6'>
-							{seamstresses.map((seamstress) => (
+							{/* {seamstresses.map((seamstress) => (
 								<div key={seamstress.id} className='bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow w-[300px]'>
 									<div className='flex flex-col items-center text-center mb-6'>
 										<div className='w-32 h-32 rounded-full overflow-hidden mb-4'>
@@ -75,7 +75,7 @@ export default function SeamstressesPage() {
 										</div>
 									</div>
 								</div>
-							))}
+							))} */}
 						</div>
 					</div>
 				</main>

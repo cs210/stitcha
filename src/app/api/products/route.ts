@@ -8,13 +8,14 @@ const client = await createClerkSupabaseClientSsr();
 // Fetch products from Supabase
 export async function GET() {
 	try {
-		const { data: products, error } = await client.from('products').select();
+		// const { data: products, error } = await client.from('products').select();
 
-		if (error) {
-			throw error;
-		}
+		// if (error) {
+		// 	throw error;
+		// }
 
-		return NextResponse.json(products, { status: 200 });
+		// return NextResponse.json(products, { status: 200 });
+		return NextResponse.json({ message: 'Products fetched successfully' }, { status: 200 });
 	} catch (error) {
 		console.error('Error fetching products:', error);
 

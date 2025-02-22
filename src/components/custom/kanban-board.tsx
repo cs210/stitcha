@@ -6,7 +6,6 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
-import { KanbanColumn } from './kanban-column';
 
 const createNewProduct = (): any => ({
 	id: `product_${Date.now()}`,
@@ -153,29 +152,29 @@ export function KanbanBoard() {
 		// }
 	};
 
-	const deleteProduct = async (productId: string) => {
-		try {
-			console.log('Deleting product with ID:', productId);
-			const { error } = await supabase.from('products').delete().eq('id', productId); // Don't convert to number, keep as string UUID
+	// const deleteProduct = async (productId: string) => {
+	// 	try {
+	// 		console.log('Deleting product with ID:', productId);
+	// 		const { error } = await supabase.from('products').delete().eq('id', productId); // Don't convert to number, keep as string UUID
 
-			if (error) {
-				console.error('Supabase delete error:', error);
-				throw error;
-			}
+	// 		if (error) {
+	// 			console.error('Supabase delete error:', error);
+	// 			throw error;
+	// 		}
 
-			// If successful, update local state
-			setProducts((prevProducts) => {
-				const updatedProducts = { ...prevProducts };
-				for (const columnId in updatedProducts) {
-					updatedProducts[columnId] = updatedProducts[columnId].filter((product) => product.id !== productId);
-				}
-				return updatedProducts;
-			});
-		} catch (error) {
-			console.error('Error deleting product:', error);
-			alert('Failed to delete product');
-		}
-	};
+	// 		// If successful, update local state
+	// 		setProducts((prevProducts) => {
+	// 			const updatedProducts = { ...prevProducts };
+	// 			for (const columnId in updatedProducts) {
+	// 				updatedProducts[columnId] = updatedProducts[columnId].filter((product) => product.id !== productId);
+	// 			}
+	// 			return updatedProducts;
+	// 		});
+	// 	} catch (error) {
+	// 		console.error('Error deleting product:', error);
+	// 		alert('Failed to delete product');
+	// 	}
+	// };
 
 	const addNewProduct = async () => {
 		const defaultImage = 'default-product.png';
@@ -192,54 +191,54 @@ export function KanbanBoard() {
 			quantity: 0,
 		};
 
-		try {
-			const { data, error } = await supabase.from('products').insert(newProduct).select().single();
+		// try {
+		// 	const { data, error } = await supabase.from('products').insert(newProduct).select().single();
 
-			if (error) throw error;
-			router.push(`/edit/${data.id}`);
-		} catch (error) {
-			console.error('Error creating product:', error);
-		}
+		// 	if (error) throw error;
+		// 	router.push(`/edit/${data.id}`);
+		// } catch (error) {
+		// 	console.error('Error creating product:', error);
+		// }
 	};
 
-	const assignSeamstress = async (productId: string, seamstress: Seamstress) => {
-		try {
-			// Find the product to update its assignees
-			let productToUpdate = null;
-			for (const column of Object.values(products)) {
-				const found = column.find((p) => p.id === productId);
-				if (found) {
-					productToUpdate = found;
-					break;
-				}
-			}
+	// const assignSeamstress = async (productId: string, seamstress: any) => {
+	// 	try {
+	// 		// Find the product to update its assignees
+	// 		let productToUpdate = null;
+	// 		for (const column of Object.values(products)) {
+	// 			const found = column.find((p) => p.id === productId);
+	// 			if (found) {
+	// 				productToUpdate = found;
+	// 				break;
+	// 			}
+	// 		}
 
-			if (!productToUpdate) return;
+	// 		if (!productToUpdate) return;
 
-			// Create new assignees array without duplicates
-			const newAssignees = productToUpdate.assignees.some((a) => a.id === seamstress.id)
-				? productToUpdate.assignees
-				: [...productToUpdate.assignees, seamstress];
+	// 		// Create new assignees array without duplicates
+	// 		const newAssignees = productToUpdate.assignees.some((a) => a.id === seamstress.id)
+	// 			? productToUpdate.assignees
+	// 			: [...productToUpdate.assignees, seamstress];
 
-			// Update Supabase
-			const { error } = await supabase.from('products').update({ assignees: newAssignees }).eq('id', productId);
+	// 		// Update Supabase
+	// 		const { error } = await supabase.from('products').update({ assignees: newAssignees }).eq('id', productId);
 
-			if (error) throw error;
+	// 		if (error) throw error;
 
-			// Update local state
-			setProducts((prevProducts) => {
-				const updatedProducts = { ...prevProducts };
-				for (const columnId in updatedProducts) {
-					updatedProducts[columnId] = updatedProducts[columnId].map((product) =>
-						product.id === productId ? { ...product, assignees: newAssignees } : product
-					);
-				}
-				return updatedProducts;
-			});
-		} catch (error) {
-			console.error('Error assigning seamstress:', error);
-		}
-	};
+	// 		// Update local state
+	// 		setProducts((prevProducts) => {
+	// 			const updatedProducts = { ...prevProducts };
+	// 			for (const columnId in updatedProducts) {
+	// 				updatedProducts[columnId] = updatedProducts[columnId].map((product) =>
+	// 					product.id === productId ? { ...product, assignees: newAssignees } : product
+	// 				);
+	// 			}
+	// 			return updatedProducts;
+	// 		});
+	// 	} catch (error) {
+	// 		console.error('Error assigning seamstress:', error);
+	// 	}
+	// };
 
 	return (
 		<div className='h-screen flex flex-col'>
@@ -256,7 +255,7 @@ export function KanbanBoard() {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-6 p-6 pt-0 h-full'>
-						<KanbanColumn
+						{/* <KanbanColumn
 							title='Not Started'
 							id='paraFazer'
 							products={products.paraFazer}
@@ -279,7 +278,7 @@ export function KanbanBoard() {
 							seamstresses={seamstresses}
 							onAssign={assignSeamstress}
 							onDelete={deleteProduct}
-						/>
+						/> */}
 					</div>
 				</div>
 			</DragDropContext>
