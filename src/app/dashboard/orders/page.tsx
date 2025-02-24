@@ -7,33 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-interface Order {
-	id: string;
-	client: string;
-	contact: string;
-	order_quantity: number;
-	due_date: string;
-	product_id: string;
-}
-
-export default function OrdersPage() {
-	const [orders, setOrders] = useState<Order[]>([]);
+export default function Page() {
+	const [orders, setOrders] = useState<any[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'client' | 'due_date' | 'order_quantity' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-	useEffect(() => {
-		async function getOrders() {
-			const response = await fetch('/api/orders');
-			const data = await response.json();
-
-			setOrders(data);
-		}
-
-		getOrders();
-	}, []);
 
 	// const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
 	// const sortedOrders = [...filteredOrders].sort((a, b) => {

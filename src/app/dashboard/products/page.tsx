@@ -7,39 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ArrowUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-interface Product {
-	id: string;
-	name: string;
-	system_code: string;
-	inmetro_cert_number: string;
-	barcode: string;
-	description: string;
-	weight: number;
-	width: number;
-	height: number;
-	percent_pieces_lost: number;
-	image_url: string;
-	product_type: string;
-}
-
-export default function ProductPage() {
-	const [products, setProducts] = useState<Product[]>([]);
+export default function Page() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-
-	useEffect(() => {
-		async function getProducts() {
-			const response = await fetch('/api/products');
-			const data = await response.json();
-
-			setProducts(data);
-		}
-
-		getProducts();
-	}, []);
+	const [products, setProducts] = useState<any[]>([]);
 
 	// 🔍 Filter products based on search query
 	// const filteredProducts = products.filter((product) =>

@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Bell, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export default function SeamstressesPage() {
+export default function Page() {
 	// const [seamstresses, setSeamstresses] = useState<any[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);

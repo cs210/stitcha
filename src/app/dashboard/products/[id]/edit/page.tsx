@@ -12,11 +12,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, use, useRef, useState } from 'react';
 
-interface EditPageProps {
-	params: Promise<{ id: string }>;
-}
-
-export default function Page({ params }: EditPageProps) {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params);
 	const router = useRouter();
 	const imageInputRef = useRef<HTMLInputElement>(null);
