@@ -5,36 +5,59 @@ import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowUpDown } from 'lucide-react';
-import { useState } from 'react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { createClerkSupabaseClient } from '@/lib/utils/client';
+import { useUser } from '@clerk/nextjs';
+import { ArrowUpDown, Loader } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
+	const { user } = useUser();
+	const client = createClerkSupabaseClient();
+
+	const [loading, setLoading] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [products, setProducts] = useState<any[]>([]);
 
-	// 🔍 Filter products based on search query
-	// const filteredProducts = products.filter((product) =>
-	// 	[product.name, product.system_code, product.barcode].join(' ').toLowerCase().includes(searchQuery.toLowerCase())
-	// );
+	useEffect(() => {
+		if (!user) return;
 
-	// 🔄 Sort products based on selected column
-	// const sortedProducts = [...filteredProducts].sort((a, b) => {
-	// 	if (!sortBy) return 0;
-	// 	let valA = a[sortBy];
-	// 	let valB = b[sortBy];
+		// Anonymous function to fetch products from Supabase
+		(async () => {
+			setLoading(true);
 
-	// 	if (sortBy === 'weight') {
-	// 		valA = Number(valA);
-	// 		valB = Number(valB);
-	// 	}
+			const { data, error } = await client.from('products').select();
 
-	// 	return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
-	// });
+			if (!error) {
+				setProducts(data);
+			}
 
-	// 🔀 Toggle sorting function
+			setLoading(false);
+		})();
+	}, [user]);
+
+	// Filter products based on search query
+	const filteredProducts = products.filter((product) =>
+		[product.name, product.system_code, product.barcode].join(' ').toLowerCase().includes(searchQuery.toLowerCase())
+	);
+
+	// Sort filtered products based on the selected criteria and order
+	const sortedProducts = [...filteredProducts].sort((a, b) => {
+		if (!sortBy) return 0;
+		let valA = a[sortBy];
+		let valB = b[sortBy];
+
+		if (sortBy === 'weight') {
+			valA = Number(valA);
+			valB = Number(valB);
+		}
+
+		return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
+	});
+
+	// Function to toggle sorting order based on the selected column
 	const toggleSort = (column: 'name' | 'weight' | 'product_type') => {
 		if (sortBy === column) {
 			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -44,6 +67,9 @@ export default function Page() {
 		}
 	};
 
+	// Loading state
+	if (loading) return <Loader />;
+
 	return (
 		<div className='p-6'>
 			<HeaderContainer>
@@ -51,7 +77,6 @@ export default function Page() {
 				<Description text='Explore a comprehensive overview of our products, including features, specifications, and benefits to help you make informed decisions.' />
 			</HeaderContainer>
 
-			{/* 🔍 Search Input */}
 			<Input
 				placeholder='Search products by Name, System Code, or Barcode...'
 				value={searchQuery}
@@ -59,7 +84,6 @@ export default function Page() {
 				className='mb-4 w-full'
 			/>
 
-			{/* 📋 Products Table */}
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -89,7 +113,7 @@ export default function Page() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{/* {sortedProducts.length ? (
+					{sortedProducts.length ? (
 						sortedProducts.map((product) => (
 							<TableRow key={product.id}>
 								<TableCell>
@@ -113,7 +137,7 @@ export default function Page() {
 								No products found.
 							</TableCell>
 						</TableRow>
-					)} */}
+					)}
 				</TableBody>
 			</Table>
 		</div>

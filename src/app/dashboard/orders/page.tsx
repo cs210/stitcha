@@ -3,35 +3,63 @@
 import { Description } from '@/components/custom/description';
 import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
+import { Loader } from '@/components/custom/loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { createClerkSupabaseClient } from '@/lib/utils/client';
+import { useUser } from '@clerk/nextjs';
 import { ArrowUpDown } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
+	const { user } = useUser();
+	const client = createClerkSupabaseClient();
+
+	const [loading, setLoading] = useState(false);
 	const [orders, setOrders] = useState<any[]>([]);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'client' | 'due_date' | 'order_quantity' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-	// const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
-	// const sortedOrders = [...filteredOrders].sort((a, b) => {
-	// 	if (!sortBy) return 0;
-	// 	let valA = a[sortBy];
-	// 	let valB = b[sortBy];
+	useEffect(() => {
+		if (!user) return;
 
-	// 	if (sortBy === 'due_date') {
-	// 		valA = new Date(valA).getTime();
-	// 		valB = new Date(valB).getTime();
-	// 	} else if (sortBy === 'order_quantity') {
-	// 		valA = Number(valA);
-	// 		valB = Number(valB);
-	// 	}
+		// Anonymous function to fetch orders from Supabase
+		(async () => {
+			setLoading(true);
 
-	// 	return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
-	// });
+			const { data, error } = await client.from('orders').select();
 
+			if (!error) {
+				setOrders(data);
+			}
+
+			setLoading(false);
+		})();
+	}, [user]);
+
+	// Filter orders based on search query
+	const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
+
+	// Sort filtered orders based on the selected criteria and order
+	const sortedOrders = [...filteredOrders].sort((a, b) => {
+		if (!sortBy) return 0;
+		let valA = a[sortBy];
+		let valB = b[sortBy];
+
+		if (sortBy === 'due_date') {
+			valA = new Date(valA).getTime();
+			valB = new Date(valB).getTime();
+		} else if (sortBy === 'order_quantity') {
+			valA = Number(valA);
+			valB = Number(valB);
+		}
+
+		return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
+	});
+
+	// Function to toggle sorting order based on the selected column
 	const toggleSort = (column: 'client' | 'due_date' | 'order_quantity') => {
 		if (sortBy === column) {
 			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -40,6 +68,9 @@ export default function Page() {
 			setSortOrder('asc');
 		}
 	};
+
+	// Loading state
+	if (loading) return <Loader />;
 
 	return (
 		<div className='p-6'>
@@ -77,7 +108,7 @@ export default function Page() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{/* {sortedOrders.length ? (
+					{sortedOrders.length ? (
 						sortedOrders.map((order) => (
 							<TableRow key={order.id}>
 								<TableCell>{order.client}</TableCell>
@@ -92,7 +123,7 @@ export default function Page() {
 								No orders found.
 							</TableCell>
 						</TableRow>
-					)} */}
+					)}
 				</TableBody>
 			</Table>
 		</div>

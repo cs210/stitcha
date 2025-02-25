@@ -2,31 +2,44 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Bell, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
-import { useState } from 'react';
+import { createClerkSupabaseClient } from '@/lib/utils/client';
+import { useUser } from '@clerk/nextjs';
+import { Bell, Loader, Mail, Phone, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
-	// const [seamstresses, setSeamstresses] = useState<any[]>([]);
+	const { user } = useUser();
+	const client = createClerkSupabaseClient();
+
+	const [loading, setLoading] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [seamstresses, setSeamstresses] = useState<any[]>([]);
 
-	// useEffect(() => {
-	// 	async function getSeamstresses() {
-	// 		const response = await fetch('/api/users');
-	// 		const data = await response.json();
+	useEffect(() => {
+		if (!user) return;
 
-	// 		setSeamstresses(data);
-	// 	}
+		// Anonymous function to fetch seamstresses from Supabase
+		(async () => {
+			setLoading(true);
 
-	// 	getSeamstresses();
-	// }, []);
+			const { data, error } = await client.from('users').select();
+
+			if (!error) {
+				setSeamstresses(data);
+			}
+
+			setLoading(false);
+		})();
+	}, [user]);
+
+	// Loading state
+	if (loading) return <Loader />;
 
 	return (
 		<div className='flex h-screen bg-[#F8F7FD]'>
-			{/* Main Content */}
 			<div className='flex-1 overflow-auto'>
-				{/* Header */}
 				<header className='bg-white px-6 py-4 flex items-center justify-between border-b'>
 					<div className='flex-1 max-w-xl'>
 						<div className='relative'>
@@ -34,6 +47,7 @@ export default function Page() {
 							<Input type='search' placeholder='Search...' className='w-full pl-10 bg-[#F8F7FD] border-none' />
 						</div>
 					</div>
+
 					<div className='flex items-center gap-4'>
 						<Button variant='ghost' size='icon' className='rounded-full'>
 							<Bell className='w-5 h-5' />
@@ -44,12 +58,11 @@ export default function Page() {
 					</div>
 				</header>
 
-				{/* Main Content Area */}
 				<main className='p-6'>
 					<div className='max-w-7xl mx-auto'>
 						<h1 className='text-2xl font-bold mb-8'>Seamstresses</h1>
 						<div className='flex flex-wrap gap-6'>
-							{/* {seamstresses.map((seamstress) => (
+							{seamstresses.map((seamstress) => (
 								<div key={seamstress.id} className='bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow w-[300px]'>
 									<div className='flex flex-col items-center text-center mb-6'>
 										<div className='w-32 h-32 rounded-full overflow-hidden mb-4'>
@@ -75,7 +88,7 @@ export default function Page() {
 										</div>
 									</div>
 								</div>
-							))} */}
+							))}
 						</div>
 					</div>
 				</main>

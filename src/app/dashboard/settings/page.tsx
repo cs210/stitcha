@@ -17,7 +17,6 @@ export default function Page() {
 			</div>
 
 			<div className='space-y-6'>
-				{/* User Info Section */}
 				<div className='space-y-4'>
 					<h2 className='text-lg font-semibold'>User Information</h2>
 					<div className='grid gap-4'>
@@ -32,7 +31,6 @@ export default function Page() {
 					</div>
 				</div>
 
-				{/* Language Section */}
 				<div className='space-y-4'>
 					<h2 className='text-lg font-semibold'>Language</h2>
 					<Select defaultValue='pt'>

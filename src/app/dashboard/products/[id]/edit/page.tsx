@@ -15,6 +15,7 @@ import { ChangeEvent, use, useRef, useState } from 'react';
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params);
 	const router = useRouter();
+
 	const imageInputRef = useRef<HTMLInputElement>(null);
 	const techSheetsInputRef = useRef<HTMLInputElement>(null);
 
