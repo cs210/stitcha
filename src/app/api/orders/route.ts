@@ -13,7 +13,7 @@ export async function GET(request: Request) {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('products').select('*');
+		const { data, error } = await supabase.from('orders').select('*');
 
 		if (error) {
 			throw new Error(error.message);

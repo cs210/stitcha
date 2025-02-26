@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils/utils';
+import { cn } from '@/utils/functions/utils';
 import { UserButton } from '@clerk/nextjs';
 import { ClipboardIcon, LayoutGridIcon, Settings2Icon, ShoppingCart, Users } from 'lucide-react';
 import Link from 'next/link';

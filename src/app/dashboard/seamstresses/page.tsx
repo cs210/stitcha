@@ -1,21 +1,20 @@
 'use client';
 
-// import { createClerkSupabaseClient } from '@/app/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { User } from '@/utils/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { Bell, Loader, Mail, Phone, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
-	// const client = createClerkSupabaseClient();
 
-	const [loading, setLoading] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
+	const [loading, setLoading] = useState<boolean>(false);
+	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-	const [seamstresses, setSeamstresses] = useState<any[]>([]);
+	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
 	useEffect(() => {
 		if (!user) return;
@@ -24,11 +23,12 @@ export default function Page() {
 		(async () => {
 			setLoading(true);
 
-			// const { data, error } = await client.from('users').select();
+			const response = await fetch('/api/users');
+			const { data, error } = await response.json();
 
-			// if (!error) {
-			// 	setSeamstresses(data);
-			// }
+			if (!error) {
+				setSeamstresses(data);
+			}
 
 			setLoading(false);
 		})();

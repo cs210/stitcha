@@ -6,19 +6,19 @@ import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Product } from '@/utils/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUpDown, Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
-	// const client = createClerkSupabaseClient();
 
-	const [loading, setLoading] = useState(false);
-	const [searchQuery, setSearchQuery] = useState('');
+	const [loading, setLoading] = useState<boolean>(false);
+	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-	const [products, setProducts] = useState<any[]>([]);
+	const [products, setProducts] = useState<Product[]>([]);
 
 	useEffect(() => {
 		if (!user) return;
@@ -29,8 +29,6 @@ export default function Page() {
 
 			const response = await fetch('/api/products');
 			const { data, error } = await response.json();
-
-			console.log(data, error);
 
 			if (!error) {
 				setProducts(data);
@@ -119,7 +117,7 @@ export default function Page() {
 						sortedProducts.map((product) => (
 							<TableRow key={product.id}>
 								<TableCell>
-									<img src={product.image_url} alt={product.name} className='w-16 h-16 object-cover' />
+									<img src={product.image_url || ''} alt={product.name} className='w-16 h-16 object-cover' />
 								</TableCell>
 								<TableCell>{product.name}</TableCell>
 								<TableCell>{product.system_code}</TableCell>

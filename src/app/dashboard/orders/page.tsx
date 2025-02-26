@@ -8,32 +8,33 @@ import { Loader } from '@/components/custom/loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Order } from '@/utils/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
-	// const client = createClerkSupabaseClient();
 
-	const [loading, setLoading] = useState(false);
-	const [orders, setOrders] = useState<any[]>([]);
-	const [searchQuery, setSearchQuery] = useState('');
+	const [loading, setLoading] = useState<boolean>(false);
+	const [orders, setOrders] = useState<Order[]>([]);
+	const [searchQuery, setSearchQuery] = useState<string>('');
 	const [sortBy, setSortBy] = useState<'client' | 'due_date' | 'order_quantity' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
 	useEffect(() => {
 		if (!user) return;
 
-		// Anonymous function to fetch orders from Supabase
+		// Anonymous function to fetch products from Supabase
 		(async () => {
 			setLoading(true);
 
-			// const { data, error } = await client.from('orders').select();
+			const response = await fetch('/api/orders');
+			const { data, error } = await response.json();
 
-			// if (!error) {
-			// 	setOrders(data);
-			// }
+			if (!error) {
+				setOrders(data);
+			}
 
 			setLoading(false);
 		})();

@@ -6,6 +6,7 @@
 		"dev": "next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
+		"types": "supabase gen types typescript --project-id mwfejtgqjajkqhdfjtzh > \"src/utils/types/supabase.ts\"",
 		"lint": "next lint"
 	},
 	"dependencies": {
