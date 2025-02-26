@@ -1,5 +1,6 @@
 'use client';
 
+// import { createClerkSupabaseClient } from '@/app/supabase/client';
 import { Description } from '@/components/custom/description';
 import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
@@ -7,14 +8,13 @@ import { Loader } from '@/components/custom/loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { createClerkSupabaseClient } from '@/lib/utils/client';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
-	const client = createClerkSupabaseClient();
+	// const client = createClerkSupabaseClient();
 
 	const [loading, setLoading] = useState(false);
 	const [orders, setOrders] = useState<any[]>([]);
@@ -29,11 +29,11 @@ export default function Page() {
 		(async () => {
 			setLoading(true);
 
-			const { data, error } = await client.from('orders').select();
+			// const { data, error } = await client.from('orders').select();
 
-			if (!error) {
-				setOrders(data);
-			}
+			// if (!error) {
+			// 	setOrders(data);
+			// }
 
 			setLoading(false);
 		})();

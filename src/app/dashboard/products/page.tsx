@@ -6,14 +6,13 @@ import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { createClerkSupabaseClient } from '@/lib/utils/client';
 import { useUser } from '@clerk/nextjs';
 import { ArrowUpDown, Loader } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
-	const client = createClerkSupabaseClient();
+	// const client = createClerkSupabaseClient();
 
 	const [loading, setLoading] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
@@ -28,7 +27,10 @@ export default function Page() {
 		(async () => {
 			setLoading(true);
 
-			const { data, error } = await client.from('products').select();
+			const response = await fetch('/api/products');
+			const { data, error } = await response.json();
+
+			console.log(data, error);
 
 			if (!error) {
 				setProducts(data);
