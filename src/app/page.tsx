@@ -1,7 +1,5 @@
-'use server';
+import { redirect } from 'next/navigation';
 
-import { redirect } from "next/navigation";
-
-export default async function RootPage() {
+export default function Page() {
 	redirect('/sign-in');
 }
