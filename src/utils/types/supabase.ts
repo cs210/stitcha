@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      education_videos: {
+        Row: {
+          description: string
+          duration: number
+          id: string
+          name: string
+          thumbnail_url: string
+          video_url: string
+        }
+        Insert: {
+          description: string
+          duration: number
+          id?: string
+          name: string
+          thumbnail_url: string
+          video_url: string
+        }
+        Update: {
+          description?: string
+          duration?: number
+          id?: string
+          name?: string
+          thumbnail_url?: string
+          video_url?: string
+        }
+        Relationships: []
+      }
       labor_types: {
         Row: {
           cost_per_minute: number
@@ -132,6 +159,50 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: true
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_progress: {
+        Row: {
+          product_id: string
+          progress_id: string
+        }
+        Insert: {
+          product_id: string
+          progress_id: string
+        }
+        Update: {
+          product_id?: string
+          progress_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_progress_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_progress_product_id_fkey1"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_progress_progress_id_fkey"
+            columns: ["progress_id"]
+            isOneToOne: false
+            referencedRelation: "progress"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_progress_progress_id_fkey1"
+            columns: ["progress_id"]
+            isOneToOne: false
+            referencedRelation: "progress"
             referencedColumns: ["id"]
           },
         ]
@@ -311,6 +382,7 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          emotion: string | null
           id: string
           image_urls: Json | null
           user_id: string
@@ -318,6 +390,7 @@ export type Database = {
         Insert: {
           created_at?: string
           description: string
+          emotion?: string | null
           id?: string
           image_urls?: Json | null
           user_id: string
@@ -325,6 +398,7 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          emotion?: string | null
           id?: string
           image_urls?: Json | null
           user_id?: string
