@@ -15,10 +15,10 @@ importers:
         specifier: ^0.7.85
         version: 0.7.85(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
       '@assistant-ui/react-ai-sdk':
-        specifier: ^0.7.14
+        specifier: ^0.7.16
         version: 0.7.16(@assistant-ui/react@0.7.85(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0)))(@types/react@19.0.10)(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0))
       '@assistant-ui/react-markdown':
-        specifier: ^0.7.17
+        specifier: ^0.7.20
         version: 0.7.20(@assistant-ui/react@0.7.85(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-sync-external-store@1.4.0(react@19.0.0)))(@types/react-dom@19.0.4(@types/react@19.0.10))(@types/react@19.0.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@clerk/elements':
         specifier: ^0.22.19

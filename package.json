@@ -11,8 +11,8 @@
 	"dependencies": {
 		"@ai-sdk/openai": "^1.1.9",
 		"@assistant-ui/react": "^0.7.85",
-		"@assistant-ui/react-ai-sdk": "^0.7.14",
-		"@assistant-ui/react-markdown": "^0.7.17",
+		"@assistant-ui/react-ai-sdk": "^0.7.16",
+		"@assistant-ui/react-markdown": "^0.7.20",
 		"@clerk/elements": "^0.22.19",
 		"@clerk/nextjs": "^6.12.0",
 		"@hello-pangea/dnd": "^18.0.1",
