@@ -1,6 +1,7 @@
 import { Sidebar } from '@/components/custom/sidebar';
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
+import { Toaster } from '@/components/ui/sonner';
 
 export default function Layout({
 	children,
@@ -31,6 +32,7 @@ export default function Layout({
 					<div className='flex flex-1 flex-col gap-4 p-4 pt-0'>{children}</div>
 				</div>
 			</main>
+			<Toaster />
 		</div>
 	);
 }

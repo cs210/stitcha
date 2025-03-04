@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Order } from '@/utils/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
@@ -80,12 +80,17 @@ export default function Page() {
 				<Description text='Manage and track customer orders.' />
 			</HeaderContainer>
 
-			<Input
-				placeholder='Search orders by ID, client, or contact...'
-				value={searchQuery}
-				onChange={(e) => setSearchQuery(e.target.value)}
-				className='mb-4 w-full'
-			/>
+			<div className='flex gap-2 mb-4 w-full'>
+				<Input
+					placeholder='Search orders by ID, client, or contact...'
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					className='w-full'
+				/>
+				<Button variant='outline' size='icon' onClick={() => (window.location.href = '/dashboard/orders/new')}>
+					<Plus size={16} />
+				</Button>
+			</div>
 
 			<Table>
 				<TableHeader>
