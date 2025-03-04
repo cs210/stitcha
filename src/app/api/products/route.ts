@@ -1,5 +1,6 @@
 import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
 import { auth } from '@clerk/nextjs/server';
+import { IdCardIcon } from 'lucide-react';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {

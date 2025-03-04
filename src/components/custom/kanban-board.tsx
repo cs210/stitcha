@@ -6,114 +6,107 @@ import { Plus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
+import { KanbanColumn } from './kanban-column';
 
-const createNewProduct = (): any => ({
-	id: `product_${Date.now()}`,
-	title: 'Untitled',
-	image: '/images/tote.png',
-	type: 'Prototype',
-	date: new Date().toLocaleDateString('en-US', {
-		month: 'short',
-		day: 'numeric',
-		year: 'numeric',
-	}),
-	assignees: [],
-	progress: '0/8',
-});
+interface Product {
+	id: string;
+	name: string;
+	image_url: string;
+	type: string;
+	progress_level: string;
+	created_at: string;
+	assignees: any[];
+	progress: string;
+	description: string;
+	quantity: number;
+}
 
 // Update the STATUS_MAPPING to have reverse mapping as well
 const STATUS_MAPPING = {
-	paraFazer: 'Not Started',
-	emAndamento: 'In Progress',
-	revisao: 'Done',
+	notStarted: 'Not Started',
+	inProgress: 'In Progress',
+	done: 'Done',
 } as const;
 
 const REVERSE_STATUS_MAPPING = {
-	'Not Started': 'paraFazer',
-	'In Progress': 'emAndamento',
-	'Done': 'revisao',
+	'Not Started': 'notStarted',
+	'In Progress': 'inProgress',
+	'Done': 'done',
 } as const;
 
 export function KanbanBoard() {
 	const router = useRouter();
-	const [products, setProducts] = useState<Record<string, any[]>>({
-		paraFazer: [],
-		emAndamento: [],
-		revisao: [],
+	const [products, setProducts] = useState<Record<string, Product[]>>({
+		notStarted: [],
+		inProgress: [],
+		done: [],
 	});
 
-	// Fetch products from Supabase on mount
+	console.log("products", products);
+
+	// Fetch products from API route on mount
 	useEffect(() => {
 		const fetchProducts = async () => {
-			// const { data, error } = await supabase.from('products').select('*');
+			try {
+				const response = await fetch('/api/products');
+				const result = await response.json();
 
-			// if (error) {
-			// 	console.error('Error fetching products:', error);
-			// 	return;
-			// }
+				if (!response.ok) {
+					throw new Error(result.error);
+				}
 
-			// Map status to column IDs
-			const getColumnId = (progress_level: string) => {
-				return REVERSE_STATUS_MAPPING[progress_level as keyof typeof REVERSE_STATUS_MAPPING] || 'paraFazer';
-			};
+				const { data } = result;
 
-			// Organize products by status, ensuring we use the correct ID from Supabase
-			// const organized = data.reduce(
-			// 	(acc, product) => {
-			// 		const columnId = getColumnId(product.progress_level);
-			// 		return {
-			// 			...acc,
-			// 			[columnId]: [
-			// 				...(acc[columnId] || []),
-			// 				{
-			// 					id: product.id.toString(), // Ensure ID is a string and from Supabase
-			// 					title: product.name || 'Untitled',
-			// 					image: product.image_url,
-			// 					type: product.type || 'Prototype',
-			// 					date: new Date(product.created_at).toLocaleDateString('en-US', {
-			// 						month: 'short',
-			// 						day: 'numeric',
-			// 						year: 'numeric',
-			// 					}),
-			// 					assignees: product.assignees || [],
-			// 					progress: product.progress_level || 'Not Started',
-			// 					description: product.description || '',
-			// 					quantity: product.quantity?.toString() || '0',
-			// 				},
-			// 			],
-			// 		};
-			// 	},
-			// 	{
-			// 		paraFazer: [],
-			// 		emAndamento: [],
-			// 		revisao: [],
-			// 	}
-			// );
+				// Map status to column IDs
+				const getColumnId = (progress_level: string) => {
+					return REVERSE_STATUS_MAPPING[progress_level as keyof typeof REVERSE_STATUS_MAPPING] || 'notStarted';
+				};
 
-			// setProducts(organized);
+				// Organize products by status and ensure unique IDs
+				const organized = data.reduce(
+					(acc: Record<string, Product[]>, product: Product) => {
+						const columnId = getColumnId(product.progress_level);
+						return {
+							...acc,
+							[columnId]: [
+								...(acc[columnId] || []),
+								{
+									id: product.id,
+									title: product.name || 'Untitled',
+									image: product.image_url,
+									type: product.type || 'Prototype',
+									date: new Date(product.created_at).toLocaleDateString('en-US', {
+										month: 'short',
+										day: 'numeric',
+										year: 'numeric',
+									}),
+									assignees: product.assignees || [],
+									progress: product.progress_level || 'Not Started',
+									description: product.description || '',
+									quantity: product.quantity?.toString() || '0',
+								},
+							],
+						};
+					},
+					{
+						notStarted: [],
+						inProgress: [],
+						done: [],
+					}
+				);
+
+				setProducts(organized);
+			} catch (error) {
+				console.error('Error fetching products:', error);
+			}
 		};
 
 		fetchProducts();
 
-		// Subscribe to changes
-		// const channel = supabase
-		// 	.channel('products_changes')
-		// 	.on(
-		// 		'postgres_changes',
-		// 		{
-		// 			event: '*',
-		// 			schema: 'public',
-		// 			table: 'products',
-		// 		},
-		// 		() => {
-		// 			fetchProducts();
-		// 		}
-		// 	)
-		// 	.subscribe();
+		// Set up polling for updates every 30 seconds
+		const intervalId = setInterval(fetchProducts, 30000);
 
-		// return () => {
-		// 	channel.unsubscribe();
-		// };
+		return () => clearInterval(intervalId);
 	}, []);
 
 	const onDragEnd = async (result: DropResult) => {
@@ -122,59 +115,62 @@ export function KanbanBoard() {
 
 		const newProducts = { ...products };
 		const sourceColumn = [...newProducts[source.droppableId]];
-		const destColumn = [...newProducts[destination.droppableId]];
+		const destColumn = source.droppableId === destination.droppableId ? sourceColumn : [...newProducts[destination.droppableId]];
+
+		// Remove from source
 		const [removed] = sourceColumn.splice(source.index, 1);
-		destColumn.splice(destination.index, 0, removed);
+
+		// Add to destination
+		if (source.droppableId === destination.droppableId) {
+			// If moving within same column, use the same array
+			sourceColumn.splice(destination.index, 0, removed);
+		} else {
+			// If moving to different column, use destination array
+			destColumn.splice(destination.index, 0, removed);
+		}
 
 		const updated = {
 			...newProducts,
 			[source.droppableId]: sourceColumn,
-			[destination.droppableId]: destColumn,
 		};
+
+		// Only update destination column if it's different from source
+		if (source.droppableId !== destination.droppableId) {
+			updated[destination.droppableId] = destColumn;
+		}
+
+		console.log("updated", updated);
 
 		// Update local state
 		setProducts(updated);
 
-		// Update Supabase with new status
-		// try {
-		// 	const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];
-		// 	console.log(newStatus);
-		// 	console.log(draggableId);
-		// 	await supabase
-		// 		.from('products')
-		// 		.update({
-		// 			progress_level: newStatus,
-		// 		})
-		// 		.eq('id', draggableId);
-		// } catch (error) {
-		// 	console.error('Error updating product status:', error);
-		// 	setProducts(newProducts);
-		// }
+		// Only make API call if moving between columns
+		if (source.droppableId !== destination.droppableId) {
+			// Extract original product ID from the unique ID
+
+			// Update progress_level in Supabase
+			try {
+				const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];
+				const response = await fetch(`/api/products/${draggableId}`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({
+						progress_level: newStatus,
+					}),
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to update product status');
+				}
+			} catch (error) {
+				console.error('Error updating product status:', error);
+				// Revert local state if update fails
+				setProducts(newProducts);
+			}
+		}
 	};
-
-	// const deleteProduct = async (productId: string) => {
-	// 	try {
-	// 		console.log('Deleting product with ID:', productId);
-	// 		const { error } = await supabase.from('products').delete().eq('id', productId); // Don't convert to number, keep as string UUID
-
-	// 		if (error) {
-	// 			console.error('Supabase delete error:', error);
-	// 			throw error;
-	// 		}
-
-	// 		// If successful, update local state
-	// 		setProducts((prevProducts) => {
-	// 			const updatedProducts = { ...prevProducts };
-	// 			for (const columnId in updatedProducts) {
-	// 				updatedProducts[columnId] = updatedProducts[columnId].filter((product) => product.id !== productId);
-	// 			}
-	// 			return updatedProducts;
-	// 		});
-	// 	} catch (error) {
-	// 		console.error('Error deleting product:', error);
-	// 		alert('Failed to delete product');
-	// 	}
-	// };
 
 	const addNewProduct = async () => {
 		const defaultImage = 'default-product.png';
@@ -191,54 +187,9 @@ export function KanbanBoard() {
 			quantity: 0,
 		};
 
-		// try {
-		// 	const { data, error } = await supabase.from('products').insert(newProduct).select().single();
-
-		// 	if (error) throw error;
-		// 	router.push(`/edit/${data.id}`);
-		// } catch (error) {
-		// 	console.error('Error creating product:', error);
-		// }
+		// TODO: Add API endpoint to create new product
+		// After creation, redirect to edit page
 	};
-
-	// const assignSeamstress = async (productId: string, seamstress: any) => {
-	// 	try {
-	// 		// Find the product to update its assignees
-	// 		let productToUpdate = null;
-	// 		for (const column of Object.values(products)) {
-	// 			const found = column.find((p) => p.id === productId);
-	// 			if (found) {
-	// 				productToUpdate = found;
-	// 				break;
-	// 			}
-	// 		}
-
-	// 		if (!productToUpdate) return;
-
-	// 		// Create new assignees array without duplicates
-	// 		const newAssignees = productToUpdate.assignees.some((a) => a.id === seamstress.id)
-	// 			? productToUpdate.assignees
-	// 			: [...productToUpdate.assignees, seamstress];
-
-	// 		// Update Supabase
-	// 		const { error } = await supabase.from('products').update({ assignees: newAssignees }).eq('id', productId);
-
-	// 		if (error) throw error;
-
-	// 		// Update local state
-	// 		setProducts((prevProducts) => {
-	// 			const updatedProducts = { ...prevProducts };
-	// 			for (const columnId in updatedProducts) {
-	// 				updatedProducts[columnId] = updatedProducts[columnId].map((product) =>
-	// 					product.id === productId ? { ...product, assignees: newAssignees } : product
-	// 				);
-	// 			}
-	// 			return updatedProducts;
-	// 		});
-	// 	} catch (error) {
-	// 		console.error('Error assigning seamstress:', error);
-	// 	}
-	// };
 
 	return (
 		<div className='h-screen flex flex-col'>
@@ -255,30 +206,30 @@ export function KanbanBoard() {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-6 p-6 pt-0 h-full'>
-						{/* <KanbanColumn
+						<KanbanColumn
 							title='Not Started'
-							id='paraFazer'
-							products={products.paraFazer}
-							seamstresses={seamstresses}
-							onAssign={assignSeamstress}
-							onDelete={deleteProduct}
+							id='notStarted'
+							products={products.notStarted}
+							seamstresses={[]}
+							onAssign={() => {}}
+							onDelete={() => {}}
 						/>
 						<KanbanColumn
 							title='In Progress'
-							id='emAndamento'
-							products={products.emAndamento}
-							seamstresses={seamstresses}
-							onAssign={assignSeamstress}
-							onDelete={deleteProduct}
+							id='inProgress'
+							products={products.inProgress}
+							seamstresses={[]}
+							onAssign={() => {}}
+							onDelete={() => {}}
 						/>
 						<KanbanColumn
 							title='Done'
-							id='revisao'
-							products={products.revisao}
-							seamstresses={seamstresses}
-							onAssign={assignSeamstress}
-							onDelete={deleteProduct}
-						/> */}
+							id='done'
+							products={products.done}
+							seamstresses={[]}
+							onAssign={() => {}}
+							onDelete={() => {}}
+						/>
 					</div>
 				</div>
 			</DragDropContext>
