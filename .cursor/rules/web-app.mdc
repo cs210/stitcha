@@ -1,0 +1,310 @@
+---
+description: Use this rule for every action you take within a Next.js project.
+globs: 
+alwaysApply: true
+---
+You are an expert in TypeScript, Node.js, Next.js App Router, React, Shadcn UI, Radix UI and Tailwind.
+
+# Project Best Practises
+
+---
+
+## **Code Style and Structure**
+
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Favor iteration and modularisation over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files with exported components, subcomponents, helpers, static content, and types.
+- Use lowercase with dashes for directory names (e.g., components/auth-wizard).
+
+## **Optimisation and Best Practices**
+
+- Minimise the use of 'use client', useEffect, and setState; favor React Server Components (RSC) and Next.js SSR features.
+- Implement dynamic imports for code splitting and optimisation.
+- Use responsive design with a mobile-first approach.
+- Optimise images: use WebP format, include size data, implement lazy loading.
+
+## **Error Handling and Validation**
+
+- Prioritize error handling and edge cases:
+    - Use early returns for error conditions.
+    - Implement guard clauses to handle preconditions and invalid states early.
+    - Use custom error types for consistent error handling.
+
+## **UI and Styling**
+
+- Use modern UI frameworks (e.g., Tailwind CSS, Shadcn UI, Radix UI) for styling.
+- Implement consistent design and responsive patterns across platforms.
+
+## **State Management and Data Fetching**
+
+- Implement validation using Zod for schema validation.
+
+## **Security and Performance**
+
+- Implement proper error handling, user input validation, and secure coding practices.
+- Follow performance optimisation techniques, such as reducing load times and improving rendering efficiency.
+
+## **Testing and Documentation**
+
+- Write unit tests for components using Jest and React Testing Library.
+- Provide clear and concise comments for complex logic.
+- Use JSDoc comments for functions and components to improve IDE intellisense.
+
+## **Methodology**
+
+1. **System 2 Thinking**: Approach the problem with analytical rigor. Break down the requirements into smaller, manageable parts and thoroughly consider each step before implementation.
+2. **Tree of Thoughts**: Evaluate multiple possible solutions and their consequences. Use a structured approach to explore different paths and select the optimal one.
+3. **Iterative Refinement**: Before finalising the code, consider improvements, edge cases, and optimisations. Iterate through potential enhancements to ensure the final solution is robust.
+
+## **Process**
+
+1. **Deep Dive Analysis**: Begin by conducting a thorough analysis of the task at hand, considering the technical requirements and constraints.
+2. **Planning**: Develop a clear plan that outlines the architectural structure and flow of the solution, using  tags if necessary.
+3. **Implementation**: Implement the solution step-by-step, ensuring that each part adheres to the specified best practices.
+4. **Review and Optimise**: Perform a review of the code, looking for areas of potential optimisation and improvement.
+5. **Finalisation**: Finalise the code by ensuring it meets all requirements, is secure, and is performant.
+
+# Syntax
+
+---
+
+## Code Style Guidelines
+
+### Comments
+
+- Keep code comments clean and professional - no emojis.
+- Add comments only when necessary to explain complex logic.
+- Use industry-standard JSDoc format for function documentation.
+- Add JSDoc comments above functions to document their purpose and parameters (except for React components). Here's the format to use:
+    
+    ```tsx
+    /**
+       * Returns the average of two numbers.
+       *
+       * @param x - The first input number
+       * @param y - The second input number
+       * @returns The arithmetic mean of `x` and `y`
+       */
+    ```
+    
+
+## Type Safety
+
+There are two methods to generate TypeScript types from your Supabase database:
+
+### Method 1: Automated Script (Recommended)
+
+- Run `pnpm run types` to automatically generate and update types in "utils/types/supabase.ts"
+    - Prerequisites:
+        - Install Supabase CLI: `brew install supabase/tap/supabase`.
+        - Add environment variable to .env.local: `SUPABASE_ACCESS_TOKEN='sbp_v0_4a8947b8f9445cb0680254eeb3250f48853727a7'`.
+        - Login to Supabase: `supabase login`.
+
+### Method 2: Manual Download
+
+- Download and copy types manually from Supabase interface.
+    - Navigate to: API Docs → Introduction (Tables and Views).
+    - Generate and download types.
+    - Copy to: "utils/types/supabase.ts".
+
+### Important Notes
+
+- Update types whenever database schema changes.
+- Import types from "utils/schemas/global.types.ts" which are derived from "utils/types/supabase.ts".
+- All objects and state must have type declarations.
+- Reference: [Supabase TypeScript Support Documentation](mdc:stitcha/stitcha/stitcha/stitcha/stitcha/https:/supabase.com/docs/reference/javascript/typescript-support).
+
+### Error Handling
+
+- Use custom error types to handle specific error cases
+- Implement proper error boundaries in React components
+- Avoid using 'any' type for errors - create proper error interfaces
+
+### Generics
+
+- Use generics to create reusable, type-safe components and functions
+- Provide clear constraints on generic types where appropriate
+- Consider using generic factory functions for creating typed instances
+
+### Type Assertions
+
+- Minimise use of type assertions (as keyword)
+- Prefer type guards over type assertions
+- Use the 'unknown' type instead of 'any' when type is truly unknown
+
+### Null Handling
+
+- Enable strict null checks in tsconfig
+- Use optional chaining (?.) and nullish coalescing (??) operators
+- Avoid explicit null/undefined checks where possible
+
+### Module Organization
+
+- Keep interfaces and types close to where they're used
+- Use barrel files (index.ts) to consolidate exports
+- Avoid circular dependencies between modules
+
+# Function and Variable Naming
+
+---
+
+## Naming Conventions
+
+- Use **camelCase** for variable and function names (e.g., getUserData, isActive, firstName).
+- Use **PascalCase** for class names, interfaces, and type aliases (e.g., UserInterface, RequestHandler).
+- Use **UPPER_SNAKE_CASE** for constants (e.g., MAX_COUNT, API_KEY).
+- Prefix private class members with underscore (e.g., _privateMethod).
+- Use descriptive names that clearly indicate purpose (e.g., fetchUserData instead of getData).
+- Prefix boolean variables with question words (e.g., isEnabled, hasPermission, shouldUpdate).
+- Use plural names for arrays (e.g., users, productIds).
+
+## Function Declarations
+
+- For page components:
+    
+    ```tsx
+    export default function Page(/* Insert params here */) {
+        /* Insert code here */
+    }
+    ```
+    
+- For layout components:
+    
+    ```tsx
+    export default function Layout(/* Insert params here */) {
+        /* Insert code here */
+    }
+    ```
+    
+- For all other functions, use arrow syntax:
+    
+    ```tsx
+    const insertProduct = (/* Insert params here */) => {
+        /* Insert code here */
+    }
+    ```
+    
+
+# API
+
+---
+
+## API Route Conventions
+
+- Place all API routes in the app/api directory using the Next.js 13+ route handlers.
+- Structure API endpoints using RESTful conventions:
+    - GET: /api/resources - Fetch resources.
+    - POST: /api/resources - Create new resource.
+    - PUT: /api/resources/[id] - Update existing resource.
+    - DELETE: /api/resources/[id] - Remove resource.
+- Use appropriate HTTP status codes:
+    - 200: Successful requests.
+    - 201: Resource created.
+    - 400: Bad request.
+    - 401: Unauthorized.
+    - 404: Not found.
+    - 500: Server error.
+- Sample route.ts file with one API route:
+    
+    ```tsx
+    import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
+    import { auth } from '@clerk/nextjs/server';
+    import { NextResponse } from 'next/server';
+    
+    export async function GET(request: Request) {
+    	const { userId } = await auth();
+    
+    	// Check if the user is authenticated
+    	if (!userId) {
+    		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    	}
+    
+    	const supabase = await createClerkSupabaseClientSsr();
+    
+    	try {
+    		const { data, error } = await supabase.from('orders').select('*');
+    
+    		if (error) {
+    			throw new Error(error.message);
+    		}
+    
+    		return Response.json({ data }, { status: 200 });
+    	} catch (error) {
+    		return Response.json({ error: 'Internal server error' }, { status: 500 });
+    	}
+    }
+    ```
+    
+- Use middleware for authentication and request validation.
+- Keep route handlers focused and modular - separate business logic from route handling.
+- Document API endpoints using comments or dedicated documentation tools.
+- API responses should follow a consistent format:
+    - Include a data object (for successful responses) or error object (for errors).
+    - Always specify an HTTP status code (like 200 for success or 400 for errors).
+
+# Folder Conventions
+
+---
+
+## Dashboard
+
+- The dashboard folder contains all files and folders for the "/dashboard" route - the main part of our application.
+- For dynamic pages (like showing specific product details), we use square brackets in folder names to create flexible URLs:
+    - Example: A folder named "/products/[id]" can handle URLs like "/products/123" or "/products/abc", where "id" becomes whatever value is in the URL.
+    - For editing products, we place the "edit" folder inside the [id] folder, creating a clean URL structure: "/products/[id]/edit". This is preferred over “/products/edit/[id]”, as the former clearly indicates that the edit functionality applies to a specific product identified by its ID.
+
+## Components
+
+- The components directory is organised into three main folders:
+    - **assistant-ui:** contains specialised components for the chatbot interface.
+    - **custom:** houses all custom-built components developed for our specific needs.
+    - **ui:** stores pre-built components from the shadcn/ui library.
+
+## Hooks
+
+- The hooks folder contains utility functions from shadcn/ui that help manage responsive design, specifically for converting the sidebar into a mobile-friendly icon view.
+    - This functionality is currently required but may be replaced in future updates.
+
+## Styles
+
+- The styles folder contains our globals.css file, which defines application-wide styling rules and CSS variables used throughout the project.
+
+## Utils
+
+- The utils folder contains various utility files and folders:
+    - **functions/** - Contains utility functions used across the application.
+    - **schemas/** - Houses global.types.ts for type definitions.
+    - **supabase/** - Contains the Supabase client configuration.
+    - **types/** - Stores auto-generated Supabase types that are imported into global.types.ts.
+
+# Database
+
+---
+
+- When creating many-to-many relationship tables, name them by combining the names of the two tables involved. For instance, to link products and progress, name the table products_progress.
+
+# Pull Requests
+
+---
+
+## Branch Naming
+
+- Create new branches with the format: "/feature".
+    - Example: "/products-form" for products form-related work.
+
+## Commit Guidelines
+
+- Write clear, descriptive commit messages that explain the changes (all lowercase).
+- Make small, focused commits rather than large ones.
+- For complex changes, provide detailed explanations in the commit message.
+
+## Pull Request Process
+
+- All changes require a pull request (PR) with at least one reviewer.
+- Include in your PR:
+    - Detailed description of changes.
+    - Steps to test the functionality.
+- Any team member can be assigned as a reviewer.
+- Reviewers should complete reviews within 24 hours.
