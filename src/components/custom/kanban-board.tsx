@@ -1,9 +1,9 @@
 'use client';
 
+import { User } from '@/lib/schemas/global.types';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Plus } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { KanbanColumn } from './kanban-column';
@@ -15,7 +15,7 @@ interface Product {
 	type: string;
 	progress_level: string;
 	created_at: string;
-	assignees: any[];
+	assignees: User[];
 	progress: string;
 	description: string;
 	quantity: number;
@@ -35,14 +35,13 @@ const REVERSE_STATUS_MAPPING = {
 } as const;
 
 export function KanbanBoard() {
-	const router = useRouter();
 	const [products, setProducts] = useState<Record<string, Product[]>>({
 		notStarted: [],
 		inProgress: [],
 		done: [],
 	});
 
-	console.log("products", products);
+	console.log('products', products);
 
 	// Fetch products from API route on mount
 	useEffect(() => {
@@ -139,7 +138,7 @@ export function KanbanBoard() {
 			updated[destination.droppableId] = destColumn;
 		}
 
-		console.log("updated", updated);
+		console.log('updated', updated);
 
 		// Update local state
 		setProducts(updated);
@@ -173,20 +172,18 @@ export function KanbanBoard() {
 	};
 
 	const addNewProduct = async () => {
-		const defaultImage = 'default-product.png';
-
-		const newProduct = {
-			name: 'Untitled',
-			image_url: defaultImage,
-			type: 'Prototype',
-			progress_level: 'Not Started',
-			created_at: new Date().toISOString(),
-			assignees: [],
-			progress: '0/8',
-			description: '',
-			quantity: 0,
-		};
-
+		// const defaultImage = 'default-product.png';
+		// const newProduct = {
+		// 	name: 'Untitled',
+		// 	image_url: defaultImage,
+		// 	type: 'Prototype',
+		// 	progress_level: 'Not Started',
+		// 	created_at: new Date().toISOString(),
+		// 	assignees: [],
+		// 	progress: '0/8',
+		// 	description: '',
+		// 	quantity: 0,
+		// };
 		// TODO: Add API endpoint to create new product
 		// After creation, redirect to edit page
 	};
@@ -206,30 +203,9 @@ export function KanbanBoard() {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-6 p-6 pt-0 h-full'>
-						<KanbanColumn
-							title='Not Started'
-							id='notStarted'
-							products={products.notStarted}
-							seamstresses={[]}
-							onAssign={() => {}}
-							onDelete={() => {}}
-						/>
-						<KanbanColumn
-							title='In Progress'
-							id='inProgress'
-							products={products.inProgress}
-							seamstresses={[]}
-							onAssign={() => {}}
-							onDelete={() => {}}
-						/>
-						<KanbanColumn
-							title='Done'
-							id='done'
-							products={products.done}
-							seamstresses={[]}
-							onAssign={() => {}}
-							onDelete={() => {}}
-						/>
+						<KanbanColumn title='Not Started' id='notStarted' products={products.notStarted} seamstresses={[]} onAssign={() => {}} onDelete={() => {}} />
+						<KanbanColumn title='In Progress' id='inProgress' products={products.inProgress} seamstresses={[]} onAssign={() => {}} onDelete={() => {}} />
+						<KanbanColumn title='Done' id='done' products={products.done} seamstresses={[]} onAssign={() => {}} onDelete={() => {}} />
 					</div>
 				</div>
 			</DragDropContext>

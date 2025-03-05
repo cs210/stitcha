@@ -1,9 +1,9 @@
-import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 // get a specific product by id
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	const supabase = await createClerkSupabaseClientSsr();
 	const { id: productId } = await params;
 
@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // update the progress_level of a specific product (dragged in kanban)
-export async function PATCH(request: Request, { params }: { params: { id: string } }) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	const { userId } = await auth();
 	const { id: productId } = await params;
 

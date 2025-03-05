@@ -1,8 +1,8 @@
-import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { NextResponse } from 'next/server';
 
 // get a specific order by id
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	const supabase = await createClerkSupabaseClientSsr();
 	const { id: orderId } = await params;
 
@@ -20,7 +20,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 }
 
 // delete a specific order by id
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
 	const supabase = await createClerkSupabaseClientSsr();
 	const { id: orderId } = await params;
 

@@ -1,4 +1,4 @@
-import { Tables } from '@/utils/types/supabase';
+import { Tables } from '@/lib/types/supabase';
 
 // These are not dynamically generated and will need to be updated manually if any changes are made to the database
 export type LaborType = Tables<'labor_types'>;

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Order } from '@/utils/schemas/global.types';
+import { Order } from '@/lib/schemas/global.types';
 import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -17,7 +17,6 @@ export default function Page() {
 	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'client' | 'due_date' | 'order_quantity' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
 	useEffect(() => {
 		async function getOrders() {
@@ -36,7 +35,7 @@ export default function Page() {
 	}, []);
 
 	// filter orders based on search query
-	const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
+	const filteredOrders = orders.filter((order: Order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
 
 	// sort orders based on selected column
 	const sortedOrders = [...filteredOrders].sort((a, b) => {
@@ -67,7 +66,7 @@ export default function Page() {
 
 	return (
 		<div className='p-6'>
-			<HeaderContainer className='mb-4'>
+			<HeaderContainer>
 				<Header text='Orders' />
 				<Description text='Manage and track customer orders.' />
 			</HeaderContainer>
@@ -81,10 +80,10 @@ export default function Page() {
 					className='w-full'
 				/>
 				<Button asChild>
-					<a href='/dashboard/orders/new'>
+					<Link href='/dashboard/orders/new'>
 						<Plus size={16} className='mr-2' />
 						New Order
-					</a>
+					</Link>
 				</Button>
 			</div>
 

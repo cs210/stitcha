@@ -1,8 +1,8 @@
-import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET() {
 	const { userId } = await auth();
 
 	// Check if the user is authenticated
@@ -21,7 +21,7 @@ export async function GET(request: Request) {
 
 		return Response.json({ data }, { status: 200 });
 	} catch (error) {
-		return Response.json({ error: 'Internal server error' }, { status: 500 });
+		return Response.json({ error }, { status: 500 });
 	}
 }
 
@@ -52,15 +52,12 @@ export async function POST(request: Request) {
 			.select()
 			.single();
 
-		console.log(data);
-		console.log(error);
-
 		if (error) {
 			throw new Error(error.message);
 		}
 
 		return Response.json({ data, success: true }, { status: 201 });
 	} catch (error) {
-		return Response.json({ error: 'Internal server error' }, { status: 500 });
+		return Response.json({ error }, { status: 500 });
 	}
 }

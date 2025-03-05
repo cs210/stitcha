@@ -8,8 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Product } from '@/utils/schemas/global.types';
+import { Product } from '@/lib/schemas/global.types';
 import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash, X } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function ProductPage() {
@@ -97,7 +98,13 @@ export default function ProductPage() {
 					</div>
 					<div className='grid grid-cols-2 gap-6'>
 						<div className='col-span-2'>
-							<img src={product.image_url} alt={product.name} className='w-full h-96 object-contain rounded-lg' />
+							<Image
+								src={product.image_url || '/images/tote.png'}
+								alt={product.name}
+								className='w-full h-96 object-contain rounded-lg'
+								width={100}
+								height={100}
+							/>
 						</div>
 						<div className='space-y-3'>
 							<p>
@@ -196,7 +203,7 @@ export default function ProductPage() {
 									}}
 								>
 									<TableCell>
-										<img src={product.image_url} alt={product.name} className='w-16 h-16 object-cover' />
+										<Image src={product.image_url || '/images/tote.png'} alt={product.name} className='w-16 h-16 object-cover' width={100} height={100} />
 									</TableCell>
 									<TableCell>{product.name}</TableCell>
 									<TableCell>
