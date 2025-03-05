@@ -6,17 +6,9 @@ import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ArrowUpDown, X } from 'lucide-react';
+import { Order } from '@/utils/schemas/global.types';
+import { ArrowUpDown, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-interface Order {
-	id: string;
-	client: string;
-	contact: string;
-	order_quantity: number;
-	due_date: string;
-	product_id: string;
-}
 
 export default function Page() {
 	const [orders, setOrders] = useState<Order[]>([]);
@@ -119,13 +111,21 @@ export default function Page() {
 				<Description text='Manage and track customer orders.' />
 			</HeaderContainer>
 
-			{/* search Input */}
-			<Input
-				placeholder='Search orders by ID, client, or contact...'
-				value={searchQuery}
-				onChange={(e) => setSearchQuery(e.target.value)}
-				className='mb-4 w-full'
-			/>
+			{/* search Input and New Order button */}
+			<div className='flex gap-4 mb-4'>
+				<Input
+					placeholder='Search orders by ID, client, or contact...'
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+					className='w-full'
+				/>
+				<Button asChild>
+					<a href='/dashboard/orders/new'>
+						<Plus size={16} className='mr-2' />
+						New Order
+					</a>
+				</Button>
+			</div>
 
 			{/* Orders Table */}
 			<Table>
