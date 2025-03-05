@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Icons } from '@/components/ui/icons';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import * as Clerk from '@clerk/elements/common';
@@ -38,7 +37,7 @@ export default function Page() {
 												<Button disabled={isGlobalLoading}>
 													<Clerk.Loading>
 														{(isLoading) => {
-															return isLoading ? <Icons.spinner className='size-4 animate-spin' /> : 'Continue';
+															return isLoading ? 'Loading...' : 'Continue';
 														}}
 													</Clerk.Loading>
 												</Button>
@@ -72,7 +71,7 @@ export default function Page() {
 													<Button disabled={isGlobalLoading}>
 														<Clerk.Loading>
 															{(isLoading) => {
-																return isLoading ? <Icons.spinner className='size-4 animate-spin' /> : 'Continue';
+																return isLoading ? 'Loading...' : 'Continue';
 															}}
 														</Clerk.Loading>
 													</Button>

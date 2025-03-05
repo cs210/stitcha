@@ -1,9 +1,8 @@
-import { createClerkSupabaseClientSsr } from '@/utils/supabase/client';
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
-import { IdCardIcon } from 'lucide-react';
 import { NextResponse } from 'next/server';
 
-export async function GET(request: Request) {
+export async function GET() {
 	const { userId } = await auth();
 
 	// Check if the user is authenticated
@@ -22,6 +21,6 @@ export async function GET(request: Request) {
 
 		return Response.json({ data }, { status: 200 });
 	} catch (error) {
-		return Response.json({ error: 'Internal server error' }, { status: 500 });
+		return Response.json({ error }, { status: 500 });
 	}
 }

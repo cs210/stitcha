@@ -1,3 +1,4 @@
+import { Product, User } from '@/lib/schemas/global.types';
 import { Draggable } from '@hello-pangea/dnd';
 import { Clock, Pencil, Trash2 } from 'lucide-react';
 import Image from 'next/image';
@@ -7,7 +8,7 @@ import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
 
 interface ProductCardProps {
-	product: any;
+	product: Product;
 	index: number;
 	onDelete: (productId: string) => void;
 }
@@ -61,7 +62,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 								{assignedSeamstress && (
 									<div className='flex items-center gap-1 text-sm text-gray-500'>
 										<Avatar className='h-5 w-5'>
-											<AvatarImage src={assignedSeamstress.avatar} />
+											<AvatarImage src={assignedSeamstress.image_url} />
 											<AvatarFallback>{assignedSeamstress.name[0]}</AvatarFallback>
 										</Avatar>
 										<span>{assignedSeamstress.name}</span>
@@ -93,9 +94,9 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 
 					{product.assignees.length > 1 && (
 						<div className='flex justify-end mt-2 -space-x-2'>
-							{product.assignees.slice(1).map((assignee: any, i: number) => (
+							{product.assignees.slice(1).map((assignee: User, i: number) => (
 								<Avatar key={`${product.id}-${assignee.id}-${i}-${Math.random().toString(36)}`} className='border-2 border-white w-6 h-6'>
-									<AvatarImage src={assignee.avatar} />
+									<AvatarImage src={assignee.image_url} />
 									<AvatarFallback>{assignee.name[0]}</AvatarFallback>
 								</Avatar>
 							))}
