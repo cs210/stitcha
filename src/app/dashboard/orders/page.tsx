@@ -4,10 +4,12 @@ import { Description } from '@/components/custom/description';
 import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Order } from '@/utils/schemas/global.types';
-import { ArrowUpDown, Plus, X } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
@@ -63,47 +65,6 @@ export default function Page() {
 		}
 	};
 
-	const Modal = ({ order, onClose }: { order: Order | null; onClose: () => void }) => {
-		if (!order) return null;
-
-		return (
-			<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-				<div className='bg-white rounded-lg p-8 max-w-4xl w-full max-h-[95vh] overflow-y-auto'>
-					<div className='flex justify-between items-center mb-6'>
-						<h2 className='text-2xl font-bold'>Order Details</h2>
-						<button onClick={onClose} className='p-1'>
-							<X size={24} />
-						</button>
-					</div>
-					<div className='grid grid-cols-2 gap-6'>
-						<div className='space-y-3'>
-							<p>
-								<strong>Order ID:</strong> {order.id}
-							</p>
-							<p>
-								<strong>Client:</strong> {order.client}
-							</p>
-							<p>
-								<strong>Contact:</strong> {order.contact}
-							</p>
-						</div>
-						<div className='space-y-3'>
-							<p>
-								<strong>Order Quantity:</strong> {order.order_quantity}
-							</p>
-							<p>
-								<strong>Due Date:</strong> {new Date(order.due_date).toLocaleDateString('en-US')}
-							</p>
-							<p>
-								<strong>Product ID:</strong> {order.product_id}
-							</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		);
-	};
-
 	return (
 		<div className='p-6'>
 			<HeaderContainer className='mb-4'>
@@ -152,11 +113,57 @@ export default function Page() {
 				<TableBody>
 					{sortedOrders.length ? (
 						sortedOrders.map((order) => (
-							<TableRow key={order.id} className='cursor-pointer hover:bg-gray-100' onClick={() => setSelectedOrder(order)}>
-								<TableCell>{order.client}</TableCell>
+							<TableRow key={order.id} className='cursor-pointer hover:bg-gray-100'>
+								<TableCell>
+									<Link href={`/dashboard/orders/${order.id}`} className='block'>
+										{order.client}
+									</Link>
+								</TableCell>
 								<TableCell>{order.contact}</TableCell>
 								<TableCell>{order.order_quantity}</TableCell>
 								<TableCell>{new Date(order.due_date).toLocaleDateString('en-US')}</TableCell>
+								<TableCell>
+									<div className='actions-dropdown'>
+										<DropdownMenu>
+											<DropdownMenuTrigger asChild>
+												<Button variant='ghost' className='h-8 w-8 p-0'>
+													<span className='sr-only'>Open menu</span>
+													<MoreHorizontal className='h-4 w-4' />
+												</Button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent align='end'>
+												<DropdownMenuItem
+													onClick={() => {
+														// Handle edit action
+														console.log('Edit order:', order.id);
+													}}
+												>
+													<Pencil className='mr-2 h-4 w-4' />
+													Edit
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() => {
+														// Handle delete action
+														console.log('Delete order:', order.id);
+														fetch(`/api/orders/${order.id}`, {
+															method: 'DELETE',
+															headers: {
+																'Content-Type': 'application/json',
+															},
+														});
+
+														// refresh the orders list
+														window.location.reload();
+													}}
+													className='text-red-600'
+												>
+													<Trash className='mr-2 h-4 w-4' />
+													Delete
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</div>
+								</TableCell>
 							</TableRow>
 						))
 					) : (
@@ -168,8 +175,6 @@ export default function Page() {
 					)}
 				</TableBody>
 			</Table>
-
-			{selectedOrder && <Modal order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
 		</div>
 	);
 }
