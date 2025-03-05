@@ -185,24 +185,40 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "product_progress_product_id_fkey1"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "product_progress_progress_id_fkey"
             columns: ["progress_id"]
             isOneToOne: false
             referencedRelation: "progress"
             referencedColumns: ["id"]
           },
+        ]
+      }
+      product_users: {
+        Row: {
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
           {
-            foreignKeyName: "product_progress_progress_id_fkey1"
-            columns: ["progress_id"]
+            foreignKeyName: "product_users_product_id_fkey"
+            columns: ["product_id"]
             isOneToOne: false
-            referencedRelation: "progress"
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

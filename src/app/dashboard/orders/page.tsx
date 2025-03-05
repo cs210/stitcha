@@ -1,49 +1,50 @@
 'use client';
 
-// import { createClerkSupabaseClient } from '@/app/supabase/client';
 import { Description } from '@/components/custom/description';
 import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Order } from '@/utils/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
-import { ArrowUpDown, Plus } from 'lucide-react';
+import { ArrowUpDown, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function Page() {
-	const { user } = useUser();
+interface Order {
+	id: string;
+	client: string;
+	contact: string;
+	order_quantity: number;
+	due_date: string;
+	product_id: string;
+}
 
-	const [loading, setLoading] = useState<boolean>(false);
+export default function Page() {
 	const [orders, setOrders] = useState<Order[]>([]);
-	const [searchQuery, setSearchQuery] = useState<string>('');
+	const [searchQuery, setSearchQuery] = useState('');
 	const [sortBy, setSortBy] = useState<'client' | 'due_date' | 'order_quantity' | null>(null);
 	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+	const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
 	useEffect(() => {
-		if (!user) return;
-
-		// Anonymous function to fetch products from Supabase
-		(async () => {
-			setLoading(true);
-
+		async function getOrders() {
 			const response = await fetch('/api/orders');
-			const { data, error } = await response.json();
+			const result = await response.json();
 
-			if (!error) {
-				setOrders(data);
+			if (!response.ok) {
+				throw new Error(result.error);
 			}
 
-			setLoading(false);
-		})();
-	}, [user]);
+			const { data } = result;
 
-	// Filter orders based on search query
+			setOrders(data);
+		}
+		getOrders();
+	}, []);
+
+	// filter orders based on search query
 	const filteredOrders = orders.filter((order) => [order.id, order.client, order.contact].join(' ').toLowerCase().includes(searchQuery.toLowerCase()));
 
-	// Sort filtered orders based on the selected criteria and order
+	// sort orders based on selected column
 	const sortedOrders = [...filteredOrders].sort((a, b) => {
 		if (!sortBy) return 0;
 		let valA = a[sortBy];
@@ -60,7 +61,7 @@ export default function Page() {
 		return sortOrder === 'asc' ? (valA > valB ? 1 : -1) : valA < valB ? 1 : -1;
 	});
 
-	// Function to toggle sorting order based on the selected column
+	// toggle sorting function
 	const toggleSort = (column: 'client' | 'due_date' | 'order_quantity') => {
 		if (sortBy === column) {
 			setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -70,28 +71,63 @@ export default function Page() {
 		}
 	};
 
-	// Loading state
-	if (loading) return <Loader />;
+	const Modal = ({ order, onClose }: { order: Order | null; onClose: () => void }) => {
+		if (!order) return null;
+
+		return (
+			<div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
+				<div className='bg-white rounded-lg p-8 max-w-4xl w-full max-h-[95vh] overflow-y-auto'>
+					<div className='flex justify-between items-center mb-6'>
+						<h2 className='text-2xl font-bold'>Order Details</h2>
+						<button onClick={onClose} className='p-1'>
+							<X size={24} />
+						</button>
+					</div>
+					<div className='grid grid-cols-2 gap-6'>
+						<div className='space-y-3'>
+							<p>
+								<strong>Order ID:</strong> {order.id}
+							</p>
+							<p>
+								<strong>Client:</strong> {order.client}
+							</p>
+							<p>
+								<strong>Contact:</strong> {order.contact}
+							</p>
+						</div>
+						<div className='space-y-3'>
+							<p>
+								<strong>Order Quantity:</strong> {order.order_quantity}
+							</p>
+							<p>
+								<strong>Due Date:</strong> {new Date(order.due_date).toLocaleDateString('en-US')}
+							</p>
+							<p>
+								<strong>Product ID:</strong> {order.product_id}
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	};
 
 	return (
 		<div className='p-6'>
-			<HeaderContainer>
+			<HeaderContainer className='mb-4'>
 				<Header text='Orders' />
 				<Description text='Manage and track customer orders.' />
 			</HeaderContainer>
 
-			<div className='flex gap-2 mb-4 w-full'>
-				<Input
-					placeholder='Search orders by ID, client, or contact...'
-					value={searchQuery}
-					onChange={(e) => setSearchQuery(e.target.value)}
-					className='w-full'
-				/>
-				<Button variant='outline' size='icon' onClick={() => (window.location.href = '/dashboard/orders/new')}>
-					<Plus size={16} />
-				</Button>
-			</div>
+			{/* search Input */}
+			<Input
+				placeholder='Search orders by ID, client, or contact...'
+				value={searchQuery}
+				onChange={(e) => setSearchQuery(e.target.value)}
+				className='mb-4 w-full'
+			/>
 
+			{/* Orders Table */}
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -116,7 +152,7 @@ export default function Page() {
 				<TableBody>
 					{sortedOrders.length ? (
 						sortedOrders.map((order) => (
-							<TableRow key={order.id}>
+							<TableRow key={order.id} className='cursor-pointer hover:bg-gray-100' onClick={() => setSelectedOrder(order)}>
 								<TableCell>{order.client}</TableCell>
 								<TableCell>{order.contact}</TableCell>
 								<TableCell>{order.order_quantity}</TableCell>
@@ -132,6 +168,8 @@ export default function Page() {
 					)}
 				</TableBody>
 			</Table>
+
+			{selectedOrder && <Modal order={selectedOrder} onClose={() => setSelectedOrder(null)} />}
 		</div>
 	);
 }
