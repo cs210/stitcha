@@ -8,24 +8,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Product } from '@/utils/schemas/global.types';
 import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-
-interface Product {
-	id: string;
-	name: string;
-	system_code: string;
-	inmetro_cert_number: string;
-	barcode: string;
-	description: string;
-	weight: number;
-	width: number;
-	height: number;
-	percent_pieces_lost: number;
-	image_url: string;
-	product_type: string;
-	progress_level: 'In Progress' | 'Not Started' | 'Done';
-}
 
 export default function ProductPage() {
 	const [products, setProducts] = useState<Product[]>([]);
