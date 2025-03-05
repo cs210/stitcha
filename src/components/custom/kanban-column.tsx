@@ -1,6 +1,4 @@
 import { Droppable } from '@hello-pangea/dnd';
-import { MoreHorizontal, Plus } from 'lucide-react';
-import { Button } from '../ui/button';
 import { ProductCard } from './product-card';
 
 interface KanbanColumnProps {
@@ -17,14 +15,6 @@ export function KanbanColumn({ title, id, products, seamstresses, onAssign, onDe
 		<div className='flex flex-col min-w-[350px] max-w-[350px] h-full'>
 			<div className='flex items-center justify-between mb-4'>
 				<h2 className='text-lg font-semibold'>{title}</h2>
-				<div className='flex gap-1'>
-					<Button size='icon' variant='ghost' className='h-8 w-8'>
-						<MoreHorizontal className='h-4 w-4' />
-					</Button>
-					<Button size='icon' variant='ghost' className='h-8 w-8'>
-						<Plus className='h-4 w-4' />
-					</Button>
-				</div>
 			</div>
 			<Droppable droppableId={id}>
 				{(provided) => (

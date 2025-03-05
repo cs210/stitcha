@@ -1,10 +1,8 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { User } from '@/utils/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import { Bell, Loader, Mail, Phone, Search, PhoneIcon as WhatsappIcon } from 'lucide-react';
+import { Loader, Mail, Phone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
@@ -38,26 +36,8 @@ export default function Page() {
 	if (loading) return <Loader />;
 
 	return (
-		<div className='flex h-screen bg-[#F8F7FD]'>
+		<div className='flex h-screen'>
 			<div className='flex-1 overflow-auto'>
-				<header className='bg-white px-6 py-4 flex items-center justify-between border-b'>
-					<div className='flex-1 max-w-xl'>
-						<div className='relative'>
-							<Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4' />
-							<Input type='search' placeholder='Search...' className='w-full pl-10 bg-[#F8F7FD] border-none' />
-						</div>
-					</div>
-
-					<div className='flex items-center gap-4'>
-						<Button variant='ghost' size='icon' className='rounded-full'>
-							<Bell className='w-5 h-5' />
-						</Button>
-						<Button variant='ghost' size='icon' className='rounded-full'>
-							<WhatsappIcon className='w-5 h-5' />
-						</Button>
-					</div>
-				</header>
-
 				<main className='p-6'>
 					<div className='max-w-7xl mx-auto'>
 						<h1 className='text-2xl font-bold mb-8'>Seamstresses</h1>
