@@ -2,6 +2,7 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
 	images: {
+		domains: ['https://mwfejtgqjajkqhdfjtzh.supabase.co/storage/v1/s3', 'm.media-amazon.com'],
 		remotePatterns: [
 			{
 				protocol: 'https',
