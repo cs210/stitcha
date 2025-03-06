@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 
 function AssistantInstructions() {
     const [products, setProducts] = useState(null);
+    const [orders, setOrders] = useState(null);
 
     const fetchProducts = async () => {
         try {
@@ -23,24 +24,44 @@ function AssistantInstructions() {
         }
     }
 
+    const fetchOrders = async () => {
+        try {
+            const response = await fetch('/api/orders');
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+            setOrders(result.data);
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+        }
+    }
+
     useEffect(() => {
         fetchProducts();
+        fetchOrders();
     }, []);
 
     useEffect(() => {
         console.log("PRODUCTS", products);
-    }, [products]);
+        console.log("ORDERS", orders);
+    }, [products, orders]);
 
     const productDetails = products ? JSON.stringify(products, null, 2) : "No product data available";
+    const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
+    const language = "English";
 
-    const instruction = `You are a helpful form assistant. You have access to all the data from the following table: ${productDetails}. If the user asks questions about a product, return the relevant information strictly from this table. If the user asks questions about a product that is not in the table, say that you don't have information about that product.`
+    const instruction = `You are a helpful assistant. You have access to all the data from the following two Supabase tables: ${productDetails} and ${orderDetails}. If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about an order, return the relevant information strictly from the order table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. If the user asks questions about an order that is not in the order table, say that you don't have information about that order.
+    You should only respond to the user in ${language}.`
 
     console.log("INSTRUCTION ", instruction)
 
     // Simple string usage
     useAssistantInstructions(instruction);
-    
+
     return <div></div>;
+    
 }
 
 export default function Page() {
