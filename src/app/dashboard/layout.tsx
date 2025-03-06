@@ -19,7 +19,7 @@ export default function Layout({
 							</BreadcrumbItem>
 							<BreadcrumbSeparator />
 							<BreadcrumbItem>
-								<BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+								<BreadcrumbPage>Kanban</BreadcrumbPage>
 							</BreadcrumbItem>
 						</BreadcrumbList>
 					</Breadcrumb>

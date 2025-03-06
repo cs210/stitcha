@@ -58,13 +58,13 @@ export default function Page() {
 							<SelectContent>
 								<SelectItem value='pt'>Português</SelectItem>
 								<SelectItem value='en'>English</SelectItem>
-								<SelectItem value='es'>Español</SelectItem>
+								{/* <SelectItem value='es'>Español</SelectItem> */}
 							</SelectContent>
 						</Select>
 					</div>
 				</div>
 
-				<div className='pt-6'>
+				<div className='pt-8'>
 					<Button>Save Changes</Button>
 				</div>
 			</div>

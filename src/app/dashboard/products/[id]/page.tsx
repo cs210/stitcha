@@ -72,13 +72,13 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 			</HeaderContainer>
 
 			<div className='py-4'>
-				<div className='grid grid-cols-12 gap-8 max-w-7xl mx-auto'>
-					<div className='col-span-6'>
+				<div className='grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto'>
+					<div className='md:col-span-6'>
 						<Image src={product?.image_url || ''} alt={product?.name || ''} className='w-full h-96 object-contain rounded-lg border' width={100} height={100} />
 					</div>
-					<div className='col-span-6'>
+					<div className='md:col-span-6'>
 						<div className='space-y-6'>
-							<div className='grid grid-cols-2 gap-6'>
+							<div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
 								<div className='space-y-4'>
 									<p>
 										<strong>System Code:</strong> {product?.system_code}
