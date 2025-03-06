@@ -25,7 +25,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
 					className='bg-white rounded-lg shadow px-5 py-3 relative group min-w-[380px] cursor-pointer'
-					onClick={() => router.push(`/edit/${product.id}`)}
+					onClick={() => router.push(`/dashboard/products/${product.id}`)}
 				>
 					<div className='absolute top-3 right-5 flex gap-2 z-10'>
 						<Button
@@ -34,7 +34,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 							className='text-gray-400 hover:text-gray-600 h-7 w-7 bg-white/80 backdrop-blur-sm'
 							onClick={(e) => {
 								e.stopPropagation();
-								router.push(`/edit/${product.id}`);
+								// router.push(`/dashboard/products/${product.id}/edit`);
 							}}
 						>
 							<Pencil className='h-4 w-4' />
@@ -45,6 +45,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 							className='text-gray-400 hover:text-red-600 h-7 w-7 bg-white/80 backdrop-blur-sm'
 							onClick={(e) => {
 								e.stopPropagation();
+
 								onDelete(product.id);
 							}}
 						>
@@ -54,7 +55,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 
 					<div className='flex gap-4 pt-8'>
 						<div className='flex-1'>
-							<h3 className='font-medium line-clamp-1 pr-24'>{product.title}</h3>
+							<h3 className='font-medium line-clamp-1 pr-12'>{product.title}</h3>
 							<div className='flex items-center gap-2 mt-1'>
 								<Badge variant='secondary' className='bg-orange-100 text-orange-600'>
 									{product.type}

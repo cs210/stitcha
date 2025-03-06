@@ -103,13 +103,13 @@ export default function Page() {
 	if (loading) return <Loader />;
 
 	return (
-		<div className='p-6'>
+		<>
 			<HeaderContainer>
 				<Header text='Orders' />
 				<Description text='Manage and track customer orders.' />
 			</HeaderContainer>
 
-			<div className='flex gap-2 mb-4 w-full'>
+			<div className='py-4'>
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-full'>
 						<div className='grid grid-cols-2 gap-6'>
@@ -200,10 +200,11 @@ export default function Page() {
 								)}
 							/>
 						</div>
+
 						<Button type='submit'>Submit</Button>
 					</form>
 				</Form>
 			</div>
-		</div>
+		</>
 	);
 }

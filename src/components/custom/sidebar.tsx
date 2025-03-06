@@ -3,18 +3,18 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { UserButton } from '@clerk/nextjs';
-import { ClipboardIcon, LayoutGridIcon, Settings2Icon, ShoppingCart, Users, MessageSquare } from 'lucide-react';
+import { BrainIcon, ClipboardIcon, KanbanIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
 const navRoutes = [
-	{ href: '/dashboard/kanban', icon: LayoutGridIcon, label: 'Kanban' },
-	{ href: '/dashboard/products', icon: ClipboardIcon, label: 'Products' },
-	{ href: '/dashboard/orders', icon: ShoppingCart, label: 'Orders' },
+	{ href: '/dashboard/assistant', icon: BrainIcon, label: 'Assistant' },
+	{ href: '/dashboard/kanban', icon: KanbanIcon, label: 'Kanban' },
+	{ href: '/dashboard/products', icon: ShirtIcon, label: 'Products' },
+	{ href: '/dashboard/orders', icon: ClipboardIcon, label: 'Orders' },
 	{ href: '/dashboard/seamstresses', icon: Users, label: 'Seamstresses' },
-	{ href: '/dashboard/settings', icon: Settings2Icon, label: 'Settings' },
-	{ href: '/dashboard/assistant', icon: MessageSquare, label: 'Assistant' },
+	{ href: '/dashboard/settings', icon: SettingsIcon, label: 'Settings' },
 ];
 
 export function Sidebar() {
