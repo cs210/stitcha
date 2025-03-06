@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { UserButton } from '@clerk/nextjs';
-import { ClipboardIcon, LayoutGridIcon, Settings2Icon, ShoppingCart, Users } from 'lucide-react';
+import { ClipboardIcon, LayoutGridIcon, Settings2Icon, ShoppingCart, Users, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -14,6 +14,7 @@ const navRoutes = [
 	{ href: '/dashboard/orders', icon: ShoppingCart, label: 'Orders' },
 	{ href: '/dashboard/seamstresses', icon: Users, label: 'Seamstresses' },
 	{ href: '/dashboard/settings', icon: Settings2Icon, label: 'Settings' },
+	{ href: '/dashboard/assistant', icon: MessageSquare, label: 'Assistant' },
 ];
 
 export function Sidebar() {
