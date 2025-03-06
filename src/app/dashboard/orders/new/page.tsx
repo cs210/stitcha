@@ -1,6 +1,5 @@
 'use client';
 
-// import { createClerkSupabaseClient } from '@/app/supabase/client';
 import { Description } from '@/components/custom/description';
 import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
@@ -30,6 +29,18 @@ export default function Page() {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
 
+	// 1. Define your form.
+	const form = useForm<z.infer<typeof formSchema>>({
+		resolver: zodResolver(formSchema),
+		defaultValues: {
+			client: '',
+			contact: '',
+			order_quantity: 0,
+			due_date: new Date(),
+			product_id: '',
+		},
+	});
+
 	useEffect(() => {
 		if (!user) return;
 
@@ -52,19 +63,7 @@ export default function Page() {
 
 			setLoading(false);
 		})();
-	}, [user]);
-
-	// 1. Define your form.
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			client: '',
-			contact: '',
-			order_quantity: 0,
-			due_date: new Date(),
-			product_id: '',
-		},
-	});
+	}, [user, form]);
 
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -91,10 +90,10 @@ export default function Page() {
 			form.reset();
 
 			// Show success message or redirect
-			toast('Order created successfully');
+			toast.success('Order created successfully');
 		} catch (error) {
-			// Handle errors
-			toast('Error creating order');
+			console.error(error);
+			// toast.error(error);
 		} finally {
 			setLoading(false);
 		}

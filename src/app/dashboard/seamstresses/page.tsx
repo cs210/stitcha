@@ -1,17 +1,15 @@
 'use client';
 
-import { User } from '@/utils/schemas/global.types';
+import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { Loader, Mail, Phone } from 'lucide-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
 	const { user } = useUser();
 
 	const [loading, setLoading] = useState<boolean>(false);
-	const [searchQuery, setSearchQuery] = useState<string>('');
-	const [sortBy, setSortBy] = useState<'name' | 'weight' | 'product_type' | null>(null);
-	const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
 	useEffect(() => {
@@ -42,14 +40,16 @@ export default function Page() {
 					<div className='max-w-7xl mx-auto'>
 						<h1 className='text-2xl font-bold mb-8'>Seamstresses</h1>
 						<div className='flex flex-wrap gap-6'>
-							{seamstresses.map((seamstress) => (
+							{seamstresses.map((seamstress: User) => (
 								<div key={seamstress.id} className='bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow w-[300px]'>
 									<div className='flex flex-col items-center text-center mb-6'>
 										<div className='w-32 h-32 rounded-full overflow-hidden mb-4'>
-											<img
+											<Image
 												src={seamstress.image_url || '/placeholder.svg'}
 												alt={`${seamstress.first_name} ${seamstress.last_name}`}
 												className='w-full h-full object-cover'
+												width={100}
+												height={100}
 											/>
 										</div>
 										<h3 className='text-xl font-semibold mb-1'>
