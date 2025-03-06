@@ -230,6 +230,7 @@ export type Database = {
           height: number
           id: string
           image_url: string | null
+          img_urls: Json | null
           inmetro_cert_number: string | null
           name: string
           percent_pieces_lost: number | null
@@ -245,6 +246,7 @@ export type Database = {
           height?: number
           id?: string
           image_url?: string | null
+          img_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
           percent_pieces_lost?: number | null
@@ -260,6 +262,7 @@ export type Database = {
           height?: number
           id?: string
           image_url?: string | null
+          img_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
           percent_pieces_lost?: number | null

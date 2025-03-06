@@ -131,12 +131,19 @@ export default function ProductPage() {
         method: "DELETE",
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to delete product");
+        throw new Error(data.error || "Failed to delete product");
       }
 
-      // Remove the product from the local state
-      setProducts(products.filter((product) => product.id !== productId));
+      // Update the local state
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== productId)
+      );
+
+      // Refresh the page data
+      router.refresh();
     } catch (error) {
       console.error("Error deleting product:", error);
     }
