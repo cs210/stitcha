@@ -5,6 +5,7 @@ import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
 import { Thread } from "@/components/assistant-ui/thread";
 import { useEffect, useState } from "react";
+import LanguageToggleButton from "@/components/assistant-ui/language-toggle";
 
 function AssistantInstructions() {
     const [products, setProducts] = useState(null);
@@ -50,7 +51,19 @@ function AssistantInstructions() {
 
     const productDetails = products ? JSON.stringify(products, null, 2) : "No product data available";
     const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
-    const language = "English";
+    const [language, setLanguage] = useState("English");
+
+    const toggleLanguage = () => {
+        setLanguage((prevLanguage) => (prevLanguage === "English" ? "Portuguese" : "English"));
+    };
+
+    const LanguageToggleButton = () => {
+        return (
+            <button onClick={toggleLanguage}>
+                {language === "English" ? "Answer in Portuguese" : "Answer in English"}
+            </button>
+        );
+    };
 
     const instruction = `You are a helpful assistant. You have access to all the data from the following two Supabase tables: ${productDetails} and ${orderDetails}. If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about an order, return the relevant information strictly from the order table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. If the user asks questions about an order that is not in the order table, say that you don't have information about that order.
     You should only respond to the user in ${language}.`
@@ -60,7 +73,7 @@ function AssistantInstructions() {
     // Simple string usage
     useAssistantInstructions(instruction);
 
-    return <div></div>;
+    return <div className="flex justify-center border-2 h-8 text-sm bg-gray-100 rounded-md">     <LanguageToggleButton /> </div>
     
 }
 
@@ -70,7 +83,7 @@ export default function Page() {
     });
     return (
         <AssistantRuntimeProvider runtime={runtime}>
-            <div className="grid h-dvh grid-cols-[200px_1fr] gap-x-2 px-4 pt-2 pb-20">
+            <div className="grid h-dvh grid-cols-[200px_1fr] gap-x-2 px-4">
                 <ThreadList />
                 <Thread />
                 <AssistantInstructions />
