@@ -47,7 +47,7 @@ function MainContent({ children }: { children: ReactNode }) {
 	return (
 		<div className='flex h-screen'>
 			<Sidebar />
-			<main className='flex-1 overflow-hidden'>{children}</main>
+			<main className='flex-1'>{children}</main>
 			<div className='fixed right-4 bottom-4'>
 				<button
 					onClick={() => setIsWhatsAppOpen(!isWhatsAppOpen)}

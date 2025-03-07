@@ -7,14 +7,14 @@ import { ProductStatus } from '@/lib/types'
 export type ProductFormData = {
     name: string
     system_code: string
-    inmetro_cert_number: string | null
-    barcode: string | null
-    description: string | null
+    inmetro_cert_number: string
+    barcode: string
+    description: string
     weight: number
     width: number
     height: number
     percent_pieces_lost?: number
-    image_url: string | null
+    image_url: string
     product_type?: string
     status: ProductStatus
 }
