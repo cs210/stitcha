@@ -55,7 +55,7 @@ export default function Page() {
 							<div className='flex flex-col items-center text-center mb-6'>
 								<div className='w-32 h-32 rounded-full overflow-hidden mb-4'>
 									<Image
-										src={seamstress.image_url || '/placeholder.svg'}
+										src={seamstress.image_url}
 										alt={`${seamstress.first_name} ${seamstress.last_name}`}
 										className='w-full h-full object-cover'
 										width={100}

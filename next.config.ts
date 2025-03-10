@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
 	images: {
 		domains: [
-			'https://mwfejtgqjajkqhdfjtzh.supabase.co/storage/v1/s3',
+			'mwfejtgqjajkqhdfjtzh.supabase.co',
 			'media.licdn.com',
 			'm.media-amazon.com',
 			'www.shutterstock.com',

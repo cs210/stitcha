@@ -185,7 +185,7 @@ export default function ProductPage() {
 									<TableRow key={product.id} className='cursor-pointer hover:bg-gray-100' onClick={() => router.push(`/dashboard/products/${product.id}`)}>
 										<TableCell className='py-4'>
 											<Image
-												src={product.image_url || ''}
+												src={product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : '/placeholder-image.jpg'}
 												alt={product.name}
 												className='w-32 h-32 object-contain rounded-lg bg-white p-2 border'
 												width={128}

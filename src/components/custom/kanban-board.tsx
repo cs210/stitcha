@@ -39,8 +39,6 @@ export function KanbanBoard() {
 		done: [],
 	});
 
-	console.log('products', products);
-
 	// Fetch products from API route on mount
 	useEffect(() => {
 		const fetchProducts = async () => {
@@ -69,18 +67,12 @@ export function KanbanBoard() {
 								...(acc[columnId] || []),
 								{
 									id: product.id,
-									title: product.name || 'Untitled',
-									image: product.image_url,
-									type: product.type || 'Prototype',
-									date: new Date(product.created_at).toLocaleDateString('en-US', {
-										month: 'short',
-										day: 'numeric',
-										year: 'numeric',
-									}),
-									assignees: product.assignees || [],
-									progress: product.progress_level || 'Not Started',
-									description: product.description || '',
-									quantity: product.quantity?.toString() || '0',
+									name: product.name || 'Untitled',
+									system_code: product.system_code || '',
+									barcode: product.barcode || '',
+									inmetro_cert_number: product.inmetro_cert_number || '',
+									image_urls: product.image_urls || [],
+									product_type: product.product_type || 'Prototype',
 								},
 							],
 						};
@@ -136,15 +128,11 @@ export function KanbanBoard() {
 			updated[destination.droppableId] = destColumn;
 		}
 
-		console.log('updated', updated);
-
 		// Update local state
 		setProducts(updated);
 
 		// Only make API call if moving between columns
 		if (source.droppableId !== destination.droppableId) {
-			// Extract original product ID from the unique ID
-
 			// Update progress_level in Supabase
 			try {
 				const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];

@@ -229,8 +229,7 @@ export type Database = {
           description: string | null
           height: number
           id: string
-          image_url: string | null
-          img_urls: Json | null
+          image_urls: Json | null
           inmetro_cert_number: string | null
           name: string
           percent_pieces_lost: number | null
@@ -245,13 +244,12 @@ export type Database = {
           description?: string | null
           height?: number
           id?: string
-          image_url?: string | null
-          img_urls?: Json | null
+          image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
           percent_pieces_lost?: number | null
           product_type?: string | null
-          progress_level?: Database["public"]["Enums"]["progress_level"]
+          progress_level: Database["public"]["Enums"]["progress_level"]
           system_code?: string
           weight?: number
           width?: number
@@ -261,8 +259,7 @@ export type Database = {
           description?: string | null
           height?: number
           id?: string
-          image_url?: string | null
-          img_urls?: Json | null
+          image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
           percent_pieces_lost?: number | null
@@ -434,24 +431,24 @@ export type Database = {
       }
       raw_materials: {
         Row: {
-          material_code: string | null
+          material_code: string
           material_id: string
-          material_name: string | null
-          purchase_price: number | null
+          material_name: string
+          purchase_price: number
           unit: string | null
         }
         Insert: {
-          material_code?: string | null
+          material_code: string
           material_id?: string
-          material_name?: string | null
-          purchase_price?: number | null
+          material_name: string
+          purchase_price: number
           unit?: string | null
         }
         Update: {
-          material_code?: string | null
+          material_code?: string
           material_id?: string
-          material_name?: string | null
-          purchase_price?: number | null
+          material_name?: string
+          purchase_price?: number
           unit?: string | null
         }
         Relationships: []
