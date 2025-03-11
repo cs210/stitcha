@@ -2,7 +2,8 @@ import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
+	const { id: seamstressId } = await params;
 	const { userId } = await auth();
 
 	// Check if the user is authenticated
@@ -13,14 +14,14 @@ export async function GET() {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('users').select('*');
+		const { data, error } = await supabase.from('users').select('*').eq('id', seamstressId).single();
 
 		if (error) {
 			throw new Error(error.message);
 		}
 
-		return Response.json({ data }, { status: 200 });
+		return NextResponse.json({ data }, { status: 200 });
 	} catch (error) {
-		return Response.json({ error }, { status: 500 });
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }
