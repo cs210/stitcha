@@ -22,7 +22,7 @@ export default function Page() {
     if (!user) return;
 
     (async () => {
-      const response = await fetch("/api/users");
+      const response = await fetch("/api/seamstresses");
       const { data, error } = await response.json();
 
       if (!error) {
