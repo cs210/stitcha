@@ -4,13 +4,7 @@ import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Loader } from '@/components/custom/loader';
 import { LoaderContainer } from '@/components/custom/loader-container';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Order, Product, User } from '@/lib/schemas/global.types';
-import { cn } from '@/lib/utils';
-import { Check, ChevronsUpDown } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
@@ -139,50 +133,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 								</div>
 							</div>
 						</div>
-
-						<div>
-							<h2 className='text-xl font-semibold mb-3'>Assign Seamstresses</h2>
-							<div className='mb-4'>
-								<Popover open={open} onOpenChange={setOpen}>
-									<PopoverTrigger asChild>
-										<Button variant='outline' role='combobox' aria-expanded={open} className='w-full justify-between'>
-											{selectedSeamstresses.length > 0
-												? `${selectedSeamstresses.length} seamstress${selectedSeamstresses.length > 1 ? 'es' : ''} selected`
-												: 'Select seamstresses...'}
-											<ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
-										</Button>
-									</PopoverTrigger>
-									<PopoverContent className='w-full p-0'>
-										<Command>
-											<CommandInput placeholder='Search seamstresses...' />
-											<CommandEmpty>{seamstressesLoading ? 'Loading...' : 'No seamstress found.'}</CommandEmpty>
-											<CommandGroup>
-												{seamstresses.map((seamstress: User) => (
-													<CommandItem key={seamstress.id} value={seamstress.id} onSelect={() => toggleSeamstress(seamstress.id)}>
-														<Check className={cn('mr-2 h-4 w-4', selectedSeamstresses.includes(seamstress.id) ? 'opacity-100' : 'opacity-0')} />
-														{seamstress.first_name} {seamstress.last_name}
-													</CommandItem>
-												))}
-											</CommandGroup>
-										</Command>
-									</PopoverContent>
-								</Popover>
-							</div>
-						</div>
-
-						<div className='flex flex-wrap gap-2'>
-							{selectedSeamstresses.map((id) => {
-								const seamstress = seamstresses.find((s: User) => s.id === id);
-								return (
-									<Badge key={id} variant='secondary' className='px-3 py-1'>
-										{seamstress?.first_name} {seamstress?.last_name}
-										<button className='ml-2 text-xs' onClick={() => removeSeamstress(id)}>
-											×
-										</button>
-									</Badge>
-								);
-							})}
-						</div>
 					</div>
 				</div>
 
@@ -190,9 +140,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 					<div className='bg-white shadow rounded-lg p-6'>
 						<h2 className='text-xl font-semibold mb-3'>Product Information</h2>
 						<div className='flex items-center gap-4'>
-							{product.image_url && (
+							{product.image_urls && product.image_urls.length > 0 && (
 								<div className='w-24 h-24 rounded overflow-hidden'>
-									<Image src={product.image_url} alt={product.name || 'Product image'} className='w-full h-full object-cover' width={100} height={100} />
+									<Image src={product.image_urls[0]} alt={product.name || 'Product image'} className='w-full h-full object-cover' width={100} height={100} />
 								</div>
 							)}
 							<div>
