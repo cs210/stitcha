@@ -158,7 +158,7 @@ export function KanbanBoard() {
 	};
 
 	return (
-		<div className='flex flex-col h-full'>
+		<div className='flex flex-col h-full p-3'>
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-6 pt-4 h-full'>
