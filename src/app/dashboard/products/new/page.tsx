@@ -127,7 +127,7 @@ const formSchema = z.object({
 		.positive({ message: "Selling price must be greater than 0" })
 		.min(0.01, { message: "Selling price must be at least 0.01" })
 		.refine(val => Number(val.toFixed(2)) === val, { message: "Selling price can only have up to 2 decimal places" }),
-	technical_drawing: z.instanceof(File).nullable().optional(),
+	technical_sheet: z.instanceof(File).nullable().optional(),
 })
 
 // Define a type for raw materials
@@ -352,16 +352,33 @@ export default function Page() {
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
 		try {
-			// Show loading state while submitting
-			setLoading(true);
+			// Create FormData to handle file uploads
+			const formData = new FormData();
 
-			// Post the form values to the API
-			const response = await fetch('/api/products/', {
+			// Add all non-file fields
+			Object.entries(values).forEach(([key, value]) => {
+				if (key !== 'image_urls' && key !== 'technical_sheet') {
+					formData.append(key, JSON.stringify(value));
+				}
+			});
+
+			// Add image files if they exist
+			if (values.image_urls) {
+				values.image_urls.forEach((file, index) => {
+					formData.append(`image_urls`, file);
+				});
+			}
+
+			// Add technical sheet if it exists
+			if (values.technical_sheet) {
+				formData.append('technical_sheet', values.technical_sheet);
+			}
+
+			// Post the form data to the API
+			const response = await fetch('/api/products/product_form_submit', {
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify(values),
+				body: formData,
+				// Don't set Content-Type header - browser will set it with boundary for FormData
 			});
 
 			const result = await response.json();
@@ -370,14 +387,14 @@ export default function Page() {
 				throw new Error(result.error || 'Failed to create product');
 			}
 
-			// Reset form after successful submission
-			form.reset();
+			// Show success message
+			toast.success('Product created successfully');
 
-			// Show success message or redirect
-			toast.success('product created successfully');
+			// Redirect to products page
+			router.push('/dashboard/products');
 		} catch (error) {
-			console.error(error);
-			// toast.error(error);
+			console.error('Error submitting form:', error);
+			toast.error(error instanceof Error ? error.message : 'Failed to create product');
 		} finally {
 			setLoading(false);
 			setIsPending(false);
@@ -431,10 +448,7 @@ export default function Page() {
 														multiple
 														onChange={(e) => {
 															const newFiles = Array.from(e.target.files || []);
-															onChange((prevFiles: File[] | null) => {
-																const existingFiles = prevFiles || [];
-																return [...existingFiles, ...newFiles];
-															});
+															onChange([...(value || []), ...newFiles]);
 														}}
 													/>
 
@@ -448,9 +462,8 @@ export default function Page() {
 																	variant="ghost"
 																	size="sm"
 																	onClick={() => {
-																		onChange((prevFiles: File[] | null) =>
-																			prevFiles?.filter((_, i) => i !== index) || null
-																		);
+																		const newFiles = value.filter((_, i) => i !== index);
+																		onChange(newFiles);
 																	}}
 																>
 																	Remove
@@ -1106,7 +1119,18 @@ export default function Page() {
 											return baseCost * (1 + percentLost / 100);
 										})();
 										const packagingCost = form.watch('packaging_materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
-										return (rawMaterialCost + packagingCost).toFixed(2);
+										const totalMaterialCost = rawMaterialCost + packagingCost;
+
+										// Calculate total labor cost
+										const laborCost = form.watch('labor')?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+
+										// Get general expenses
+										const generalExpenses = form.watch('general_expenses') || 0;
+
+										// Calculate final total
+										const totalCost = totalMaterialCost + laborCost + generalExpenses;
+
+										return totalCost.toFixed(2);
 									})()}</span>
 								</div>
 							</div>
