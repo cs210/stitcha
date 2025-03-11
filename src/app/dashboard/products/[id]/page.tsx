@@ -41,8 +41,9 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
 		async function getUsers() {
 			try {
-				const response = await fetch('/api/users');
+				const response = await fetch('/api/seamstresses');
 				const { data, error } = await response.json();
+
 				if (!error) {
 					setUsers(data);
 				}

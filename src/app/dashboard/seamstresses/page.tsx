@@ -9,6 +9,7 @@ import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { Mail, Phone } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
@@ -21,7 +22,7 @@ export default function Page() {
 		if (!user) return;
 
 		(async () => {
-			const response = await fetch('/api/users');
+			const response = await fetch('/api/seamstresses');
 			const { data, error } = await response.json();
 
 			if (!error) {
@@ -55,16 +56,18 @@ export default function Page() {
 							<div className='flex flex-col items-center text-center mb-6'>
 								<div className='w-32 h-32 rounded-full overflow-hidden mb-4'>
 									<Image
-										src={seamstress.image_url}
+										src={seamstress.image_url || ''}
 										alt={`${seamstress.first_name} ${seamstress.last_name}`}
 										className='w-full h-full object-cover'
 										width={100}
 										height={100}
 									/>
 								</div>
-								<h3 className='text-xl font-semibold mb-1'>
-									{seamstress.first_name} {seamstress.last_name}
-								</h3>
+								<Link href={`/dashboard/seamstresses/${seamstress.id}`}>
+									<h3 className='text-xl font-semibold mb-1'>
+										{seamstress.first_name} {seamstress.last_name}
+									</h3>
+								</Link>
 								<p className='text-gray-500 mb-4'>{seamstress.location}</p>
 								<div className='space-y-3 w-full text-left'>
 									<div className='flex items-center gap-2 text-gray-600'>
