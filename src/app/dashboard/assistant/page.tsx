@@ -1,11 +1,12 @@
 'use client';
 
-import { AssistantRuntimeProvider, useAssistantInstructions } from "@assistant-ui/react";
-import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
+import { useAssistantInstructions } from "@assistant-ui/react";
+// import { useChatRuntime } from "@assistant-ui/react-ai-sdk";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
 import { Thread } from "@/components/assistant-ui/thread";
 import { useEffect, useState } from "react";
-import LanguageToggleButton from "@/components/assistant-ui/language-toggle";
+import { MyRuntimeProvider } from "@/app/runtime-provider";
+// import LanguageToggleButton from "@/components/assistant-ui/language-toggle";
 
 function AssistantInstructions() {
     const [products, setProducts] = useState(null);
@@ -78,16 +79,13 @@ function AssistantInstructions() {
 }
 
 export default function Page() {
-    const runtime = useChatRuntime({
-        api: "/api/chat",
-    });
     return (
-        <AssistantRuntimeProvider runtime={runtime}>
+        <MyRuntimeProvider>
             <div className="grid h-dvh grid-cols-[200px_1fr] gap-x-2 px-4">
                 <ThreadList />
                 <Thread />
                 <AssistantInstructions />
             </div>
-        </AssistantRuntimeProvider>
+        </MyRuntimeProvider>
     );
 }
