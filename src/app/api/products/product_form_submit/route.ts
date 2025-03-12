@@ -1,7 +1,7 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { handleProductTableInsert, updateRawMaterialFromProduct } from "@/lib/supabase/supabase_utils";
+import { handleProductTableInsert, updatePackagingMaterialFromProduct, updateRawMaterialFromProduct } from "@/lib/supabase/supabase_utils";
 
 export async function POST(request: Request) {
     try {
@@ -21,6 +21,7 @@ export async function POST(request: Request) {
         const updatedProduct = await handleProductTableInsert(formData, supabase, userId);
         const productId = updatedProduct.id;
         await updateRawMaterialFromProduct(productId, supabase, formData);
+        await updatePackagingMaterialFromProduct(productId, supabase, formData);
 
         return NextResponse.json({ success: true, product: updatedProduct }, { status: 200 });
 

@@ -9,7 +9,7 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      education_videos: {
+      education: {
         Row: {
           description: string
           duration: number
@@ -95,21 +95,21 @@ export type Database = {
           packaging_material_code: string | null
           packaging_material_name: string | null
           purchase_price: number | null
-          unit: string | null
+          units: string | null
         }
         Insert: {
           packaging_id: string
           packaging_material_code?: string | null
           packaging_material_name?: string | null
           purchase_price?: number | null
-          unit?: string | null
+          units?: string | null
         }
         Update: {
           packaging_id?: string
           packaging_material_code?: string | null
           packaging_material_name?: string | null
           purchase_price?: number | null
-          unit?: string | null
+          units?: string | null
         }
         Relationships: []
       }
@@ -195,14 +195,17 @@ export type Database = {
       }
       product_users: {
         Row: {
+          created_at: string | null
           product_id: string
           user_id: string
         }
         Insert: {
+          created_at?: string | null
           product_id: string
           user_id: string
         }
         Update: {
+          created_at?: string | null
           product_id?: string
           user_id?: string
         }
@@ -275,29 +278,29 @@ export type Database = {
         Row: {
           conversion: number
           id: string
-          number_of_pieces: number
           product_id: string | null
           rework: number
           task_id: string
           time_per_unit: number
+          total_cost: number
         }
         Insert: {
           conversion: number
           id?: string
-          number_of_pieces: number
           product_id?: string | null
           rework: number
           task_id: string
           time_per_unit: number
+          total_cost: number
         }
         Update: {
           conversion?: number
           id?: string
-          number_of_pieces?: number
           product_id?: string | null
           rework?: number
           task_id?: string
           time_per_unit?: number
+          total_cost?: number
         }
         Relationships: [
           {
@@ -318,25 +321,25 @@ export type Database = {
       }
       products_and_packaging_materials: {
         Row: {
-          amount_of_materials: number
           id: string
           material_code: string | null
           product_id: string | null
           total_cost: number
+          unit_consumption: number
         }
         Insert: {
-          amount_of_materials?: number
           id?: string
           material_code?: string | null
           product_id?: string | null
           total_cost?: number
+          unit_consumption?: number
         }
         Update: {
-          amount_of_materials?: number
           id?: string
           material_code?: string | null
           product_id?: string | null
           total_cost?: number
+          unit_consumption?: number
         }
         Relationships: [
           {
@@ -357,25 +360,25 @@ export type Database = {
       }
       products_and_raw_materials: {
         Row: {
-          amount_of_materials: number
           id: string
-          material_code: string
+          material_code: string | null
           product_id: string
           total_cost: number
+          unit_consumption: number
         }
         Insert: {
-          amount_of_materials: number
           id?: string
-          material_code: string
+          material_code?: string | null
           product_id: string
           total_cost: number
+          unit_consumption: number
         }
         Update: {
-          amount_of_materials?: number
           id?: string
-          material_code?: string
+          material_code?: string | null
           product_id?: string
           total_cost?: number
+          unit_consumption?: number
         }
         Relationships: [
           {
@@ -435,23 +438,49 @@ export type Database = {
           material_id: string
           material_name: string
           purchase_price: number
-          unit: string | null
+          units: string | null
         }
         Insert: {
           material_code: string
           material_id?: string
           material_name: string
-          purchase_price: number
-          unit?: string | null
+          purchase_price?: number
+          units?: string | null
         }
         Update: {
           material_code?: string
           material_id?: string
           material_name?: string
           purchase_price?: number
-          unit?: string | null
+          units?: string | null
         }
         Relationships: []
+      }
+      technical_sheets: {
+        Row: {
+          id: number
+          product_id: string
+          technical_sheet: string | null
+        }
+        Insert: {
+          id?: number
+          product_id: string
+          technical_sheet?: string | null
+        }
+        Update: {
+          id?: number
+          product_id?: string
+          technical_sheet?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_sheets_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       users: {
         Row: {

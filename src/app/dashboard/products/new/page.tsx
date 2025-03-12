@@ -108,6 +108,7 @@ const formSchema = z.object({
 			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
 		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
 		units: z.string().optional(),
+		total_cost: z.number(),
 	})).optional(),
 	labor: z.array(z.object({
 		labor_name: z.string().min(1, { message: "Task name is required" }),
@@ -297,8 +298,8 @@ export default function Page() {
 			}
 
 			// Also set units if available
-			if (selectedMaterial.unit) {
-				form.setValue(`materials.${index}.units`, selectedMaterial.unit);
+			if (selectedMaterial.units) {
+				form.setValue(`materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
@@ -320,8 +321,9 @@ export default function Page() {
 			}
 
 			// Also set units if available
-			if (selectedMaterial.unit) {
-				form.setValue(`materials.${index}.units`, selectedMaterial.unit);
+			if (selectedMaterial.units) {
+				form.setValue(`materials.${index}.units`, selectedMaterial.units
+				);
 			}
 		}
 
@@ -329,7 +331,31 @@ export default function Page() {
 		form.setValue(`materials.${index}.material_name`, value);
 	};
 
-	// Add new handler for packaging materials
+	// Add this handler for packaging material name changes
+	const handlePackagingMaterialNameChange = (index: number, value: string) => {
+		// If selecting from dropdown, auto-fill other fields
+		const selectedMaterial = packagingMaterials.find(m => m.packaging_material_name === value);
+
+		if (selectedMaterial) {
+			// Update related fields
+			form.setValue(`packaging_materials.${index}.material_code`, selectedMaterial.packaging_material_code || '');
+
+			// Also set purchase price if available
+			if (selectedMaterial.purchase_price) {
+				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
+			}
+
+			// Also set units if available
+			if (selectedMaterial.units) {
+				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
+			}
+		}
+
+		// Always update the name field with the new value
+		form.setValue(`packaging_materials.${index}.material_name`, value);
+	};
+
+	// Update the existing handlePackagingMaterialCodeChange function
 	const handlePackagingMaterialCodeChange = (index: number, value: string) => {
 		const selectedMaterial = packagingMaterials.find(m => m.packaging_material_code === value);
 
@@ -343,11 +369,12 @@ export default function Page() {
 			}
 
 			// Also set units if available
-			if (selectedMaterial.unit) {
-				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.unit);
+			if (selectedMaterial.units) {
+				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
+		// Always update the code field with the new value
 		form.setValue(`packaging_materials.${index}.material_code`, value);
 	};
 
@@ -872,6 +899,7 @@ export default function Page() {
 								</div>
 							</div>
 
+							{/* Update the packaging materials section */}
 							<div className="space-y-4">
 								<div className="flex items-center justify-between">
 									<FormLabel>Packaging Materials</FormLabel>
@@ -959,7 +987,7 @@ export default function Page() {
 																		<ComboboxFormField
 																			options={packagingMaterialOptions.names}
 																			value={field.value}
-																			onChange={field.onChange}
+																			onChange={(value) => handlePackagingMaterialNameChange(index, value)}
 																		/>
 																	</FormControl>
 																	<FormMessage />

@@ -23,6 +23,15 @@ interface RawMaterialProduct {
     total_cost: number;
 }
 
+interface PackagingMaterialProduct {
+    material_code: string;
+    material_name: string;
+    purchase_price: number;
+    unit_consumption: number;
+    units?: string;
+    total_cost: number;
+}
+
 const emptyToNull = (value: any) => {
     if (value === "") return null;
     return value;
@@ -185,6 +194,74 @@ export async function updateRawMaterialFromProduct(
 
         if (insertError2) {
             throw new Error(`Failed to insert or update material for product ${productId}: ${insertError2.message}`);
+        }
+
+    }
+}
+export async function updatePackagingMaterialFromProduct(
+    productId: string,
+    supabase: any,
+    formData: FormData
+) {
+    // Parse the packaging materials from the form data
+    const packaging_materials = JSON.parse(formData.get("packaging_materials") as string) as PackagingMaterialProduct[];
+
+    if (!packaging_materials || packaging_materials.length === 0) {
+        return;
+    }
+
+    // Process each packaging material
+    for (const packaging_material of packaging_materials) {
+        // Step 1: Prepare the packaging material data
+        const packagingMaterial = {
+            packaging_material_code: packaging_material.material_code,
+            packaging_material_name: packaging_material.material_name,
+            purchase_price: packaging_material.purchase_price,
+            units: emptyToNull(packaging_material.units),
+        };
+
+        const { data: existingPackagingMaterial, error: fetchError } = await supabase
+            .from('packaging_materials')
+            .select()
+            .or(`packaging_material_code.eq.${packagingMaterial.packaging_material_code},packaging_material_name.eq.${packagingMaterial.packaging_material_name}`)
+            .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') { // Ignore "No rows found" error
+            throw new Error(`Failed to check for existing packaging material: ${fetchError.message}`);
+        }
+
+        let upsertData;
+        if (existingPackagingMaterial) {
+            // Step 2: If a row exists, update it
+            upsertData = { ...existingPackagingMaterial, ...packagingMaterial }; // Merge existing and new data
+        } else {
+            // Step 3: If no row exists, insert as new
+            upsertData = packagingMaterial;
+        }
+
+        // Step 4: Upsert (Insert or Update)
+        const { data: insertedPackagingMaterial, error: insertError1 } = await supabase
+            .from('packaging_materials')
+            .upsert(upsertData, { ignoreDuplicates: false })
+            .select()
+            .single();
+
+        if (insertError1) {
+            throw new Error(`Failed to insert or update packaging material: ${insertError1.message}`);
+        }
+
+        // Add the packaging material to the products_and_packaging_materials junction table
+        const { error: insertError2 } = await supabase
+            .from('products_and_packaging_materials')
+            .insert({
+                product_id: productId,
+                material_code: insertedPackagingMaterial.packaging_id,
+                unit_consumption: packaging_material.unit_consumption,
+                total_cost: packaging_material.total_cost,
+            });
+
+        if (insertError2) {
+            throw new Error(`Failed to insert or update packaging material for product ${productId}: ${insertError2.message}`);
         }
 
     }
