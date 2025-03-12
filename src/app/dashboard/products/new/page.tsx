@@ -97,6 +97,7 @@ const formSchema = z.object({
 			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
 		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
 		units: z.string().optional(),
+		total_cost: z.number(),
 	})).optional(),
 	packaging_materials: z.array(z.object({
 		material_code: z.string().min(1, { message: "Material code is required" }),
@@ -283,6 +284,7 @@ export default function Page() {
 
 	// Auto-fill related fields when a material code is selected
 	const handleMaterialCodeChange = (index: number, value: string) => {
+		// If selecting from dropdown, auto-fill other fields
 		const selectedMaterial = materials.find(m => m.material_code === value);
 
 		if (selectedMaterial) {
@@ -300,7 +302,31 @@ export default function Page() {
 			}
 		}
 
+		// Always update the code field with the new value
 		form.setValue(`materials.${index}.material_code`, value);
+	};
+
+	const handleMaterialNameChange = (index: number, value: string) => {
+		// If selecting from dropdown, auto-fill other fields
+		const selectedMaterial = materials.find(m => m.material_name === value);
+
+		if (selectedMaterial) {
+			// Update related fields
+			form.setValue(`materials.${index}.material_code`, selectedMaterial.material_code || '');
+
+			// Also set purchase price if available
+			if (selectedMaterial.purchase_price) {
+				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
+			}
+
+			// Also set units if available
+			if (selectedMaterial.unit) {
+				form.setValue(`materials.${index}.units`, selectedMaterial.unit);
+			}
+		}
+
+		// Always update the name field with the new value
+		form.setValue(`materials.${index}.material_name`, value);
 	};
 
 	// Add new handler for packaging materials
@@ -637,7 +663,7 @@ export default function Page() {
 																		<ComboboxFormField
 																			options={materialOptions.names}
 																			value={field.value}
-																			onChange={field.onChange}
+																			onChange={(value) => handleMaterialNameChange(index, value)}
 																		/>
 																	</FormControl>
 																	<FormMessage />
@@ -1513,7 +1539,7 @@ export default function Page() {
 									name="selling_price"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Selling Price</FormLabel>
+											<FormLabel>Selling Price *</FormLabel>
 											<FormControl>
 												<div className="relative">
 													<span className="absolute right-3 top-1/2 -translate-y-1/2">R$</span>
