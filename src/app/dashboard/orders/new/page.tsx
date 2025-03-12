@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -25,6 +26,7 @@ const formSchema = z.object({
 
 export default function Page() {
 	const { user } = useUser();
+	const router = useRouter();
 
 	const [loading, setLoading] = useState<boolean>(false);
 	const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
@@ -89,8 +91,10 @@ export default function Page() {
 			// Reset form after successful submission
 			form.reset();
 
-			// Show success message or redirect
+			// Show success message and redirect
 			toast.success('Order created successfully');
+
+			router.push('/dashboard/orders');
 		} catch (error) {
 			console.error(error);
 			// toast.error(error);
