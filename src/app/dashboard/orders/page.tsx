@@ -185,10 +185,28 @@ export default function Page() {
             <TableBody>
               {currentItems.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell>{order.client}</TableCell>
-                  <TableCell>{order.contact}</TableCell>
-                  <TableCell>{order.order_quantity}</TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.client}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.contact}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.order_quantity}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
                     {order.due_date
                       ? new Date(order.due_date).toLocaleDateString()
                       : "-"}

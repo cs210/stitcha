@@ -26,6 +26,7 @@ import { Check, Search, Users, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function ProductDetails({
   params,
@@ -53,88 +54,92 @@ export default function ProductDetails({
   }, [isDialogOpen, selectedUsers]);
 
   useEffect(() => {
-    async function getProduct() {
+    async function fetchData() {
       try {
-        const response = await fetch(`/api/products/${unwrappedParams.id}`);
-        const data = await response.json();
+        // Fetch product details
+        const productResponse = await fetch(
+          `/api/products/${unwrappedParams.id}`
+        );
+        const productData = await productResponse.json();
 
-        if (!response.ok) {
-          throw new Error(data.error);
+        if (!productResponse.ok) {
+          throw new Error(productData.error);
         }
 
-        setProduct(data);
+        setProduct(productData);
+
+        // Fetch all available seamstresses
+        const usersResponse = await fetch("/api/seamstresses");
+        const { data: usersData } = await usersResponse.json();
+
+        if (Array.isArray(usersData)) {
+          setUsers(usersData);
+        }
+
+        // Fetch assigned seamstresses for this product
+        const assignedResponse = await fetch(
+          `/api/products/${unwrappedParams.id}/assigned`
+        );
+        const { data: assignedData } = await assignedResponse.json();
+
+        if (Array.isArray(assignedData)) {
+          // Find the full user objects for assigned seamstresses
+          const assignedUsers = usersData.filter((user) =>
+            assignedData.some((assigned) => assigned.user_id === user.id)
+          );
+          setSelectedUsers(assignedUsers);
+          setTempSelectedUsers(assignedUsers);
+        }
       } catch (error) {
-        console.error("Error fetching product:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    async function getUsers() {
-      try {
-        const response = await fetch("/api/users");
-        const { data, error } = await response.json();
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch users");
-        }
-
-        if (error) {
-          console.error("Error fetching users:", error);
-          return;
-        }
-
-        if (Array.isArray(data)) {
-          setUsers(data);
-        } else {
-          console.error("Unexpected users data format:", data);
-        }
-      } catch (error) {
-        console.error("Error fetching users:", error);
-      }
-    }
-
-    getProduct();
-    getUsers();
+    fetchData();
   }, [unwrappedParams.id]);
 
   useEffect(() => {
-    if (!product) return;
+    async function fetchTimelineUpdates() {
+      if (!product) return;
 
-    async function getProgressUpdates() {
       try {
-        const response = await fetch(
-          `/api/products/${unwrappedParams.id}/progress`
+        console.log(
+          "Fetching timeline updates for product:",
+          unwrappedParams.id
         );
-        const { data, error } = await response.json();
 
-        if (!error) {
-          // Add a default "Product Created" event if there are no events yet
-          const updates = Array.isArray(data) ? data : [];
-          const createdEvent: Progress = {
-            id: "created",
-            created_at: product.created_at || new Date().toISOString(),
-            description: `Batch #${
-              product.batch_number || "2024-001"
-            } entered production phase`,
-            emotion: "created",
-            user_id: "system",
-            image_urls: [],
-          };
+        const response = await fetch(
+          `/api/products/${unwrappedParams.id}/timeline`
+        );
+        const { data } = await response.json();
 
-          // Always include the created event at the beginning
+        console.log("Fetched timeline data:", data);
+
+        if (Array.isArray(data)) {
+          // Add the created event if it doesn't exist
+          const updates = [...data];
           if (!updates.some((update) => update.emotion === "created")) {
-            updates.push(createdEvent);
+            updates.unshift({
+              id: "created",
+              created_at: "2025-03-10T13:20:00.000Z", // Hardcoded date
+              description: `Batch #${
+                product.batch_number || "2024-001"
+              } entered production phase`,
+              emotion: "created",
+              user_id: "system",
+              image_urls: [],
+            });
           }
-
           setProgressUpdates(updates);
         }
       } catch (error) {
-        console.error("Error fetching progress:", error);
+        console.error("Error fetching timeline:", error);
       }
     }
 
-    getProgressUpdates();
+    fetchTimelineUpdates();
   }, [unwrappedParams.id, product]);
 
   // Reset command open state when dialog closes
@@ -158,36 +163,114 @@ export default function ProductDetails({
   };
 
   const handleConfirmAssignment = async () => {
-    // Find newly assigned users (users in tempSelectedUsers but not in selectedUsers)
-    const newlyAssignedUsers = tempSelectedUsers.filter(
-      (tempUser) =>
-        !selectedUsers.some((selectedUser) => selectedUser.id === tempUser.id)
-    );
+    try {
+      console.log("Attempting to assign seamstresses:", {
+        productId: unwrappedParams.id,
+        seamstressIds: tempSelectedUsers.map((user) => user.id),
+      });
 
-    // Only create an event if there are new assignments
-    if (newlyAssignedUsers.length > 0) {
-      // Create a single event for all newly assigned users
-      const newEvent: Progress = {
-        id: `assigned-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        description:
-          newlyAssignedUsers.length === 1
-            ? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
-            : `Product assigned to ${newlyAssignedUsers
-                .map((user) => `${user.first_name} ${user.last_name}`)
-                .join(", ")}`,
-        emotion: "assigned",
-        user_id: newlyAssignedUsers.map((user) => user.id).join(","),
-        image_urls: [],
-      };
+      const response = await fetch(
+        `/api/products/${unwrappedParams.id}/assign`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            seamstressIds: tempSelectedUsers.map((user) => user.id),
+          }),
+        }
+      );
 
-      // Update the progress updates with the single new assignment event
-      setProgressUpdates((prev) => [...(prev || []), newEvent]);
+      const data = await response.json();
+      console.log("API Response:", data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to assign seamstresses");
+      }
+
+      // Find newly assigned users (for the progress update)
+      const newlyAssignedUsers = tempSelectedUsers.filter(
+        (tempUser) =>
+          !selectedUsers.some((selectedUser) => selectedUser.id === tempUser.id)
+      );
+
+      // Create progress event if there are new assignments
+      if (newlyAssignedUsers.length > 0) {
+        const newEvent: Progress = {
+          id: `assigned-${Date.now()}`,
+          created_at: new Date().toISOString(),
+          description:
+            newlyAssignedUsers.length === 1
+              ? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
+              : `Product assigned to ${newlyAssignedUsers
+                  .map((user) => `${user.first_name} ${user.last_name}`)
+                  .join(", ")}`,
+          emotion: "assigned",
+          user_id: newlyAssignedUsers.map((user) => user.id).join(","),
+          image_urls: [],
+        };
+
+        setProgressUpdates((prev) => [...(prev || []), newEvent]);
+      }
+
+      // Update UI state
+      setSelectedUsers(tempSelectedUsers);
+      setIsDialogOpen(false);
+      toast.success("Seamstresses assigned successfully");
+    } catch (error) {
+      console.error("Error in handleConfirmAssignment:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to assign seamstresses"
+      );
     }
+  };
 
-    // Update the selected users list
-    setSelectedUsers(tempSelectedUsers);
-    setIsDialogOpen(false);
+  const handleDeleteAssignment = async (userId: string) => {
+    try {
+      const response = await fetch(
+        `/api/products/${unwrappedParams.id}/assign`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            seamstressIds: [userId], // Send as array since the API expects an array
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to remove assignment");
+      }
+
+      // Update the UI state
+      setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+
+      // Add a progress event for the removal
+      const removedUser = selectedUsers.find((user) => user.id === userId);
+      if (removedUser) {
+        const newEvent: Progress = {
+          id: `unassigned-${Date.now()}`,
+          created_at: new Date().toISOString(),
+          description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
+          emotion: "unassigned",
+          user_id: userId,
+          image_urls: [],
+        };
+
+        setProgressUpdates((prev) => [...(prev || []), newEvent]);
+      }
+
+      toast.success("Assignment removed successfully");
+    } catch (error) {
+      console.error("Error removing assignment:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to remove assignment"
+      );
+    }
   };
 
   // Loading state
@@ -223,20 +306,25 @@ export default function ProductDetails({
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500">Assigned to:</span>
             {selectedUsers.length > 0 ? (
-              <div className="flex -space-x-2">
+              <div className="flex items-center gap-2">
                 {selectedUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white"
-                    title={`${user.first_name} ${user.last_name}`}
-                  >
-                    <Image
-                      src={user.image_url || "/placeholder-avatar.jpg"}
-                      alt={`${user.first_name} ${user.last_name}`}
-                      className="w-full h-full object-cover"
-                      width={32}
-                      height={32}
-                    />
+                  <div key={user.id} className="group relative">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                      <Image
+                        src={user.image_url || "/placeholder-avatar.jpg"}
+                        alt={`${user.first_name} ${user.last_name}`}
+                        className="w-full h-full object-cover"
+                        width={32}
+                        height={32}
+                      />
+                    </div>
+                    <button
+                      onClick={() => handleDeleteAssignment(user.id)}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      title={`Remove ${user.first_name} ${user.last_name}`}
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -485,25 +573,14 @@ export default function ProductDetails({
                         new Date(b.created_at).getTime() -
                         new Date(a.created_at).getTime()
                     )
-                    .map((update, index, array) => (
-                      <div key={index} className="relative pl-8">
-                        <div
-                          className={`absolute left-0 top-[6px] w-4 h-4 rounded-full ${
-                            update.emotion === "created"
-                              ? "bg-black"
-                              : "bg-black"
-                          }`}
-                        />
-
+                    .map((update, index) => (
+                      <div key={update.id} className="relative pl-8">
+                        <div className="absolute left-0 top-[6px] w-4 h-4 rounded-full bg-black" />
                         <div>
                           <h3 className="text-lg font-medium">
-                            {update.emotion === "production_started"
-                              ? "Production Started"
-                              : update.emotion === "assigned"
-                              ? "Assigned to Seamstress"
-                              : update.emotion === "created"
+                            {update.emotion === "created"
                               ? "Product Created"
-                              : update.emotion}
+                              : "Seamstress Assigned"}
                           </h3>
                           <p className="text-gray-500 mt-1">
                             {update.description}
@@ -533,3 +610,4 @@ export default function ProductDetails({
       </div>
     </>
   );
+}

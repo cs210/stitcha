@@ -11,7 +11,6 @@ import { Mail, Phone } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-
 export default function Page() {
   const { user } = useUser();
 
@@ -89,5 +88,4 @@ export default function Page() {
       </div>
     </>
   );
-			
 }

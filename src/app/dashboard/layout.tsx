@@ -21,10 +21,11 @@ export default function Layout({
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
   const [productName, setProductName] = useState<string>("");
+  const [orderClient, setOrderClient] = useState<string>("");
 
-  // Fetch product name if we're on a product details page
+  // Fetch product or order details if we're on a details page
   useEffect(() => {
-    async function getProductName() {
+    async function getDetails() {
       if (segments[1] === "products" && segments.length === 3) {
         try {
           const response = await fetch(`/api/products/${segments[2]}`);
@@ -35,17 +36,29 @@ export default function Layout({
         } catch (error) {
           console.error("Error fetching product:", error);
         }
+      } else if (segments[1] === "orders" && segments.length === 3) {
+        try {
+          const response = await fetch(`/api/orders/${segments[2]}`);
+          const data = await response.json();
+          if (data?.client) {
+            setOrderClient(data.client);
+          }
+        } catch (error) {
+          console.error("Error fetching order:", error);
+        }
       }
     }
-    getProductName();
+    getDetails();
   }, [segments]);
 
   // Determine what to show in the breadcrumb
   const isProductDetails = segments[1] === "products" && segments.length === 3;
-  const isProductsPage = segments[1] === "products" && segments.length === 2;
+  const isOrderDetails = segments[1] === "orders" && segments.length === 3;
   const currentPage = segments[segments.length - 1];
   const formattedPage = isProductDetails
     ? productName
+    : isOrderDetails
+    ? orderClient
     : currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
 
   return (
@@ -59,11 +72,12 @@ export default function Layout({
                 <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              {isProductDetails ? (
+              {isProductDetails || isOrderDetails ? (
                 <>
                   <BreadcrumbItem>
-                    <BreadcrumbLink href="/dashboard/products">
-                      Products
+                    <BreadcrumbLink href={`/dashboard/${segments[1]}`}>
+                      {segments[1].charAt(0).toUpperCase() +
+                        segments[1].slice(1)}
                     </BreadcrumbLink>
                   </BreadcrumbItem>
                   <BreadcrumbSeparator />
