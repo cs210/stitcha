@@ -3,6 +3,8 @@ import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
+import { createClerkSupabaseClient } from "@/utils/supabase/client";
+import { toast } from "sonner";
 
 // get a specific product by id
 export async function GET(
@@ -59,31 +61,34 @@ export async function PATCH(
 // Delete a specific product
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { userId } = await auth();
-
-  // Check if the user is authenticated
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const supabase = await createClerkSupabaseClientSsr();
-
   try {
+    const { userId } = await auth();
+    const { id: productId } = await params;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const supabase = await createClerkSupabaseClientSsr();
+
+    // Then delete the product
     const { error } = await supabase
       .from("products")
       .delete()
-      .eq("id", params.id);
+      .eq("id", productId);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("Error in Supabase delete operation:", error);
+      throw error;
     }
 
-    return NextResponse.json({ message: "Product deleted successfully" });
+    return NextResponse.json({ success: true, deletedId: productId });
   } catch (error) {
+    console.error("Error deleting product:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Failed to delete product" },
       { status: 500 }
     );
   }
