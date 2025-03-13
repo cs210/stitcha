@@ -8,7 +8,7 @@ export default function Page() {
 		<>
 			<HeaderContainer>
 				<Header text='Kanban' />
-				<Description text='Manage and track customer orders' />
+				<Description text='Manage and track product progress' />
 			</HeaderContainer>
 
 			<KanbanBoard />
