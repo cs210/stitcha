@@ -45,6 +45,7 @@ export default function ProductDetails({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCommandOpen, setIsCommandOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     // Reset temporary selection when dialog opens
@@ -298,6 +299,13 @@ export default function ProductDetails({
         ))
   );
 
+  // Check if image_urls is an array or needs to be converted
+  const imageUrls = Array.isArray(product.image_urls)
+    ? product.image_urls
+    : product.image_urls && typeof product.image_urls === "object"
+    ? Object.values(product.image_urls)
+    : [];
+
   return (
     <>
       <HeaderContainer>
@@ -486,17 +494,60 @@ export default function ProductDetails({
         <div className="grid grid-cols-[2fr,1fr] gap-4">
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-8 shadow-sm border">
-              <Image
-                src={
-                  product.image_urls && product.image_urls.length > 0
-                    ? product.image_urls[0]
-                    : "/placeholder-image.jpg"
-                }
-                alt={product.name}
-                className="w-full h-64 object-contain rounded-lg mb-8"
-                width={100}
-                height={100}
-              />
+              {/* Image Gallery */}
+              <div className="mb-8">
+                {imageUrls.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Main Image */}
+                    <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                      <Image
+                        src={imageUrls[selectedImageIndex]}
+                        alt={product.name}
+                        className="w-full h-full object-contain"
+                        width={500}
+                        height={300}
+                      />
+                    </div>
+
+                    {/* Thumbnails - only show if there are multiple images */}
+                    {imageUrls.length > 1 && (
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {imageUrls.map((imageUrl, index) => (
+                          <div
+                            key={index}
+                            className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
+                              selectedImageIndex === index
+                                ? "border-2 border-blue-500 shadow-md"
+                                : "border border-gray-200 hover:border-gray-300"
+                            }`}
+                            onClick={() => setSelectedImageIndex(index)}
+                          >
+                            <Image
+                              src={imageUrl}
+                              alt={`${product.name} - image ${index + 1}`}
+                              className="w-full h-full object-cover"
+                              width={80}
+                              height={80}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                    <Image
+                      src="/placeholder-image.jpg"
+                      alt={product.name}
+                      className="w-full h-full object-contain"
+                      width={500}
+                      height={300}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Rest of the product information */}
               <div className="grid grid-cols-2 gap-8">
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">
