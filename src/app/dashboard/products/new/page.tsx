@@ -120,6 +120,7 @@ const formSchema = z.object({
 		cost_per_minute: z.number()
 			.min(0, { message: "Cost per minute must be 0 or greater" })
 			.refine(val => Number(val.toFixed(2)) === val, { message: "Cost per minute can only have up to 2 decimal places" }),
+		total_cost: z.number(),
 	})).optional(),
 	general_expenses: z.number()
 		.min(0, { message: "General expenses must be 0 or greater" })

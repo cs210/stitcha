@@ -124,9 +124,8 @@ export default function ProductDetails({
             updates.unshift({
               id: "created",
               created_at: "2025-03-10T13:20:00.000Z", // Hardcoded date
-              description: `Batch #${
-                product.batch_number || "2024-001"
-              } entered production phase`,
+              description: `Batch #${product.batch_number || "2024-001"
+                } entered production phase`,
               emotion: "created",
               user_id: "system",
               image_urls: [],
@@ -204,8 +203,8 @@ export default function ProductDetails({
             newlyAssignedUsers.length === 1
               ? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
               : `Product assigned to ${newlyAssignedUsers
-                  .map((user) => `${user.first_name} ${user.last_name}`)
-                  .join(", ")}`,
+                .map((user) => `${user.first_name} ${user.last_name}`)
+                .join(", ")}`,
           emotion: "assigned",
           user_id: newlyAssignedUsers.map((user) => user.id).join(","),
           image_urls: [],
