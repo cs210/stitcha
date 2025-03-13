@@ -4,9 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
+  const { id: productId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,7 +19,7 @@ export async function GET(
     const { data, error } = await supabase
       .from("product_users")
       .select("user_id")
-      .eq("product_id", params.id);
+      .eq("product_id", productId);
 
     if (error) {
       throw new Error(error.message);

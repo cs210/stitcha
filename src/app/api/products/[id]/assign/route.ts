@@ -4,9 +4,10 @@ import { NextResponse } from "next/server";
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
+  const { id: productId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,7 +21,7 @@ export async function POST(
     const { error: deleteError } = await supabase
       .from("product_users")
       .delete()
-      .eq("product_id", params.id)
+      .eq("product_id", productId)
       .not("user_id", "in", `(${seamstressIds.join(",")})`);
 
     if (deleteError) {
@@ -29,7 +30,7 @@ export async function POST(
 
     // create records for new assignments
     const productUserRecords = seamstressIds.map((seamstressId: string) => ({
-      product_id: params.id,
+      product_id: productId,
       user_id: seamstressId,
       created_at: new Date().toISOString(),
     }));
@@ -63,9 +64,10 @@ export async function POST(
 // add a DELETE endpoint to remove assignments
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { userId } = await auth();
+  const { id: productId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -78,7 +80,7 @@ export async function DELETE(
     const { error } = await supabase
       .from("product_users")
       .delete()
-      .eq("product_id", params.id)
+      .eq("product_id", productId)
       .in("user_id", seamstressIds);
 
     if (error) {
