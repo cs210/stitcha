@@ -22,8 +22,9 @@ export default function Layout({
   const segments = pathname.split("/").filter(Boolean);
   const [productName, setProductName] = useState<string>("");
   const [orderClient, setOrderClient] = useState<string>("");
+  const [seamstressName, setSeamstressName] = useState<string>("");
 
-  // Fetch product or order details if we're on a details page
+  // Fetch product, order, or seamstress details if we're on a details page
   useEffect(() => {
     async function getDetails() {
       if (segments[1] === "products" && segments.length === 3) {
@@ -46,6 +47,16 @@ export default function Layout({
         } catch (error) {
           console.error("Error fetching order:", error);
         }
+      } else if (segments[1] === "seamstresses" && segments.length === 3) {
+        try {
+          const response = await fetch(`/api/seamstresses/${segments[2]}`);
+          const { data } = await response.json();
+          if (data?.first_name && data?.last_name) {
+            setSeamstressName(`${data.first_name} ${data.last_name}`);
+          }
+        } catch (error) {
+          console.error("Error fetching seamstress:", error);
+        }
       }
     }
     getDetails();
@@ -54,11 +65,16 @@ export default function Layout({
   // Determine what to show in the breadcrumb
   const isProductDetails = segments[1] === "products" && segments.length === 3;
   const isOrderDetails = segments[1] === "orders" && segments.length === 3;
+  const isSeamstressDetails =
+    segments[1] === "seamstresses" && segments.length === 3;
+
   const currentPage = segments[segments.length - 1];
   const formattedPage = isProductDetails
     ? productName
     : isOrderDetails
     ? orderClient
+    : isSeamstressDetails
+    ? seamstressName
     : currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
 
   return (
@@ -72,7 +88,7 @@ export default function Layout({
                 <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              {isProductDetails || isOrderDetails ? (
+              {isProductDetails || isOrderDetails || isSeamstressDetails ? (
                 <>
                   <BreadcrumbItem>
                     <BreadcrumbLink href={`/dashboard/${segments[1]}`}>

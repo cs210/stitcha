@@ -1,60 +1,65 @@
-'use client';
+"use client";
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
-import { LoaderContainer } from '@/components/custom/loader-container';
-import { User } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
-import { Mail, Phone } from 'lucide-react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { Description } from "@/components/custom/description";
+import { Header } from "@/components/custom/header";
+import { HeaderContainer } from "@/components/custom/header-container";
+import { Loader } from "@/components/custom/loader";
+import { LoaderContainer } from "@/components/custom/loader-container";
+import { User } from "@/lib/schemas/global.types";
+import { useUser } from "@clerk/nextjs";
+import { Mail, Phone } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Page() {
-	const { user } = useUser();
+  const { user } = useUser();
+  const router = useRouter();
 
-	const [loading, setLoading] = useState<boolean>(true);
-	const [seamstresses, setSeamstresses] = useState<User[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
-	useEffect(() => {
-		if (!user) return;
+  useEffect(() => {
+    if (!user) return;
 
-		(async () => {
-			const response = await fetch('/api/seamstresses');
-			const { data, error } = await response.json();
+    (async () => {
+      const response = await fetch("/api/seamstresses");
+      const { data, error } = await response.json();
 
-			if (!error) {
-				setSeamstresses(data);
-			}
+      if (!error) {
+        setSeamstresses(data);
+      }
 
-			setLoading(false);
-		})();
-	}, [user]);
+      setLoading(false);
+    })();
+  }, [user]);
 
-	// Loading state
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+  // Loading state
+  if (loading) {
+    return (
+      <LoaderContainer>
+        <Loader />
+      </LoaderContainer>
+    );
+  }
 
-	return (
-		<>
-			<HeaderContainer>
-				<Header text='Seamstresses' />
-				<Description text='View and manage all seamstresses' />
-			</HeaderContainer>
+  return (
+    <>
+      <HeaderContainer>
+        <Header text="Seamstresses" />
+        <Description text="View and manage all seamstresses" />
+      </HeaderContainer>
 
       <div className="py-4">
         <div className="flex flex-wrap gap-6">
           {seamstresses.map((seamstress: User) => (
             <div
               key={seamstress.id}
-              className="bg-white rounded-2xl p-8 border hover:border-gray-300 transition-colors w-[300px]"
+              className="bg-white rounded-2xl p-8 border hover:border-gray-300 transition-colors w-[300px] cursor-pointer hover:shadow-md"
+              onClick={() =>
+                router.push(`/dashboard/seamstresses/${seamstress.id}`)
+              }
             >
               <div className="flex flex-col items-center text-center mb-6">
                 <div className="w-32 h-32 rounded-full overflow-hidden mb-4">
