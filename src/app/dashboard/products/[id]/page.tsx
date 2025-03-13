@@ -112,14 +112,16 @@ import Link from 'next/link';
  					}
  				}
  
+				console.log('Updates:', updates);
+ 
  				// Add progress data
  				if (Array.isArray(progressData.data)) {
  					updates = [
  						...updates,
  						...progressData.data.map((progress) => ({
  							...progress,
- 							status: 'progress',
- 							emotion: progress.emotion,
+ 							status: 'progress',							
+ 							// emotion: progress.emotion,
 							user: progress.user,
  							description: `Progress update: ${progress.description || 'No additional notes'}`,
  						})),
@@ -129,6 +131,8 @@ import Link from 'next/link';
  				// Sort all updates by date
  				updates.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
  
+				console.log('Updates:', updates);
+
  				setProgressUpdates(updates);
  			} catch (error) {
  				console.error('Error fetching updates:', error);
@@ -192,7 +196,7 @@ import Link from 'next/link';
  						newlyAssignedUsers.length === 1
  							? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
  							: `Product assigned to ${newlyAssignedUsers.map((user) => `${user.first_name} ${user.last_name}`).join(', ')}`,
- 					emotion: 'assigned',
+ 					status: 'assigned',
  					user_id: newlyAssignedUsers.map((user) => user.id).join(','),
  					image_urls: [],
  				};
@@ -237,7 +241,7 @@ import Link from 'next/link';
  					id: `unassigned-${Date.now()}`,
  					created_at: new Date().toISOString(),
  					description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
- 					emotion: 'unassigned',
+ 					status: 'unassigned',
  					user_id: userId,
  					image_urls: [],
  				};
@@ -591,10 +595,9 @@ import Link from 'next/link';
  													<p className='text-gray-500 mt-1'>{update.description}</p>
  													{update.user && (
  														<p className='text-gray-500 mt-1'>
- 															Seamstress: <Link href={`/dashboard/seamstresses/${update.user_id}`} className="hover:underline">{update.user.first_name} {update.user.last_name}</Link>
+ 															Seamstress: <Link href={`/dashboard/seamstresses/${update.user_id}`} className="hover:underline">{update.user.first_name} {update.user.last_name}</Link> is feeling {update.emotion}
  														</p>
  													)}
- 													{update.emotion && <p className='text-gray-500 mt-1'>Emotion: {update.emotion}</p>}
  													<p className='text-gray-500 mt-1'>
  														{new Date(update.created_at)
  															.toLocaleString('en-US', {
