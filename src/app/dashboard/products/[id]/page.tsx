@@ -22,7 +22,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Product, Progress, User } from "@/lib/schemas/global.types";
-import { Check, Search, Users, X } from "lucide-react";
+import {
+  Check,
+  Search,
+  Users,
+  X,
+  ZoomIn,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -46,6 +54,8 @@ export default function ProductDetails({
   const [searchQuery, setSearchQuery] = useState("");
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  const [zoomImageIndex, setZoomImageIndex] = useState(0);
 
   useEffect(() => {
     // Reset temporary selection when dialog opens
@@ -274,6 +284,25 @@ export default function ProductDetails({
     }
   };
 
+  // Function to open zoom modal
+  const openZoomModal = (index: number) => {
+    setZoomImageIndex(index);
+    setIsZoomModalOpen(true);
+  };
+
+  // Function to navigate to next/previous image in zoom view
+  const navigateZoomImage = (direction: "next" | "prev") => {
+    if (!imageUrls.length) return;
+
+    if (direction === "next") {
+      setZoomImageIndex((prev) => (prev + 1) % imageUrls.length);
+    } else {
+      setZoomImageIndex(
+        (prev) => (prev - 1 + imageUrls.length) % imageUrls.length
+      );
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -498,15 +527,22 @@ export default function ProductDetails({
               <div className="mb-8">
                 {imageUrls.length > 0 ? (
                   <div className="space-y-4">
-                    {/* Main Image */}
-                    <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
+                    {/* Main Image with zoom functionality */}
+                    <div
+                      className="w-full h-96 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative group cursor-zoom-in"
+                      onClick={() => openZoomModal(selectedImageIndex)}
+                    >
                       <Image
                         src={imageUrls[selectedImageIndex]}
                         alt={product.name}
                         className="w-full h-full object-contain"
-                        width={500}
-                        height={300}
+                        width={800}
+                        height={600}
+                        priority
                       />
+                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <ZoomIn className="w-10 h-10 text-white drop-shadow-lg" />
+                      </div>
                     </div>
 
                     {/* Thumbnails - only show if there are multiple images */}
@@ -659,6 +695,71 @@ export default function ProductDetails({
           </div>
         </div>
       </div>
+
+      {/* Image Zoom Modal */}
+      {isZoomModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
+          onClick={() => setIsZoomModalOpen(false)}
+        >
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Close button */}
+            <button
+              className="absolute top-6 right-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
+              onClick={() => setIsZoomModalOpen(false)}
+            >
+              <X className="w-8 h-8" />
+            </button>
+
+            {/* Navigation buttons */}
+            {imageUrls.length > 1 && (
+              <>
+                <button
+                  className="absolute left-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateZoomImage("prev");
+                  }}
+                >
+                  <ChevronLeft className="w-10 h-10" />
+                </button>
+                <button
+                  className="absolute right-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateZoomImage("next");
+                  }}
+                >
+                  <ChevronRight className="w-10 h-10" />
+                </button>
+              </>
+            )}
+
+            {/* Zoomed image */}
+            <div
+              className="w-[95%] h-[95%] relative flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={imageUrls[zoomImageIndex]}
+                alt={`${product.name} - zoomed image`}
+                className="max-w-full max-h-full object-contain"
+                width={2000}
+                height={2000}
+                priority
+                quality={100}
+              />
+
+              {/* Image counter */}
+              {imageUrls.length > 1 && (
+                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm font-medium">
+                  {zoomImageIndex + 1} / {imageUrls.length}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
