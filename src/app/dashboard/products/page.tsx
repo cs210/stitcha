@@ -148,8 +148,6 @@ export default function ProductPage() {
 
       // Show success message
       toast.success("Product deleted successfully");
-
-      // Don't reload the page - just let the state update handle the UI
     } catch (error) {
       console.error("Error deleting product:", error);
       toast.error("Failed to delete product");

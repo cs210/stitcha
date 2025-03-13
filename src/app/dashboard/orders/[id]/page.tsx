@@ -116,10 +116,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-xl font-semibold mb-3">Product Information</h2>
             <div className="flex items-center gap-4">
-              {product.image_url && (
+              {product.image_urls && (
                 <div className="w-24 h-24 rounded overflow-hidden">
                   <Image
-                    src={product.image_url}
+                    src={product.image_urls[0]}
                     alt={product.name || "Product image"}
                     className="w-full h-full object-cover"
                     width={100}
