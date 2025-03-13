@@ -11,8 +11,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 		.select('progress_id, progress(id, description, image_urls, emotion, created_at, user_id, user:user_id(first_name, last_name))')
 		.eq('product_id', productId);
 
-	console.log(data);
-
 	if (data && data.length > 0) {
 		const progressUpdates = data.map((item) => item.progress);
 
