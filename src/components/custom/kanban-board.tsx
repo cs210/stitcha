@@ -157,14 +157,38 @@ export function KanbanBoard() {
 		}
 	};
 
+	const onDelete = async (productId: string) => {
+		try {
+			console.log('DELETING PRODUCT', productId);
+
+			const response = await fetch(`/api/products/${productId}`, {
+				method: 'DELETE',
+			});
+
+			if (!response.ok) {
+				throw new Error('Failed to delete product');
+			}
+
+			// Update local state after successful deletion
+			const newProducts = { ...products };
+			Object.keys(newProducts).forEach(key => {
+				newProducts[key] = newProducts[key].filter(product => product.id !== productId);
+			});
+			setProducts(newProducts);
+
+		} catch (error) {
+			console.error('Error deleting product:', error);
+		}
+	};
+
 	return (
 		<div className='flex flex-col h-full p-3'>
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-6 pt-4 h-full'>
-						<KanbanColumn title='Not Started' id='notStarted' products={products.notStarted} />
-						<KanbanColumn title='In Progress' id='inProgress' products={products.inProgress} />
-						<KanbanColumn title='Done' id='done' products={products.done} />
+						<KanbanColumn title='Not Started' id='notStarted' products={products.notStarted} onDelete={onDelete} />
+						<KanbanColumn title='In Progress' id='inProgress' products={products.inProgress} onDelete={onDelete} />
+						<KanbanColumn title='Done' id='done' products={products.done} onDelete={onDelete} />
 					</div>
 				</div>
 			</DragDropContext>

@@ -39,43 +39,37 @@ function AssistantInstructions() {
         }
     }
 
+    // const fetchProgress = async () => {
+    //     try {
+    //         const response = await fetch('/api/progress');
+    //         const result = await response.json();
+
+
+    //     } catch (error) {
+    //         console.error("Error fetching progress:", error);
+    //     }
+    // }
+
     useEffect(() => {
         fetchProducts();
         fetchOrders();
+        // fetchProgress();
     }, []);
 
     useEffect(() => {
-        console.log("PRODUCTS", products);
-        console.log("ORDERS", orders);
     }, [products, orders]);
 
     const productDetails = products ? JSON.stringify(products, null, 2) : "No product data available";
     const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
-    // const [language, setLanguage] = useState("English");
-
-    // const toggleLanguage = () => {
-    //     setLanguage((prevLanguage) => (prevLanguage === "English" ? "Portuguese" : "English"));
-    // };
-
-    // const LanguageToggleButton = () => {
-    //     return (
-    //         <button onClick={toggleLanguage}>
-    //             {language === "English" ? "Answer in Portuguese" : "Answer in English"}
-    //         </button>
-    //     );
-    // };
 
     const instruction = `You are a helpful assistant for the organization Orientavida. You have access to all the data from the following two Supabase tables: ${productDetails} and ${orderDetails}. If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about an order, return the relevant information strictly from the order table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. If the user asks questions about an order that is not in the order table, say that you don't have information about that order.
-    You should only respond to the user in the language that the user asks the question in (English or Portuguese).`
 
-    console.log("INSTRUCTION ", instruction)
+    You should only respond to the user in the language that the user asks the question in (English or Portuguese).`
 
     // Simple string usage
     useAssistantInstructions(instruction);
     
     return <div></div>;
-
-    // return <div className="flex justify-center border-2 h-8 text-sm bg-gray-100 rounded-md">     <LanguageToggleButton /> </div>
     
 }
 
