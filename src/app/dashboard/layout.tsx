@@ -27,7 +27,11 @@ export default function Layout({
   // Fetch product, order, or seamstress details if we're on a details page
   useEffect(() => {
     async function getDetails() {
-      if (segments[1] === "products" && segments.length === 3) {
+      if (
+        segments[1] === "products" &&
+        segments.length === 3 &&
+        segments[2] !== "new"
+      ) {
         try {
           const response = await fetch(`/api/products/${segments[2]}`);
           const data = await response.json();
@@ -37,7 +41,11 @@ export default function Layout({
         } catch (error) {
           console.error("Error fetching product:", error);
         }
-      } else if (segments[1] === "orders" && segments.length === 3) {
+      } else if (
+        segments[1] === "orders" &&
+        segments.length === 3 &&
+        segments[2] !== "new"
+      ) {
         try {
           const response = await fetch(`/api/orders/${segments[2]}`);
           const data = await response.json();
@@ -63,10 +71,16 @@ export default function Layout({
   }, [segments]);
 
   // Determine what to show in the breadcrumb
-  const isProductDetails = segments[1] === "products" && segments.length === 3;
-  const isOrderDetails = segments[1] === "orders" && segments.length === 3;
+  const isProductDetails =
+    segments[1] === "products" &&
+    segments.length === 3 &&
+    segments[2] !== "new";
+  const isOrderDetails =
+    segments[1] === "orders" && segments.length === 3 && segments[2] !== "new";
   const isSeamstressDetails =
     segments[1] === "seamstresses" && segments.length === 3;
+  const isNewProduct = segments[1] === "products" && segments[2] === "new";
+  const isNewOrder = segments[1] === "orders" && segments[2] === "new";
 
   const currentPage = segments[segments.length - 1];
   const formattedPage = isProductDetails
@@ -75,6 +89,10 @@ export default function Layout({
     ? orderClient
     : isSeamstressDetails
     ? seamstressName
+    : isNewProduct
+    ? "New Product"
+    : isNewOrder
+    ? "New Order"
     : currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
 
   return (
@@ -88,7 +106,11 @@ export default function Layout({
                 <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
-              {isProductDetails || isOrderDetails || isSeamstressDetails ? (
+              {isProductDetails ||
+              isOrderDetails ||
+              isSeamstressDetails ||
+              isNewProduct ||
+              isNewOrder ? (
                 <>
                   <BreadcrumbItem>
                     <BreadcrumbLink href={`/dashboard/${segments[1]}`}>
