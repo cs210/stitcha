@@ -21,12 +21,12 @@ import {
 } from "../ui/tooltip";
 
 const navRoutes = [
-  { href: "/dashboard/assistant", icon: BrainIcon, label: "Assistant" },
   { href: "/dashboard/kanban", icon: KanbanIcon, label: "Kanban" },
   { href: "/dashboard/products", icon: ShirtIcon, label: "Products" },
   { href: "/dashboard/orders", icon: ClipboardIcon, label: "Orders" },
   { href: "/dashboard/seamstresses", icon: Users, label: "Seamstresses" },
   { href: "/dashboard/settings", icon: SettingsIcon, label: "Settings" },
+  { href: "/dashboard/assistant", icon: BrainIcon, label: "Assistant" },
 ];
 
 export function Sidebar() {

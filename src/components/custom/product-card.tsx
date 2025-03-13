@@ -28,7 +28,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 					onClick={() => router.push(`/dashboard/products/${product.id}`)}
 				>
 					<div className='absolute top-3 right-5 flex gap-2 z-10'>
-						<Button
+						{/* <Button
 							size='sm'
 							variant='ghost'
 							className='text-gray-400 hover:text-gray-600 h-7 w-7 bg-white/80 backdrop-blur-sm'
@@ -37,7 +37,7 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 							}}
 						>
 							<Pencil className='h-4 w-4' />
-						</Button>
+						</Button> */}
 						<Button
 							size='sm'
 							variant='ghost'
