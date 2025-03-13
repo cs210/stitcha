@@ -1,31 +1,19 @@
-"use client";
+'use client';
 
-import { Description } from "@/components/custom/description";
-import { Header } from "@/components/custom/header";
-import { HeaderContainer } from "@/components/custom/header-container";
-import { Loader } from "@/components/custom/loader";
-import { LoaderContainer } from "@/components/custom/loader-container";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Order } from "@/lib/schemas/global.types";
-import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Description } from '@/components/custom/description';
+import { Header } from '@/components/custom/header';
+import { HeaderContainer } from '@/components/custom/header-container';
+import { Loader } from '@/components/custom/loader';
+import { LoaderContainer } from '@/components/custom/loader-container';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Order } from '@/lib/schemas/global.types';
+import { ArrowUpDown, MoreHorizontal, Pencil, Plus, Trash } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
   const router = useRouter();
@@ -185,10 +173,28 @@ export default function Page() {
             <TableBody>
               {currentItems.map((order) => (
                 <TableRow key={order.id}>
-                  <TableCell>{order.client}</TableCell>
-                  <TableCell>{order.contact}</TableCell>
-                  <TableCell>{order.order_quantity}</TableCell>
-                  <TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.client}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.contact}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
+                    {order.order_quantity}
+                  </TableCell>
+                  <TableCell
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/dashboard/orders/${order.id}`)}
+                  >
                     {order.due_date
                       ? new Date(order.due_date).toLocaleDateString()
                       : "-"}

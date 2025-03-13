@@ -1,53 +1,53 @@
-"use client";
+'use client';
 
-import { Description } from "@/components/custom/description";
-import { Header } from "@/components/custom/header";
-import { HeaderContainer } from "@/components/custom/header-container";
-import { Loader } from "@/components/custom/loader";
-import { LoaderContainer } from "@/components/custom/loader-container";
-import { User } from "@/lib/schemas/global.types";
-import { useUser } from "@clerk/nextjs";
-import { Mail, Phone } from "lucide-react";
-import Image from "next/image";
-import { useEffect, useState } from "react";
-
+import { Description } from '@/components/custom/description';
+import { Header } from '@/components/custom/header';
+import { HeaderContainer } from '@/components/custom/header-container';
+import { Loader } from '@/components/custom/loader';
+import { LoaderContainer } from '@/components/custom/loader-container';
+import { User } from '@/lib/schemas/global.types';
+import { useUser } from '@clerk/nextjs';
+import { Mail, Phone } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user } = useUser();
+	const { user } = useUser();
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [seamstresses, setSeamstresses] = useState<User[]>([]);
+	const [loading, setLoading] = useState<boolean>(true);
+	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
-  useEffect(() => {
-    if (!user) return;
+	useEffect(() => {
+		if (!user) return;
 
-    (async () => {
-      const response = await fetch("/api/seamstresses");
-      const { data, error } = await response.json();
+		(async () => {
+			const response = await fetch('/api/seamstresses');
+			const { data, error } = await response.json();
 
-      if (!error) {
-        setSeamstresses(data);
-      }
+			if (!error) {
+				setSeamstresses(data);
+			}
 
-      setLoading(false);
-    })();
-  }, [user]);
+			setLoading(false);
+		})();
+	}, [user]);
 
-  // Loading state
-  if (loading) {
-    return (
-      <LoaderContainer>
-        <Loader />
-      </LoaderContainer>
-    );
-  }
+	// Loading state
+	if (loading) {
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
+	}
 
-  return (
-    <>
-      <HeaderContainer>
-        <Header text="Seamstresses" />
-        <Description text="View and manage all seamstresses" />
-      </HeaderContainer>
+	return (
+		<>
+			<HeaderContainer>
+				<Header text='Seamstresses' />
+				<Description text='View and manage all seamstresses' />
+			</HeaderContainer>
 
       <div className="py-4">
         <div className="flex flex-wrap gap-6">
@@ -89,5 +89,4 @@ export default function Page() {
       </div>
     </>
   );
-			
 }
