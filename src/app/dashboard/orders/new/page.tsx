@@ -164,16 +164,22 @@ export default function Page() {
 								name='due_date'
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Order Date</FormLabel>
+										<FormLabel>Due Date</FormLabel>
 										<FormControl>
 											<Input
 												type='date'
-												placeholder='Order Date'
+												placeholder='Due Date'
 												{...field}
-												value={field.value instanceof Date ? field.value.toISOString().split('T')[0] : ''}
+												value={field.value ? field.value.toISOString().split('T')[0] : ''}
+												onChange={(e) => {
+													const date = new Date(e.target.value);
+													if (!isNaN(date.getTime())) {
+														field.onChange(date);
+													}
+												}}
 											/>
 										</FormControl>
-										<FormDescription>This is the date of the order.</FormDescription>
+										<FormDescription>This is the due date for the order.</FormDescription>
 										<FormMessage />
 									</FormItem>
 								)}

@@ -11,7 +11,7 @@ interface KanbanColumnProps {
 
 export function KanbanColumn({ title, id, products, onDelete }: KanbanColumnProps) {
 	return (
-		<div className='flex flex-col w-full h-full bg-gray-50 p-4 rounded-md overflow-y-auto'>
+		<div className='flex flex-col w-full h-full bg-gray-50 p-4 rounded-md'>
 			<div className='flex items-center justify-between mb-4'>
 				<h2 className='text-lg font-semibold'>{title}</h2>
 			</div>

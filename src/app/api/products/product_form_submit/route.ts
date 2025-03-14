@@ -13,11 +13,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Get the form data from the request
-        const formData = await request.formData();
+		// Get the form data from the request
+		const formData = await request.formData();
 
-        // Initialize Supabase client
-        const supabase = await createClerkSupabaseClientSsr();
+		// Initialize Supabase client
+		const supabase = await createClerkSupabaseClientSsr();
 
         // Handle the product submission
         const updatedProduct = await handleProductTableInsert(formData, supabase, userId);

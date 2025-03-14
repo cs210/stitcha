@@ -25,12 +25,12 @@ import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button
 export const Thread: FC = () => {
   return (
     <ThreadPrimitive.Root
-      className="bg-background box-border flex h-full flex-col overflow-hidden"
-      style={{
-        ["--thread-max-width" as string]: "42rem",
-      }}
+      className="bg-background box-border flex h-full flex-col"
+      // style={{
+      //   ["--thread-max-width" as string]: "42rem",
+      // }}
     >
-      <ThreadPrimitive.Viewport className="flex h-full flex-col items-center overflow-y-scroll scroll-smooth bg-inherit px-4 pt-8">
+      <ThreadPrimitive.Viewport className="flex flex-col items-center bg-inherit px-4 pt-8 h-[calc(100vh-210px)] overflow-y-auto">
         <ThreadWelcome />
 
         <ThreadPrimitive.Messages
@@ -44,12 +44,12 @@ export const Thread: FC = () => {
         <ThreadPrimitive.If empty={false}>
           <div className="min-h-8 flex-grow" />
         </ThreadPrimitive.If>
-
-        <div className="sticky bottom-0 mt-3 flex w-full max-w-[var(--thread-max-width)] flex-col items-center justify-end rounded-t-lg bg-inherit pb-4">
-          <ThreadScrollToBottom />
-          <Composer />
-        </div>
       </ThreadPrimitive.Viewport>
+
+      <div className="sticky bottom-0 mt-3 flex w-full flex-col items-center justify-end rounded-t-lg bg-inherit pb-4 px-4">
+        <ThreadScrollToBottom />
+        <Composer />
+      </div>
     </ThreadPrimitive.Root>
   );
 };
@@ -73,8 +73,11 @@ const ThreadWelcome: FC = () => {
     <ThreadPrimitive.Empty>
       <div className="flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
         <div className="flex w-full flex-grow flex-col items-center justify-center">
-          <p className="mt-4 font-large font-bold">
-            Welcome to Stitcha Assistant. How may I help you today?
+          <p className="mt-4 text-xl font-bold">
+            Welcome to Stitcha AI Assistant. 
+          </p>
+          <p className="mt-2 text-large">
+            How may I help you today?
           </p>
         </div>
         <ThreadWelcomeSuggestions />
@@ -87,7 +90,7 @@ const ThreadWelcomeSuggestions: FC = () => {
   return (
     <div className="mt-3 flex w-full items-stretch justify-center gap-4">
       <ThreadPrimitive.Suggestion
-        className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
+        className="hover:bg-muted/80 flex grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
         prompt="Display the details for all pending products."
         method="replace"
         autoSend
@@ -97,13 +100,13 @@ const ThreadWelcomeSuggestions: FC = () => {
         </span>
       </ThreadPrimitive.Suggestion>
       <ThreadPrimitive.Suggestion
-        className="hover:bg-muted/80 flex max-w-sm grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
-        prompt="What is the progress update on the Orientavida Lion King Sweatshirt?"
+        className="hover:bg-muted/80 flex grow basis-0 flex-col items-center justify-center rounded-lg border p-3 transition-colors ease-in"
+        prompt="What is the progress update on the Lion King Sweatshirt?"
         method="replace"
         autoSend
       >
         <span className="line-clamp-2 text-ellipsis text-sm font-semibold">
-          What is the progress update on the Orientavida Lion King Sweatshirt?
+          What is the progress update on the Lion King Sweatshirt?
         </span>
       </ThreadPrimitive.Suggestion>
     </div>

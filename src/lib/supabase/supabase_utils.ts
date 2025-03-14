@@ -184,11 +184,11 @@ export async function handleProductTableInsert(
             }
 
             // Get the public URL for the uploaded file
-            const { data: urlData } = supabase.storage
+            const { data: urlData } = await supabase.storage
                 .from('products')
-                .getPublicUrl(filePath);
+                .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiration
 
-            image_urls.push(urlData.publicUrl);
+            image_urls.push(urlData?.signedUrl || "");
         }
     }
 
