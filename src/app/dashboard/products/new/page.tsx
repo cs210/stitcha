@@ -391,23 +391,18 @@ export default function Page() {
 	};
 
 	// Add this function to calculate total cost
-	const calculateLaborTotalCost = (labor: any) => {
-		if (!labor) return 0;
-
-		const timePerUnit = Number(labor.time_per_unit) || 0;
-		const costPerMinute = Number(labor.cost_per_minute) || 0;
-		const rework = Number(labor.rework) || 0;
-		const conversion = Number(labor.conversion) || 1; // Default to 1 to avoid division by zero
-
-		return timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion));
-	};
-
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
 		try {
-			// Create FormData to handle file uploads
 			const formData = new FormData();
+
+			// Calculate raw material cost first
+			const rawMaterialsBaseCost = values.materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+			const percentLost = values.percent_pieces_lost || 0;
+			const totalRawMaterialCost = rawMaterialsBaseCost * (1 + percentLost / 100);
+			// Ensure the value is a number and not null
+			formData.append('raw_material_cost', JSON.stringify(totalRawMaterialCost));
 
 			// Add all non-file fields
 			Object.entries(values).forEach(([key, value]) => {
@@ -415,6 +410,23 @@ export default function Page() {
 					formData.append(key, JSON.stringify(value));
 				}
 			});
+
+			// Calculate and add the total packaging material cost
+			const packagingMaterialsBaseCost = values.packaging_materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+			const totalPackagingMaterialCost = packagingMaterialsBaseCost;
+			formData.append('packaging_cost', JSON.stringify(totalPackagingMaterialCost));
+			// Calculate and add the total labor cost
+			const totalLaborCost = values.labor?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+			formData.append('total_labor_cost', JSON.stringify(totalLaborCost));
+			// Calculate and add the total material cost (raw materials + packaging)
+			const totalMaterialCost = totalRawMaterialCost + totalPackagingMaterialCost;
+			formData.append('total_material_cost', JSON.stringify(totalMaterialCost));
+			// Calculate and add the total costs
+			const totalCost = totalMaterialCost + totalLaborCost + values.general_expenses + values.royalties;
+			formData.append('total_cost', JSON.stringify(totalCost));
+			// Calculate and add the selling price
+			const margin = ((values.selling_price - totalCost) / values.selling_price) * 100;
+			formData.append('margin', JSON.stringify(margin));
 
 			// Add image files if they exist
 			if (values.image_urls) {

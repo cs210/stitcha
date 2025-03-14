@@ -41,11 +41,62 @@ interface LaborProduct {
     total_cost: number;
 }
 
+interface ProductCosts {
+    raw_material_cost: number;
+    packaging_material_cost: number;
+    total_material_cost: number;
+    total_labor_cost: number;
+    general_expenses: number;
+    royalties: number;
+    total_cost: number;
+    selling_price: number;
+    margin: number;
+}
+
 const emptyToNull = (value: any) => {
     if (value === "") return null;
     return value;
 };
+export async function handleProductCostsInsert(
+    productId: string,
+    supabase: SupabaseClient,
+    formData: FormData,
+) {
+    const productCosts: ProductCosts = {
+        raw_material_cost: JSON.parse(formData.get("raw_material_cost") as string),
+        packaging_material_cost: JSON.parse(formData.get("packaging_cost") as string),
+        total_material_cost: JSON.parse(formData.get("total_material_cost") as string),
+        total_labor_cost: JSON.parse(formData.get("total_labor_cost") as string),
+        general_expenses: JSON.parse(formData.get("general_expenses") as string),
+        royalties: JSON.parse(formData.get("royalties") as string),
+        total_cost: JSON.parse(formData.get("total_cost") as string),
+        selling_price: JSON.parse(formData.get("selling_price") as string),
+        margin: JSON.parse(formData.get("margin") as string),
+    }
+    // Insert the product costs into the product_costs table
+    const { data: productCostsData, error: productCostsError } = await supabase
+        .from('product_costs')
+        .insert({
+            raw_material_cost: productCosts.raw_material_cost,
+            packaging_cost: productCosts.packaging_material_cost,
+            total_material_cost: productCosts.total_material_cost,
+            total_labor_cost: productCosts.total_labor_cost,
+            general_expenses: productCosts.general_expenses,
+            royalties: productCosts.royalties,
+            total_cost: productCosts.total_cost,
+            selling_price: productCosts.selling_price,
+            margin: productCosts.margin,
+            product_id: productId
+        })
+        .select()
+        .single();
 
+    if (productCostsError) {
+        throw new Error(`Failed to insert product costs: ${productCostsError.message}`);
+    }
+
+    return productCostsData.id;
+}
 export async function handleProductTableInsert(
     formData: FormData,
     supabase: SupabaseClient,
@@ -380,13 +431,13 @@ export async function updateTechnicalSheetFromProduct(
     }
 
     // Get the public URL for the uploaded file
-    const { data: urlData } = supabase
+    const { data: urlData } = await supabase
         .storage
         .from('technical-sheets')
-        .getPublicUrl(filePath);
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days expiration
 
     // Check if the URL was successfully generated
-    if (!urlData || !urlData.publicUrl) {
+    if (!urlData || !urlData.signedUrl) {
         throw new Error('Failed to generate public URL for technical sheet');
     }
 
@@ -395,7 +446,7 @@ export async function updateTechnicalSheetFromProduct(
         .from('technical_sheets')
         .insert({
             product_id: productId,
-            technical_sheet: urlData.publicUrl,
+            technical_sheet: urlData.signedUrl,
         })
         .select()
         .single();
