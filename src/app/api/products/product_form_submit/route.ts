@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error("Error processing product form:", error);
         // If an error occurred after product creation, clean up by deleting the product
+        // TODO: also delete files from storage
         if (productId) {  // This checks for both null and undefined
             try {
                 const supabase = await createClerkSupabaseClientSsr();
