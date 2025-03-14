@@ -87,68 +87,48 @@ const formSchema = z.object({
 		.optional(),
 	image_urls: z.array(z.instanceof(File)).nullable(),
 	status: progressLevelSchema,
-	materials: z
-		.array(
-			z.object({
-				material_code: z.string().min(1, { message: 'Material code is required' }),
-				material_name: z.string().min(1, { message: 'Material name is required' }),
-				purchase_price: z
-					.number()
-					.positive({ message: 'Purchase price must be greater than 0' })
-					.min(0.01, { message: 'Purchase price must be at least 0.01' })
-					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
-				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
-				units: z.string().optional(),
-				total_cost: z.number(),
-			})
-		)
-		.optional(),
-	packaging_materials: z
-		.array(
-			z.object({
-				material_code: z.string().min(1, { message: 'Material code is required' }),
-				material_name: z.string().min(1, { message: 'Material name is required' }),
-				purchase_price: z
-					.number()
-					.positive({ message: 'Purchase price must be greater than 0' })
-					.min(0.01, { message: 'Purchase price must be at least 0.01' })
-					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
-				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
-				units: z.string().optional(),
-				total_cost: z.number(),
-			})
-		)
-		.optional(),
-	labor: z
-		.array(
-			z.object({
-				labor_name: z.string().min(1, { message: 'Task name is required' }),
-				time_per_unit: z.number().min(0, { message: 'Time per unit must be 0 or greater' }),
-				conversion: z.number().min(0, { message: 'Conversion must be 0 or greater' }),
-				rework: z
-					.number()
-					.min(0, { message: 'Rework percentage must be between 0 and 100' })
-					.max(100, { message: 'Rework percentage must be between 0 and 100' }),
-				cost_per_minute: z
-					.number()
-					.min(0, { message: 'Cost per minute must be 0 or greater' })
-					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Cost per minute can only have up to 2 decimal places' }),
-			})
-		)
-		.optional(),
-	general_expenses: z
-		.number()
-		.min(0, { message: 'General expenses must be 0 or greater' })
-		.refine((val) => Number(val.toFixed(2)) === val, { message: 'General expenses can only have up to 2 decimal places' }),
-	royalties: z
-		.number()
-		.min(0, { message: 'Royalties percentage must be 0 or greater' })
-		.max(100, { message: 'Royalties percentage must be between 0 and 100' }),
-	selling_price: z
-		.number()
-		.positive({ message: 'Selling price must be greater than 0' })
-		.min(0.01, { message: 'Selling price must be at least 0.01' })
-		.refine((val) => Number(val.toFixed(2)) === val, { message: 'Selling price can only have up to 2 decimal places' }),
+	materials: z.array(z.object({
+		material_code: z.string().min(1, { message: "Material code is required" }),
+		material_name: z.string().min(1, { message: "Material name is required" }),
+		purchase_price: z.number()
+			.positive({ message: "Purchase price must be greater than 0" })
+			.min(0.01, { message: "Purchase price must be at least 0.01" })
+			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
+		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
+		units: z.string().optional(),
+		total_cost: z.number(),
+	})).optional(),
+	packaging_materials: z.array(z.object({
+		material_code: z.string().min(1, { message: "Material code is required" }),
+		material_name: z.string().min(1, { message: "Material name is required" }),
+		purchase_price: z.number()
+			.positive({ message: "Purchase price must be greater than 0" })
+			.min(0.01, { message: "Purchase price must be at least 0.01" })
+			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
+		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
+		units: z.string().optional(),
+		total_cost: z.number(),
+	})).optional(),
+	labor: z.array(z.object({
+		labor_name: z.string().min(1, { message: "Task name is required" }),
+		time_per_unit: z.number().min(0, { message: "Time per unit must be 0 or greater" }),
+		conversion: z.number().min(0, { message: "Conversion must be 0 or greater" }),
+		rework: z.number()
+			.min(0, { message: "Rework percentage must be between 0 and 100" })
+			.max(100, { message: "Rework percentage must be between 0 and 100" }),
+		cost_per_minute: z.number()
+			.min(0, { message: "Cost per minute must be 0 or greater" })
+			.refine(val => Number(val.toFixed(2)) === val, { message: "Cost per minute can only have up to 2 decimal places" }),
+		total_cost: z.number(),
+	})).optional(),
+	general_expenses: z.number()
+		.min(0, { message: "General expenses must be 0 or greater" })
+		.refine(val => Number(val.toFixed(2)) === val, { message: "General expenses can only have up to 2 decimal places" }),
+	royalties: z.number().min(0, { message: "Royalties percentage must be 0 or greater" }).max(100, { message: "Royalties percentage must be between 0 and 100" }),
+	selling_price: z.number()
+		.positive({ message: "Selling price must be greater than 0" })
+		.min(0.01, { message: "Selling price must be at least 0.01" })
+		.refine(val => Number(val.toFixed(2)) === val, { message: "Selling price can only have up to 2 decimal places" }),
 	technical_sheet: z.instanceof(File).nullable().optional(),
 });
 
@@ -409,23 +389,18 @@ export default function Page() {
 	};
 
 	// Add this function to calculate total cost
-	const calculateLaborTotalCost = (labor: any) => {
-		if (!labor) return 0;
-
-		const timePerUnit = Number(labor.time_per_unit) || 0;
-		const costPerMinute = Number(labor.cost_per_minute) || 0;
-		const rework = Number(labor.rework) || 0;
-		const conversion = Number(labor.conversion) || 1; // Default to 1 to avoid division by zero
-
-		return timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion));
-	};
-
 	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
 		try {
-			// Create FormData to handle file uploads
 			const formData = new FormData();
+
+			// Calculate raw material cost first
+			const rawMaterialsBaseCost = values.materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+			const percentLost = values.percent_pieces_lost || 0;
+			const totalRawMaterialCost = rawMaterialsBaseCost * (1 + percentLost / 100);
+			// Ensure the value is a number and not null
+			formData.append('raw_material_cost', JSON.stringify(totalRawMaterialCost));
 
 			// Add all non-file fields
 			Object.entries(values).forEach(([key, value]) => {
@@ -433,6 +408,23 @@ export default function Page() {
 					formData.append(key, JSON.stringify(value));
 				}
 			});
+
+			// Calculate and add the total packaging material cost
+			const packagingMaterialsBaseCost = values.packaging_materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+			const totalPackagingMaterialCost = packagingMaterialsBaseCost;
+			formData.append('packaging_cost', JSON.stringify(totalPackagingMaterialCost));
+			// Calculate and add the total labor cost
+			const totalLaborCost = values.labor?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+			formData.append('total_labor_cost', JSON.stringify(totalLaborCost));
+			// Calculate and add the total material cost (raw materials + packaging)
+			const totalMaterialCost = totalRawMaterialCost + totalPackagingMaterialCost;
+			formData.append('total_material_cost', JSON.stringify(totalMaterialCost));
+			// Calculate and add the total costs
+			const totalCost = totalMaterialCost + totalLaborCost + values.general_expenses + values.royalties;
+			formData.append('total_cost', JSON.stringify(totalCost));
+			// Calculate and add the selling price
+			const margin = ((values.selling_price - totalCost) / values.selling_price) * 100;
+			formData.append('margin', JSON.stringify(margin));
 
 			// Add image files if they exist
 			if (values.image_urls) {

@@ -32,11 +32,71 @@ interface PackagingMaterialProduct {
     total_cost: number;
 }
 
+interface LaborProduct {
+    labor_name: string;
+    time_per_unit: number;
+    conversion: number;
+    rework: number;
+    cost_per_minute: number;
+    total_cost: number;
+}
+
+interface ProductCosts {
+    raw_material_cost: number;
+    packaging_material_cost: number;
+    total_material_cost: number;
+    total_labor_cost: number;
+    general_expenses: number;
+    royalties: number;
+    total_cost: number;
+    selling_price: number;
+    margin: number;
+}
+
 const emptyToNull = (value: any) => {
     if (value === "") return null;
     return value;
 };
+export async function handleProductCostsInsert(
+    productId: string,
+    supabase: SupabaseClient,
+    formData: FormData,
+) {
+    const productCosts: ProductCosts = {
+        raw_material_cost: JSON.parse(formData.get("raw_material_cost") as string),
+        packaging_material_cost: JSON.parse(formData.get("packaging_cost") as string),
+        total_material_cost: JSON.parse(formData.get("total_material_cost") as string),
+        total_labor_cost: JSON.parse(formData.get("total_labor_cost") as string),
+        general_expenses: JSON.parse(formData.get("general_expenses") as string),
+        royalties: JSON.parse(formData.get("royalties") as string),
+        total_cost: JSON.parse(formData.get("total_cost") as string),
+        selling_price: JSON.parse(formData.get("selling_price") as string),
+        margin: JSON.parse(formData.get("margin") as string),
+    }
+    // Insert the product costs into the product_costs table
+    const { data: productCostsData, error: productCostsError } = await supabase
+        .from('product_costs')
+        .insert({
+            raw_material_cost: productCosts.raw_material_cost,
+            packaging_cost: productCosts.packaging_material_cost,
+            total_material_cost: productCosts.total_material_cost,
+            total_labor_cost: productCosts.total_labor_cost,
+            general_expenses: productCosts.general_expenses,
+            royalties: productCosts.royalties,
+            total_cost: productCosts.total_cost,
+            selling_price: productCosts.selling_price,
+            margin: productCosts.margin,
+            product_id: productId
+        })
+        .select()
+        .single();
 
+    if (productCostsError) {
+        throw new Error(`Failed to insert product costs: ${productCostsError.message}`);
+    }
+
+    return productCostsData.id;
+}
 export async function handleProductTableInsert(
     formData: FormData,
     supabase: SupabaseClient,
@@ -71,12 +131,25 @@ export async function handleProductTableInsert(
     };
 
     // Insert the product
+    // First, check if a product with the same system_code exists
+    const { data: existingProduct } = await supabase
+        .from('products')
+        .select('id')
+        .eq('system_code', product.system_code)
+        .maybeSingle();
+
+    // If it exists, delete it first
+    if (existingProduct) {
+        await supabase
+            .from('products')
+            .delete()
+            .eq('id', existingProduct.id);
+    }
+
+    // Now insert the new product
     const { data: insertedProduct, error: insertError } = await supabase
         .from('products')
-        .upsert(product, {
-            onConflict: 'system_code',
-            ignoreDuplicates: false
-        })
+        .insert(product)
         .select()
         .single();
 
@@ -132,6 +205,67 @@ export async function handleProductTableInsert(
     }
 
     return updatedProduct;
+}
+
+export async function updateLaborFromProduct(
+    productId: string,
+    supabase: SupabaseClient,
+    formData: FormData
+) {
+    const labors = JSON.parse(formData.get("labor") as string) as LaborProduct[];
+
+    if (!labors || labors.length === 0) {
+        return;
+    }
+
+    for (const labor of labors) {
+        const task_insert = {
+            task: labor.labor_name,
+            cost_per_minute: labor.cost_per_minute,
+        };
+
+        const { data: existingTask, error: fetchError } = await supabase
+            .from('labor_types')
+            .select()
+            .or(`task.eq.${task_insert.task}`)
+            .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') { // Ignore "No rows found" error
+            throw new Error(`Failed to check for existing task: ${fetchError.message}`);
+        }
+
+        let upsertData;
+        if (existingTask) {
+            upsertData = { ...existingTask, ...task_insert };
+        } else {
+            upsertData = task_insert;
+        }
+
+        const { data: insertedTask, error: insertError } = await supabase
+            .from('labor_types')
+            .upsert(upsertData, { ignoreDuplicates: false })
+            .select()
+            .single();
+
+        if (insertError) {
+            throw new Error(`Failed to insert or update labor type: ${insertError.message}`);
+        }
+
+        const { error: insertError2 } = await supabase
+            .from('products_and_labor')
+            .insert({
+                product_id: productId,
+                task_id: insertedTask.task_id,
+                time_per_unit: labor.time_per_unit,
+                conversion: labor.conversion,
+                rework: labor.rework,
+                total_cost: labor.total_cost,
+            });
+
+        if (insertError2) {
+            throw new Error(`Failed to insert or update labor for product ${productId}: ${insertError2.message}`);
+        }
+    }
 }
 
 export async function updateRawMaterialFromProduct(
@@ -264,5 +398,60 @@ export async function updatePackagingMaterialFromProduct(
             throw new Error(`Failed to insert or update packaging material for product ${productId}: ${insertError2.message}`);
         }
 
+    }
+}
+
+export async function updateTechnicalSheetFromProduct(
+    productId: string,
+    supabase: SupabaseClient,
+    formData: FormData
+) {
+    const technical_sheet = formData.get("technical_sheet") as File;
+
+    if (!technical_sheet) {
+        return;
+    }
+
+    // Generate a unique file name to avoid collisions
+    const fileExt = technical_sheet.name.split('.').pop();
+    const fileName = `${productId}_${Date.now()}.${fileExt}`;
+    const filePath = `${productId}/${fileName}`;
+
+    // Upload the file to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+        .storage
+        .from('technical-sheets')
+        .upload(filePath, technical_sheet, {
+            cacheControl: '3600',
+            upsert: true
+        });
+
+    if (uploadError) {
+        throw new Error(`Failed to upload technical sheet: ${uploadError.message}`);
+    }
+
+    // Get the public URL for the uploaded file
+    const { data: urlData } = await supabase
+        .storage
+        .from('technical-sheets')
+        .createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days expiration
+
+    // Check if the URL was successfully generated
+    if (!urlData || !urlData.signedUrl) {
+        throw new Error('Failed to generate public URL for technical sheet');
+    }
+
+    // Update the technical_sheets table with the new technical sheet
+    const { error: insertError } = await supabase
+        .from('technical_sheets')
+        .insert({
+            product_id: productId,
+            technical_sheet: urlData.signedUrl,
+        })
+        .select()
+        .single();
+
+    if (insertError) {
+        throw new Error(`Failed to insert technical sheet record: ${insertError.message}`);
     }
 }
