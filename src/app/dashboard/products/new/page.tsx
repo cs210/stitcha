@@ -1,9 +1,9 @@
 'use client';
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ComboboxFormField } from '@/components/ui/combobox-form-field';

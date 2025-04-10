@@ -1,9 +1,9 @@
 'use client';
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';

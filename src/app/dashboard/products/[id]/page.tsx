@@ -1,9 +1,9 @@
 'use client';
  
- import { Header } from '@/components/custom/header';
- import { HeaderContainer } from '@/components/custom/header-container';
- import { Loader } from '@/components/custom/loader';
- import { LoaderContainer } from '@/components/custom/loader-container';
+ import { Header } from '@/components/custom/header/header';
+ import { HeaderContainer } from '@/components/custom/header/header-container';
+ import { Loader } from '@/components/custom/loader/loader';
+ import { LoaderContainer } from '@/components/custom/loader/loader-container';
  import { Button } from '@/components/ui/button';
  import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
  import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';

@@ -1,9 +1,9 @@
 'use client';
 
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
-import { LoaderContainer } from '@/components/custom/loader-container';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Order, Product } from '@/lib/schemas/global.types';
 import Image from 'next/image';
 import Link from 'next/link';

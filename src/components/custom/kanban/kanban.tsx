@@ -19,7 +19,6 @@ interface Product {
 	quantity: number;
 }
 
-// Update the STATUS_MAPPING to have reverse mapping as well
 const STATUS_MAPPING = {
 	notStarted: 'Not Started',
 	inProgress: 'In Progress',
@@ -111,10 +110,8 @@ export function KanbanBoard() {
 
 		// Add to destination
 		if (source.droppableId === destination.droppableId) {
-			// If moving within same column, use the same array
 			sourceColumn.splice(destination.index, 0, removed);
 		} else {
-			// If moving to different column, use destination array
 			destColumn.splice(destination.index, 0, removed);
 		}
 
@@ -123,17 +120,14 @@ export function KanbanBoard() {
 			[source.droppableId]: sourceColumn,
 		};
 
-		// Only update destination column if it's different from source
 		if (source.droppableId !== destination.droppableId) {
 			updated[destination.droppableId] = destColumn;
 		}
 
-		// Update local state
 		setProducts(updated);
 
 		// Only make API call if moving between columns
 		if (source.droppableId !== destination.droppableId) {
-			// Update progress_level in Supabase
 			try {
 				const newStatus = STATUS_MAPPING[destination.droppableId as keyof typeof STATUS_MAPPING];
 				const response = await fetch(`/api/products/${draggableId}`, {
@@ -151,6 +145,7 @@ export function KanbanBoard() {
 				}
 			} catch (error) {
 				console.error('Error updating product status:', error);
+
 				// Revert local state if update fails
 				setProducts(newProducts);
 			}
@@ -159,8 +154,6 @@ export function KanbanBoard() {
 
 	const onDelete = async (productId: string) => {
 		try {
-			console.log('DELETING PRODUCT', productId);
-
 			const response = await fetch(`/api/products/${productId}`, {
 				method: 'DELETE',
 			});
@@ -171,11 +164,12 @@ export function KanbanBoard() {
 
 			// Update local state after successful deletion
 			const newProducts = { ...products };
-			Object.keys(newProducts).forEach(key => {
-				newProducts[key] = newProducts[key].filter(product => product.id !== productId);
-			});
-			setProducts(newProducts);
 
+			Object.keys(newProducts).forEach((key) => {
+				newProducts[key] = newProducts[key].filter((product) => product.id !== productId);
+			});
+
+			setProducts(newProducts);
 		} catch (error) {
 			console.error('Error deleting product:', error);
 		}
