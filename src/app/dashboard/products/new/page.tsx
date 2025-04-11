@@ -23,6 +23,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 type ProgressLevel = Database['public']['Enums']['progress_level'];
+
 const progressLevelValues = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
 const progressLevelSchema = z.enum(progressLevelValues);
 

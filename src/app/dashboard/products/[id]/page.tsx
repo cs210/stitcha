@@ -40,9 +40,13 @@ import Link from 'next/link';
  	}, [isDialogOpen, selectedUsers]);
  
  	useEffect(() => {
+ 		// Reset command open state when dialog closes
+ 		if (!isDialogOpen) {
+ 			setIsCommandOpen(false);
+ 		}
+
  		async function fetchData() {
- 			try {
- 				// Fetch product details
+ 			try { 				
  				const productResponse = await fetch(`/api/products/${unwrappedParams.id}`);
  				const productData = await productResponse.json();
  
@@ -52,7 +56,6 @@ import Link from 'next/link';
  
  				setProduct(productData);
  
- 				// Fetch all available seamstresses
  				const usersResponse = await fetch('/api/seamstresses');
  				const { data: usersData } = await usersResponse.json();
  
@@ -60,13 +63,13 @@ import Link from 'next/link';
  					setUsers(usersData);
  				}
  
- 				// Fetch assigned seamstresses for this product
  				const assignedResponse = await fetch(`/api/products/${unwrappedParams.id}/assigned`);
  				const { data: assignedData } = await assignedResponse.json();
- 
+
+				// Find the full user objects for assigned seamstresses 
  				if (Array.isArray(assignedData)) {
- 					// Find the full user objects for assigned seamstresses
- 					const assignedUsers = usersData.filter((user) => assignedData.some((assigned) => assigned.user_id === user.id));
+ 					const assignedUsers = usersData.filter((user: User) => assignedData.some((assigned: any) => assigned.user_id === user.id));
+					
  					setSelectedUsers(assignedUsers);
  					setTempSelectedUsers(assignedUsers);
  				}
@@ -77,16 +80,10 @@ import Link from 'next/link';
  			}
  		}
  
- 		fetchData();
- 	}, [unwrappedParams.id]);
- 
- 	useEffect(() => {
  		async function fetchTimelineUpdates() {
  			if (!product) return;
  
- 			try {
- 				console.log('Fetching timeline updates for product:', unwrappedParams.id);
- 
+ 			try { 
  				// Fetch both timeline and progress updates
  				const [timelineResponse, progressResponse] = await Promise.all([
  					fetch(`/api/products/${unwrappedParams.id}/timeline`),
@@ -100,29 +97,27 @@ import Link from 'next/link';
  				// Add timeline data
  				if (Array.isArray(timelineData.data)) {
  					updates = [...timelineData.data];
+
  					if (!updates.some((update) => update.status === 'created')) {
  						updates.unshift({
  							id: 'created',
  							created_at: '2025-03-10T13:20:00.000Z',
- 							description: `Batch #${product.batch_number || '2024-001'} entered production phase`,
+ 							description: `Batch 2024-001 entered production phase`,
  							status: 'created',
  							user_id: 'system',
  							image_urls: [],
  						});
  					}
- 				}
- 
-				console.log('Updates:', updates);
+ 				}			
  
  				// Add progress data
  				if (Array.isArray(progressData.data)) {
  					updates = [
  						...updates,
- 						...progressData.data.map((progress) => ({
- 							...progress,
- 							status: 'progress',							
- 							// emotion: progress.emotion,
-							user: progress.user,
+ 						...progressData.data.map((progress: Progress) => ({
+ 							...progress, 											
+ 							emotion: progress.emotion,
+							user_id: progress.user_id,
  							description: `Progress update: ${progress.description || 'No additional notes'}`,
  						})),
  					];
@@ -130,8 +125,6 @@ import Link from 'next/link';
  
  				// Sort all updates by date
  				updates.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
- 
-				console.log('Updates:', updates);
 
  				setProgressUpdates(updates);
  			} catch (error) {
@@ -139,34 +132,27 @@ import Link from 'next/link';
  			}
  		}
  
- 		fetchTimelineUpdates();
- 	}, [unwrappedParams.id, product]);
- 
- 	// Reset command open state when dialog closes
- 	useEffect(() => {
- 		if (!isDialogOpen) {
- 			setIsCommandOpen(false);
- 		}
- 	}, [isDialogOpen]);
- 
+		fetchData();
+ 		fetchTimelineUpdates(); 		
+ 	}, [unwrappedParams.id, product, isDialogOpen]);
+  
+	// Handle user selection
  	const handleUserSelect = (userId: string) => {
  		const user = users.find((u) => u.id === userId);
+
  		if (user && !tempSelectedUsers.some((u) => u.id === userId)) {
  			setTempSelectedUsers([...tempSelectedUsers, user]);
  		}
  	};
- 
+
+	// Handle user removal
  	const handleRemoveUser = (userId: string) => {
  		setTempSelectedUsers(tempSelectedUsers.filter((user) => user.id !== userId));
  	};
  
+	// Handle assignment confirmation
  	const handleConfirmAssignment = async () => {
- 		try {
- 			console.log('Attempting to assign seamstresses:', {
- 				productId: unwrappedParams.id,
- 				seamstressIds: tempSelectedUsers.map((user) => user.id),
- 			});
- 
+ 		try { 
  			const response = await fetch(`/api/products/${unwrappedParams.id}/assign`, {
  				method: 'POST',
  				headers: {
@@ -178,7 +164,6 @@ import Link from 'next/link';
  			});
  
  			const data = await response.json();
- 			console.log('API Response:', data);
  
  			if (!response.ok) {
  				throw new Error(data.error || 'Failed to assign seamstresses');
@@ -196,24 +181,26 @@ import Link from 'next/link';
  						newlyAssignedUsers.length === 1
  							? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
  							: `Product assigned to ${newlyAssignedUsers.map((user) => `${user.first_name} ${user.last_name}`).join(', ')}`,
- 					status: 'assigned',
+					emotion: null,
  					user_id: newlyAssignedUsers.map((user) => user.id).join(','),
  					image_urls: [],
  				};
  
  				setProgressUpdates((prev) => [...(prev || []), newEvent]);
  			}
- 
- 			// Update UI state
+  			
  			setSelectedUsers(tempSelectedUsers);
  			setIsDialogOpen(false);
+
  			toast.success('Seamstresses assigned successfully');
  		} catch (error) {
  			console.error('Error in handleConfirmAssignment:', error);
+
  			toast.error(error instanceof Error ? error.message : 'Failed to assign seamstresses');
  		}
  	};
  
+	// Handle assignment removal
  	const handleDeleteAssignment = async (userId: string) => {
  		try {
  			const response = await fetch(`/api/products/${unwrappedParams.id}/assign`, {
@@ -222,26 +209,26 @@ import Link from 'next/link';
  					'Content-Type': 'application/json',
  				},
  				body: JSON.stringify({
- 					seamstressIds: [userId], // Send as array since the API expects an array
+ 					seamstressIds: [userId],
  				}),
  			});
  
  			if (!response.ok) {
  				const data = await response.json();
+
  				throw new Error(data.error || 'Failed to remove assignment');
  			}
  
- 			// Update the UI state
  			setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
  
- 			// Add a progress event for the removal
  			const removedUser = selectedUsers.find((user) => user.id === userId);
+
  			if (removedUser) {
  				const newEvent: Progress = {
  					id: `unassigned-${Date.now()}`,
  					created_at: new Date().toISOString(),
  					description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
- 					status: 'unassigned',
+					emotion: null,
  					user_id: userId,
  					image_urls: [],
  				};
@@ -252,6 +239,7 @@ import Link from 'next/link';
  			toast.success('Assignment removed successfully');
  		} catch (error) {
  			console.error('Error removing assignment:', error);
+
  			toast.error(error instanceof Error ? error.message : 'Failed to remove assignment');
  		}
  	};
@@ -281,11 +269,8 @@ import Link from 'next/link';
  			</LoaderContainer>
  		);
  	}
- 
- 	if (!product) {
- 		return <div>Product not found</div>;
- 	}
- 
+
+	// Filter available users
  	const filteredAvailableUsers = users.filter(
  		(user) =>
  			!tempSelectedUsers.some((selectedUser) => selectedUser.id === user.id) &&
@@ -295,19 +280,21 @@ import Link from 'next/link';
  	);
  
  	// Check if image_urls is an array or needs to be converted
- 	const imageUrls = Array.isArray(product.image_urls)
- 		? product.image_urls
- 		: product.image_urls && typeof product.image_urls === 'object'
- 		? Object.values(product.image_urls)
+ 	const imageUrls = Array.isArray(product?.image_urls)
+ 		? product?.image_urls
+ 		: product?.image_urls && typeof product?.image_urls === 'object'
+ 		? Object.values(product?.image_urls)
  		: [];
  
  	return (
  		<>
  			<HeaderContainer>
- 				<Header text={product.name} />
- 				<div className='flex items-center gap-4 mt-4'>
- 					<div className='flex items-center gap-2'>
- 						<span className='text-sm text-gray-500'>Assigned to:</span>
+ 				<Header text={product?.name || ''} />
+			</HeaderContainer>
+
+			<div className='flex items-center gap-4 mt-4'>
+				<div className='flex items-center gap-2'>
+					<span className='text-sm text-gray-500'>Assigned to:</span>
  						{selectedUsers.length > 0 ? (
  							<div className='flex items-center gap-2'>
  								{selectedUsers.map((user) => (
@@ -465,8 +452,7 @@ import Link from 'next/link';
  							</div>
  						</DialogContent>
  					</Dialog>
- 				</div>
- 			</HeaderContainer>
+ 				</div> 			
  
  			<div className='py-4 space-y-4'>
  				<div className='grid grid-cols-[2fr,1fr] gap-4'>

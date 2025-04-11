@@ -61,7 +61,7 @@ export type Database = {
           due_date: string
           id: string
           order_quantity: number
-          product_id: string
+          product_id: string | null
         }
         Insert: {
           client: string
@@ -69,7 +69,7 @@ export type Database = {
           due_date: string
           id?: string
           order_quantity: number
-          product_id: string
+          product_id?: string | null
         }
         Update: {
           client?: string
@@ -77,7 +77,7 @@ export type Database = {
           due_date?: string
           id?: string
           order_quantity?: number
-          product_id?: string
+          product_id?: string | null
         }
         Relationships: [
           {
@@ -92,23 +92,23 @@ export type Database = {
       packaging_materials: {
         Row: {
           packaging_id: string
-          packaging_material_code: string | null
-          packaging_material_name: string | null
-          purchase_price: number | null
+          packaging_material_code: string
+          packaging_material_name: string
+          purchase_price: number
           units: string | null
         }
         Insert: {
-          packaging_id: string
-          packaging_material_code?: string | null
-          packaging_material_name?: string | null
-          purchase_price?: number | null
+          packaging_id?: string
+          packaging_material_code: string
+          packaging_material_name: string
+          purchase_price?: number
           units?: string | null
         }
         Update: {
           packaging_id?: string
-          packaging_material_code?: string | null
-          packaging_material_name?: string | null
-          purchase_price?: number | null
+          packaging_material_code?: string
+          packaging_material_name?: string
+          purchase_price?: number
           units?: string | null
         }
         Relationships: []
@@ -124,7 +124,7 @@ export type Database = {
           royalties: number
           selling_price: number
           total_cost: number
-          total_labour_cost: number
+          total_labor_cost: number
           total_material_cost: number
         }
         Insert: {
@@ -137,7 +137,7 @@ export type Database = {
           royalties?: number
           selling_price?: number
           total_cost?: number
-          total_labour_cost?: number
+          total_labor_cost?: number
           total_material_cost?: number
         }
         Update: {
@@ -150,7 +150,7 @@ export type Database = {
           royalties?: number
           selling_price?: number
           total_cost?: number
-          total_labour_cost?: number
+          total_labor_cost?: number
           total_material_cost?: number
         }
         Relationships: [
@@ -278,27 +278,27 @@ export type Database = {
         Row: {
           conversion: number
           id: string
-          product_id: string | null
+          product_id: string
           rework: number
-          task_id: string
+          task_id: string | null
           time_per_unit: number
           total_cost: number
         }
         Insert: {
-          conversion: number
+          conversion?: number
           id?: string
-          product_id?: string | null
-          rework: number
-          task_id: string
-          time_per_unit: number
-          total_cost: number
+          product_id: string
+          rework?: number
+          task_id?: string | null
+          time_per_unit?: number
+          total_cost?: number
         }
         Update: {
           conversion?: number
           id?: string
-          product_id?: string | null
+          product_id?: string
           rework?: number
-          task_id?: string
+          task_id?: string | null
           time_per_unit?: number
           total_cost?: number
         }
@@ -306,14 +306,14 @@ export type Database = {
           {
             foreignKeyName: "products_and_labor_product_id_fkey"
             columns: ["product_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "products_and_labor_task_id_fkey"
             columns: ["task_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "labor_types"
             referencedColumns: ["task_id"]
           },
@@ -534,27 +534,29 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DefaultSchema = Database[Extract<keyof Database, "public">]
 
 export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-        Database[PublicTableNameOrOptions["schema"]]["Views"])
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-      Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
-        PublicSchema["Views"])
-    ? (PublicSchema["Tables"] &
-        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -562,20 +564,22 @@ export type Tables<
     : never
 
 export type TablesInsert<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -583,20 +587,22 @@ export type TablesInsert<
     : never
 
 export type TablesUpdate<
-  PublicTableNameOrOptions extends
-    | keyof PublicSchema["Tables"]
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
     | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -604,21 +610,23 @@ export type TablesUpdate<
     : never
 
 export type Enums<
-  PublicEnumNameOrOptions extends
-    | keyof PublicSchema["Enums"]
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
     | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
+  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof PublicSchema["CompositeTypes"]
+    | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof Database },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
@@ -627,6 +635,14 @@ export type CompositeTypes<
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-    ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
+
+export const Constants = {
+  public: {
+    Enums: {
+      progress_level: ["Not Started", "In Progress", "Done"],
+    },
+  },
+} as const

@@ -6,7 +6,20 @@ import { AssistantCloud, AssistantRuntimeProvider, useAssistantInstructions } fr
 import { useChatRuntime } from '@assistant-ui/react-ai-sdk';
 import { useEffect, useState } from 'react';
 
-function AssistantInstructions() {
+const cloud = new AssistantCloud({
+	baseUrl: process.env['NEXT_PUBLIC_ASSISTANT_BASE_URL']!,
+	authToken: () =>
+		fetch('/api/assistant-ui-token', { method: 'POST' })
+			.then((r) => r.json())
+			.then((r) => r.token),
+});
+
+export default function Page() {
+	const runtime = useChatRuntime({
+		cloud,
+		api: '/api/chat',
+	});
+
 	const [products, setProducts] = useState(null);
 	const [orders, setOrders] = useState(null);
 	const [productUsers, setProductUsers] = useState(null);
@@ -98,23 +111,6 @@ function AssistantInstructions() {
 
 	useAssistantInstructions(instruction);
 
-	return <div></div>;
-}
-
-const cloud = new AssistantCloud({
-	baseUrl: process.env['NEXT_PUBLIC_ASSISTANT_BASE_URL']!,
-	authToken: () =>
-		fetch('/api/assistant-ui-token', { method: 'POST' })
-			.then((r) => r.json())
-			.then((r) => r.token),
-});
-
-export default function Page() {
-	const runtime = useChatRuntime({
-		cloud,
-		api: '/api/chat',
-	});
-
 	return (
 		<AssistantRuntimeProvider runtime={runtime}>
 			<div className='flex gap-x-6 flex-row h-full overflow-y-hidden'>
@@ -124,7 +120,6 @@ export default function Page() {
 				<div className='w-3/4'>
 					<Thread />
 				</div>
-				<AssistantInstructions />
 			</div>
 		</AssistantRuntimeProvider>
 	);

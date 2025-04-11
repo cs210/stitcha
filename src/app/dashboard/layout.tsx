@@ -1,7 +1,7 @@
 'use client';
 
+import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-breadcrumb';
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
 import { Toaster } from '@/components/ui/sonner';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ export default function Layout({
 
 	useEffect(() => {
 		async function getDetails() {
+			// Get product details based on segments
 			if (segments[1] === 'products' && segments.length === 3) {
 				try {
 					const response = await fetch(`/api/products/${segments[2]}`);
@@ -31,7 +32,9 @@ export default function Layout({
 				} catch (error) {
 					console.error('Error fetching product:', error);
 				}
-			} else if (segments[1] === 'orders' && segments.length === 3) {
+			}
+			// Get order details based on segments
+			else if (segments[1] === 'orders' && segments.length === 3) {
 				try {
 					const response = await fetch(`/api/orders/${segments[2]}`);
 					const data = await response.json();
@@ -42,7 +45,9 @@ export default function Layout({
 				} catch (error) {
 					console.error('Error fetching order:', error);
 				}
-			} else if (segments[1] === 'seamstresses' && segments.length === 3) {
+			}
+			// Get seamstress details based on segments
+			else if (segments[1] === 'seamstresses' && segments.length === 3) {
 				try {
 					const response = await fetch(`/api/seamstresses/${segments[2]}`);
 					const { data } = await response.json();
@@ -65,42 +70,29 @@ export default function Layout({
 	const isSeamstressDetails = segments[1] === 'seamstresses' && segments.length === 3;
 
 	const currentPage = segments[segments.length - 1];
-	const formattedPage = isProductDetails
-		? productName
-		: isOrderDetails
-		? orderClient
-		: isSeamstressDetails
-		? seamstressName
-		: currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+	let formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+
+	// Format the page based on the current segment
+	if (isProductDetails) {
+		formattedPage = productName;
+	} else if (isOrderDetails) {
+		formattedPage = orderClient;
+	} else if (isSeamstressDetails) {
+		formattedPage = seamstressName;
+	}
 
 	return (
 		<div className='flex h-screen'>
 			<Sidebar />
 			<main className='flex-1 overflow-x-hidden overflow-y-auto p-8'>
 				<header>
-					<Breadcrumb>
-						<BreadcrumbList>
-							<BreadcrumbItem>
-								<BreadcrumbLink href='/dashboard'>Dashboard</BreadcrumbLink>
-							</BreadcrumbItem>
-							<BreadcrumbSeparator />
-							{isProductDetails || isOrderDetails || isSeamstressDetails ? (
-								<>
-									<BreadcrumbItem>
-										<BreadcrumbLink href={`/dashboard/${segments[1]}`}>{segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}</BreadcrumbLink>
-									</BreadcrumbItem>
-									<BreadcrumbSeparator />
-									<BreadcrumbItem>
-										<BreadcrumbPage>{formattedPage}</BreadcrumbPage>
-									</BreadcrumbItem>
-								</>
-							) : (
-								<BreadcrumbItem>
-									<BreadcrumbPage>{formattedPage}</BreadcrumbPage>
-								</BreadcrumbItem>
-							)}
-						</BreadcrumbList>
-					</Breadcrumb>
+					<NavigationBreadcrumb
+						isProductDetails={isProductDetails}
+						isOrderDetails={isOrderDetails}
+						isSeamstressDetails={isSeamstressDetails}
+						segments={segments}
+						formattedPage={formattedPage}
+					/>
 				</header>
 
 				<div className='flex-1 flex-col h-full pt-8'>{children}</div>

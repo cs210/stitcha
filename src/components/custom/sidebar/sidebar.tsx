@@ -6,7 +6,7 @@ import { UserButton } from '@clerk/nextjs';
 import { BrainIcon, ClipboardIcon, KanbanIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../ui/tooltip';
+import { SidebarTooltip } from './sidebar-tooltip';
 
 const navRoutes = [
 	{ href: '/dashboard/kanban', icon: KanbanIcon, label: 'Kanban' },
@@ -22,38 +22,22 @@ export function Sidebar() {
 
 	return (
 		<div className='flex h-full w-[72px] flex-col items-center border-r px-3 py-5'>
-			{/* Main navigation */}
 			<div className='flex flex-col gap-4'>
 				{navRoutes.map(({ href, icon: Icon, label }) => (
-					<TooltipProvider key={href}>
-						<Tooltip>
-							<TooltipTrigger>
-								<Button variant='ghost' size='icon' className={cn('h-10 w-10', pathname === href && 'bg-primary text-white')} asChild>
-									<Link href={href}>
-										<Icon className='h-5 w-5' />
-									</Link>
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent>
-								<p>{label}</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
+					<SidebarTooltip key={href} label={label}>
+						<Button variant='ghost' size='icon' className={cn('h-10 w-10', pathname === href && 'bg-primary text-white')} asChild>
+							<Link href={href}>
+								<Icon className='h-5 w-5' />
+							</Link>
+						</Button>
+					</SidebarTooltip>
 				))}
 			</div>
 
-			{/* User button at bottom */}
 			<div className='mt-auto'>
-				<TooltipProvider>
-					<Tooltip>
-						<TooltipTrigger>
-							<UserButton />
-						</TooltipTrigger>
-						<TooltipContent>
-							<p>Sign out</p>
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
+				<SidebarTooltip label='Sign out'>
+					<UserButton />
+				</SidebarTooltip>
 			</div>
 		</div>
 	);
