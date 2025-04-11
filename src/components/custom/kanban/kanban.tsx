@@ -1,23 +1,10 @@
 'use client';
 
-import { User } from '@/lib/schemas/global.types';
+import { Product } from '@/lib/schemas/global.types';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { useEffect, useState } from 'react';
 import { KanbanColumn } from './kanban-column';
-
-interface Product {
-	id: string;
-	name: string;
-	image_url: string;
-	type: string;
-	progress_level: string;
-	created_at: string;
-	assignees: User[];
-	progress: string;
-	description: string;
-	quantity: number;
-}
 
 const STATUS_MAPPING = {
 	notStarted: 'Not Started',

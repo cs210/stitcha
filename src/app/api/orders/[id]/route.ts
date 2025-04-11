@@ -1,16 +1,19 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-// get a specific order by id
-export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
-	const supabase = await createClerkSupabaseClientSsr();
+// Retrieves a specific order by id
+export async function GET({ params }: { params: Promise<{ id: string }> }) {
+	const { userId } = await auth();
 	const { id: orderId } = await params;
 
-	const { data, error } = await supabase
-		.from('orders')
-		.select('*')
-		.eq('id', orderId) // Fetch the specific order by ID
-		.single();
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const supabase = await createClerkSupabaseClientSsr();
+
+	const { data, error } = await supabase.from('orders').select('*').eq('id', orderId).single();
 
 	if (error) {
 		return NextResponse.json({ error: error.message }, { status: 400 });
@@ -19,10 +22,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 	return NextResponse.json(data, { status: 200 });
 }
 
-// delete a specific order by id
-export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
-	const supabase = await createClerkSupabaseClientSsr();
+// Deletes a specific order by id
+export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+	const { userId } = await auth();
 	const { id: orderId } = await params;
+
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const supabase = await createClerkSupabaseClientSsr();
 
 	const { error } = await supabase.from('orders').delete().eq('id', orderId);
 

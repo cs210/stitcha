@@ -2,7 +2,7 @@ import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-// Retrieves all seamstresses
+// Retrieves all packaging materials
 export async function GET() {
 	const { userId } = await auth();
 
@@ -13,7 +13,7 @@ export async function GET() {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('users').select('*');
+		const { data, error } = await supabase.from('packaging_materials').select('*');
 
 		if (error) {
 			throw new Error(error.message);

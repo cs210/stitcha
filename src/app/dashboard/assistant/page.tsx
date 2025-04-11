@@ -22,7 +22,6 @@ export default function Page() {
 
 	const [products, setProducts] = useState(null);
 	const [orders, setOrders] = useState(null);
-	const [productUsers, setProductUsers] = useState(null);
 	const [users, setUsers] = useState(null);
 
 	// Fetch products from the database
@@ -57,22 +56,6 @@ export default function Page() {
 		}
 	};
 
-	// Fetch product users from the database
-	const fetchProductUsers = async () => {
-		try {
-			const response = await fetch('/api/product-users');
-			const result = await response.json();
-
-			if (!response.ok) {
-				throw new Error(result.error);
-			}
-
-			setProductUsers(result.data);
-		} catch (error) {
-			console.error('Error fetching product users:', error);
-		}
-	};
-
 	// Fetch users from the database
 	const fetchUsers = async () => {
 		try {
@@ -92,14 +75,12 @@ export default function Page() {
 	useEffect(() => {
 		fetchProducts();
 		fetchOrders();
-		fetchProductUsers();
 		fetchUsers();
 	}, []);
 
 	const productDetails = products ? JSON.stringify(products, null, 2) : 'No product data available';
 	const orderDetails = orders ? JSON.stringify(orders, null, 2) : 'No order data available';
 	const usersDetails = users ? JSON.stringify(users, null, 2) : 'No users data available';
-	const productUsersDetails = productUsers ? JSON.stringify(productUsers, null, 2) : 'No product users data available';
 
 	const instruction = `You are a helpful professional assistant for the organization Orientavida. You have access to all the data from the following 5 Supabase tables: the PRODUCT TABLE ${productDetails}, the ORDER TABLE ${orderDetails}, the PRODUCT_USERS TABLE ${productUsersDetails}, and the USERS TABLE ${usersDetails}. You must use the data from the tables to answer the user's questions. If necessary, you are encouraged to link the data from multiple tables to answer the user's questions (i.e. search by product or user id).    
     (a) If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. Include a link to the image url which the user can click on to view the image. If a product has multiple images, ONLY include 1 image url unless the user asks for more. Format the description text so it is easy to read.    
