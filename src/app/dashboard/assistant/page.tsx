@@ -15,6 +15,9 @@ function AssistantInstructions() {
     const [progress, setProgress] = useState(null);
     const [productUsers, setProductUsers] = useState(null);
     const [users, setUsers] = useState(null);
+    const [productCosts, setProductCosts] = useState(null);
+    const [productRawMaterials, setProductRawMaterials] = useState(null);
+    const [rawMaterials, setRawMaterials] = useState(null);
 
     const fetchProducts = async () => {
         try {
@@ -73,12 +76,58 @@ function AssistantInstructions() {
             console.error("Error fetching users:", error);
         }
     }
-    
+
+    const fetchProductCosts = async () => {
+        try {
+            const response = await fetch('/api/products/costs');
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+            setProductCosts(result.data);
+        } catch (error) {
+            console.error("Error fetching product costs:", error);
+        }
+    }
+
+    const fetchProductRawMaterials = async () => {
+        try {
+            const response = await fetch('/api/product-raw-materials');
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+            setProductRawMaterials(result.data);
+        } catch (error) {
+            console.error("Error fetching product raw materials:", error);
+        }
+    }
+
+    const fetchRawMaterials = async () => {
+        try {
+            const response = await fetch('/api/products/raw_materials');
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error);
+            }
+            setRawMaterials(result.data);
+        } catch (error) {
+            console.error("Error fetching raw materials:", error);
+        }
+    }
+
+
     useEffect(() => {
         fetchProducts();
         fetchOrders();
         fetchProductUsers();
         fetchUsers();
+        fetchProductCosts();
+        fetchProductRawMaterials();
+        fetchRawMaterials();
     }, []);
 
     useEffect(() => {
@@ -88,8 +137,11 @@ function AssistantInstructions() {
     const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
     const usersDetails = users ? JSON.stringify(users, null, 2) : "No users data available";
     const productUsersDetails = productUsers ? JSON.stringify(productUsers, null, 2) : "No product users data available";
+    const productCostsDetails = productCosts ? JSON.stringify(productCosts, null, 2) : "No product costs data available";
+    const productRawMaterialsDetails = productRawMaterials ? JSON.stringify(productRawMaterials, null, 2) : "No product raw materials data available";
+    const rawMaterialsDetails = rawMaterials ? JSON.stringify(rawMaterials, null, 2) : "No raw materials data available";
 
-    const instruction = `You are a helpful professional assistant for the organization Orientavida. You have access to all the data from the following 5 Supabase tables: the PRODUCT TABLE ${productDetails}, the ORDER TABLE ${orderDetails}, the PRODUCT_USERS TABLE ${productUsersDetails}, and the USERS TABLE ${usersDetails}. You must use the data from the tables to answer the user's questions. If necessary, you are encouraged to link the data from multiple tables to answer the user's questions (i.e. search by product or user id).
+    const instruction = `You are a helpful professional assistant for the organization Orientavida. You have access to all the data from the following 5 Supabase tables: the PRODUCT TABLE ${productDetails}, the ORDER TABLE ${orderDetails}, the PRODUCT_USERS TABLE ${productUsersDetails}, the USERS TABLE ${usersDetails}, the PRODUCT_COSTS TABLE ${productCostsDetails}, the PRODUCT_RAW_MATERIALS TABLE ${productRawMaterialsDetails}, and the RAW_MATERIALS TABLE ${rawMaterialsDetails}. You must use the data from the tables to answer the user's questions. If necessary, you are encouraged to link the data from multiple tables to answer the user's questions (i.e. search by product or user id).
     
     (a) If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. Include a link to the image url which the user can click on to view the image. If a product has multiple images, ONLY include 1 image url unless the user asks for more. Format the description text so it is easy to read.
     
@@ -100,6 +152,9 @@ function AssistantInstructions() {
     (d) If the user asks questions about a 'seamstress', return the relevant information strictly from the users table. If the user asks questions about a user that is not in the users table, say that you don't have information about that user.
 
     (e) If the user asks questions about the progress of a product, return the status (Not Started, In Progress, Done) of the product and any relevant information strictly from the progress table.
+
+    (f) If the user asks questions about the costs of a product, return the relevant information strictly from the product_costs table. If the user asks questions about a product that is not in the product_costs table, say that you don't have information about that product. Additionally, if the user asks you to estimate the potential cost of a new product, use the product_costs table, product_raw_materials table, and raw_materials table to estimate the cost of the product. Specifically, use the product_raw_materials table to find the raw materials used in the product, then use the raw_materials table to find the cost of each raw material, and finally use the product_costs table to find the cost of the product. Factor in all this information to give the user a reasonable estimate of the cost of the new product.
+
 
     You should only respond to the user in the language that the user asks the question in (English or Portuguese).`
 
