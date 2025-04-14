@@ -5,7 +5,7 @@ import { Header } from '@/components/custom/header';
 import { HeaderContainer } from '@/components/custom/header-container';
 import { Loader } from '@/components/custom/loader';
 import { LoaderContainer } from '@/components/custom/loader-container';
-import { Product, User } from '@/lib/schemas/global.types';
+import { Product, Progress, User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { Mail, Phone } from 'lucide-react';
 import Image from 'next/image';
@@ -19,6 +19,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [seamstress, setSeamstress] = useState<User | null>(null);
 	const [products, setProducts] = useState<Product[]>([]);
+	const [progressUpdates, setProgressUpdates] = useState<Progress[]>([]);
 
 	useEffect(() => {
 		if (!user) return;
@@ -37,6 +38,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 				if (!productsError) {
 					setProducts(productsData);
+					
+					// Fetch progress updates for each product
+					const progressPromises = productsData.map((product: Product) =>
+						fetch(`/api/products/${product.id}/progress`).then(res => res.json())
+					);
+					
+					const progressResults = await Promise.all(progressPromises);
+					const allProgressUpdates = progressResults
+						.flatMap(result => result.data || [])
+						.filter(update => update.user_id === seamstressId)
+						.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+					
+					setProgressUpdates(allProgressUpdates);
 				}
 			}
 
@@ -87,6 +101,33 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							</div>
 						</div>
 					)}
+
+					{/* Activity Timeline */}
+					{progressUpdates.length > 0 && (
+						<div className='w-full mt-8'>
+							<h3 className='text-xl font-semibold mb-4'>Activity Timeline</h3>
+							<div className='space-y-4'>
+								{progressUpdates.map((update, index) => (
+									<div key={index} className='flex items-center gap-4 p-4 bg-white rounded-lg border'>
+										<div className='text-4xl'>{update.emotion}</div>
+										<div>
+											<p className='text-sm text-gray-500'>
+												{new Date(update.created_at).toLocaleDateString('en-US', {
+													year: 'numeric',
+													month: 'long',
+													day: 'numeric',
+													hour: '2-digit',
+													minute: '2-digit'
+												})}
+											</p>
+											<p className='text-gray-700'>{update.description}</p>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					)}
+
 					{products && products.length > 0 && (
 						<div className='w-full mt-8'>
 							<h3 className='text-xl font-semibold mb-4'>Assigned Products</h3>
