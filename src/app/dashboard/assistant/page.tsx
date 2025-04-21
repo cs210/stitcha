@@ -1,6 +1,6 @@
 'use client';
 
-import { AssistantRuntimeProvider, useAssistantInstructions, AssistantCloud } from "@assistant-ui/react";
+import { AssistantRuntimeProvider, useAssistantInstructions, AssistantCloud, makeAssistantToolUI } from "@assistant-ui/react";
 import { useChatRuntime, } from "@assistant-ui/react-ai-sdk";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
 import { Thread } from "@/components/assistant-ui/thread";
@@ -134,27 +134,16 @@ function AssistantInstructions() {
     }, [products, orders, productUsers, users, progress]);
 
     const productDetails = products ? JSON.stringify(products, null, 2) : "No product data available";
-    const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
-    const usersDetails = users ? JSON.stringify(users, null, 2) : "No users data available";
-    const productUsersDetails = productUsers ? JSON.stringify(productUsers, null, 2) : "No product users data available";
-    const productCostsDetails = productCosts ? JSON.stringify(productCosts, null, 2) : "No product costs data available";
-    const productRawMaterialsDetails = productRawMaterials ? JSON.stringify(productRawMaterials, null, 2) : "No product raw materials data available";
-    const rawMaterialsDetails = rawMaterials ? JSON.stringify(rawMaterials, null, 2) : "No raw materials data available";
+    // const orderDetails = orders ? JSON.stringify(orders, null, 2) : "No order data available";
+    // const usersDetails = users ? JSON.stringify(users, null, 2) : "No users data available";
+    // const productUsersDetails = productUsers ? JSON.stringify(productUsers, null, 2) : "No product users data available";
+    // const productCostsDetails = productCosts ? JSON.stringify(productCosts, null, 2) : "No product costs data available";
+    // const productRawMaterialsDetails = productRawMaterials ? JSON.stringify(productRawMaterials, null, 2) : "No product raw materials data available";
+    // const rawMaterialsDetails = rawMaterials ? JSON.stringify(rawMaterials, null, 2) : "No raw materials data available";
 
-    const instruction = `You are a helpful professional assistant for the organization Orientavida. You have access to all the data from the following 5 Supabase tables: the PRODUCT TABLE ${productDetails}, the ORDER TABLE ${orderDetails}, the PRODUCT_USERS TABLE ${productUsersDetails}, the USERS TABLE ${usersDetails}, the PRODUCT_COSTS TABLE ${productCostsDetails}, the PRODUCT_RAW_MATERIALS TABLE ${productRawMaterialsDetails}, and the RAW_MATERIALS TABLE ${rawMaterialsDetails}. You must use the data from the tables to answer the user's questions. If necessary, you are encouraged to link the data from multiple tables to answer the user's questions (i.e. search by product or user id).
-    
-    (a) If the user asks questions about a product, return the relevant information strictly from the product table. If the user asks questions about a product that is not in the product table, say that you don't have information about that product. Include a link to the image url which the user can click on to view the image. If a product has multiple images, ONLY include 1 image url unless the user asks for more. Format the description text so it is easy to read.
-    
-    (b) If the user asks questions about an order, return the relevant information strictly from the order table. If the user asks questions about an order that is not in the order table, say that you don't have information about that order.
-    
-    (c) If the user asks questions about which seamstress is assigned to a product, return the relevant information strictly from the product_users table. Use the products table to extract the product_id that corresponds to the product that the user is asking about, then map that to the seamstress_id in the product_users table, which can then further be mapped to the seamstress's information (such as name, email, phone number, etc.) in the users table. If no seamstress is assigned to the product, say that no seamstress is assigned to the product.
+    const instruction = `You are a helpful professional assistant for the organization Orientavida. You have access to all the data from the following table: the PRODUCT TABLE ${productDetails}. If the user mentions a product (i.e. by its name or properties), you will use the product table to find the product id. You should also use the product table to answer the user's questions. 
 
-    (d) If the user asks questions about a 'seamstress', return the relevant information strictly from the users table. If the user asks questions about a user that is not in the users table, say that you don't have information about that user.
-
-    (e) If the user asks questions about the progress of a product, return the status (Not Started, In Progress, Done) of the product and any relevant information strictly from the progress table.
-
-    (f) If the user asks questions about the costs of a product, return the relevant information strictly from the product_costs table. If the user asks questions about a product that is not in the product_costs table, say that you don't have information about that product. Additionally, if the user asks you to estimate the potential cost of a new product, use the product_costs table, product_raw_materials table, and raw_materials table to estimate the cost of the product. Specifically, use the product_raw_materials table to find the raw materials used in the product, then use the raw_materials table to find the cost of each raw material, and finally use the product_costs table to find the cost of the product. Factor in all this information to give the user a reasonable estimate of the cost of the new product.
-
+    (a) If the user asks questions about predicting the costs of a new product, you should first find the product_id using the product table. Then, you should call the relevant function to predict the costs of the new product.
 
     You should only respond to the user in the language that the user asks the question in (English or Portuguese).`
 
@@ -172,6 +161,33 @@ const cloud = new AssistantCloud({
         .then((r) => r.json())
         .then((r) => r.token),
   });
+
+
+// const ProductCostsToolUI = makeAssistantToolUI({
+//     toolName: "get_product_costs",
+//     render: async ({ product_id }) => {
+//         try {
+//             const productCosts = await fetch(`/api/products/${product_id}/costs`, { method: "GET" });
+//             const productCostsData = await productCosts.json();
+
+//             console.log("productCostsData:", productCostsData);
+
+//             return (
+//                 <div>
+//                     <p>The cost of the product is ${productCostsData.cost}</p>
+//                 </div>
+//             );
+//         } catch (error) {
+//             console.error("Error fetching product costs:", error);
+//             return (
+//                 <div>
+//                     <p>Error loading product costs</p>
+//                 </div>
+//             );
+//         }
+//     }
+// });
+
 
 export default function Page() {
 
@@ -192,6 +208,7 @@ export default function Page() {
                 </div>
                 <AssistantInstructions />
             </div>
+            {/* <ProductCostsToolUI /> */}
         </AssistantRuntimeProvider>
     );
 }
