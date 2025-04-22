@@ -96,7 +96,6 @@ export default function Page() {
 		}
 	}
 
-	// Loading state
 	if (loading) {
 		return (
 			<LoaderContainer>

@@ -258,15 +258,6 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 		}
 	};
 
-	// Loading state
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
-
 	// Filter available users
 	const filteredAvailableUsers = users.filter(
 		(user) =>
@@ -282,6 +273,14 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 		: product?.image_urls && typeof product?.image_urls === 'object'
 		? Object.values(product?.image_urls)
 		: [];
+
+	if (loading) {
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
+	}
 
 	return (
 		<>

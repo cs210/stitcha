@@ -14,7 +14,18 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('users').select('*').eq('id', seamstressId).single();
+		const { data, error } = await supabase
+			.from('users')
+			.select(
+				`
+				*,
+				product_users!inner (
+					products (*)
+				)
+			`
+			)
+			.eq('id', seamstressId)
+			.single();
 
 		if (error) {
 			throw new Error(error.message);

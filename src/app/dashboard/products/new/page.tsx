@@ -4,6 +4,7 @@ import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ComboboxFormField } from '@/components/ui/combobox-form-field';
@@ -11,8 +12,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { Database } from '@/lib/types/supabase';
-import { Tables } from '@/lib/types/supabase';
+import { LaborType, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -21,8 +21,6 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-
-type ProgressLevel = Database['public']['Enums']['progress_level'];
 
 const progressLevelValues = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
 const progressLevelSchema = z.enum(progressLevelValues);
@@ -40,7 +38,7 @@ export type ProductFormData = {
 	image_urls: File[] | null;
 	product_type?: string;
 	status: ProgressLevel;
-	// update this to use types from supabase.types.ts
+	// TODO: Update this to use types from supabase.types.ts
 	materials?: {
 		material_code: string;
 		material_name: string;
@@ -153,19 +151,15 @@ const formSchema = z.object({
 	technical_sheet: z.instanceof(File).nullable().optional(),
 });
 
-// Define a type for raw materials
-type RawMaterial = Tables<'raw_materials'>;
-type PackagingMaterial = Tables<'packaging_materials'>;
-type Labor = Tables<'labor_types'>;
-
 export default function Page() {
 	const { user } = useUser();
 	const router = useRouter();
+
 	const [loading, setLoading] = useState<boolean>(true);
 	const [isPending, setIsPending] = useState<boolean>(false);
 	const [materials, setMaterials] = useState<RawMaterial[]>([]);
 	const [packagingMaterials, setPackagingMaterials] = useState<PackagingMaterial[]>([]);
-	const [labor, setLabor] = useState<Labor[]>([]);
+	const [labor, setLabor] = useState<LaborType[]>([]);
 	const [materialOptions, setMaterialOptions] = useState({
 		codes: [] as { value: string; label: string }[],
 		names: [] as { value: string; label: string }[],
@@ -179,7 +173,6 @@ export default function Page() {
 	const [collapsedPackagingMaterials, setCollapsedPackagingMaterials] = useState<boolean[]>([]);
 	const [collapsedLabor, setCollapsedLabor] = useState<boolean[]>([]);
 
-	// 1. Define your form.
 	const form = useForm<ProductFormData>({
 		resolver: zodResolver(formSchema),
 		mode: 'onBlur',
@@ -206,16 +199,15 @@ export default function Page() {
 		},
 	});
 
-	// Fetch materials on component mount
 	useEffect(() => {
+		// Fetch materials from the database
 		async function fetchMaterials() {
 			try {
-				const response = await fetch('/api/products/raw_materials');
+				const response = await fetch('/api/raw_materials');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
 					setMaterials(result.data);
-					console.log(result.data);
 
 					// Transform raw materials into options for dropdowns
 					const codes = result.data.map((material: RawMaterial) => ({
@@ -241,14 +233,15 @@ export default function Page() {
 				setLoading(false);
 			}
 		}
+
+		// Fetch packaging materials from the database
 		async function fetchPackagingMaterials() {
 			try {
-				const response = await fetch('/api/products/packaging_materials');
+				const response = await fetch('/api/packaging_materials');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
 					setPackagingMaterials(result.data);
-					console.log(result.data);
 
 					// Transform packaging materials into options for dropdowns
 					const codes = result.data.map((material: PackagingMaterial) => ({
@@ -274,17 +267,18 @@ export default function Page() {
 				setLoading(false);
 			}
 		}
+
+		// Fetch labor types from the database
 		async function fetchLabor() {
 			try {
-				const response = await fetch('/api/products/labor');
+				const response = await fetch('/api/labor_types');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
 					setLabor(result.data);
-					console.log(result.data);
 
 					// Transform labor into options for dropdowns
-					const names = result.data.map((labor: Labor) => ({
+					const names = result.data.map((labor: LaborType) => ({
 						value: labor.task,
 						label: labor.task,
 					})) as { value: string; label: string }[];
@@ -299,106 +293,87 @@ export default function Page() {
 				setLoading(false);
 			}
 		}
+
 		fetchMaterials();
 		fetchPackagingMaterials();
 		fetchLabor();
 	}, []);
 
+	// TODO: Can we make streamline the below functions or put them into a different component?
+
 	// Auto-fill related fields when a material code is selected
 	const handleMaterialCodeChange = (index: number, value: string) => {
-		// If selecting from dropdown, auto-fill other fields
 		const selectedMaterial = materials.find((m) => m.material_code === value);
 
 		if (selectedMaterial) {
-			// Update related fields
 			form.setValue(`materials.${index}.material_name`, selectedMaterial.material_name || '');
 
-			// Also set purchase price if available
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
 			}
-
-			// Also set units if available
 			if (selectedMaterial.units) {
 				form.setValue(`materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
-		// Always update the code field with the new value
 		form.setValue(`materials.${index}.material_code`, value);
 	};
 
+	// Auto-fill related fields when a material name is selected
 	const handleMaterialNameChange = (index: number, value: string) => {
-		// If selecting from dropdown, auto-fill other fields
 		const selectedMaterial = materials.find((m) => m.material_name === value);
 
 		if (selectedMaterial) {
-			// Update related fields
 			form.setValue(`materials.${index}.material_code`, selectedMaterial.material_code || '');
 
-			// Also set purchase price if available
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
 			}
-
-			// Also set units if available
 			if (selectedMaterial.units) {
 				form.setValue(`materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
-		// Always update the name field with the new value
 		form.setValue(`materials.${index}.material_name`, value);
 	};
 
-	// Add this handler for packaging material name changes
+	// Auto-fill related fields when a packaging material name is selected
 	const handlePackagingMaterialNameChange = (index: number, value: string) => {
-		// If selecting from dropdown, auto-fill other fields
 		const selectedMaterial = packagingMaterials.find((m) => m.packaging_material_name === value);
 
 		if (selectedMaterial) {
-			// Update related fields
 			form.setValue(`packaging_materials.${index}.material_code`, selectedMaterial.packaging_material_code || '');
 
-			// Also set purchase price if available
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
 			}
-
-			// Also set units if available
 			if (selectedMaterial.units) {
 				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
-		// Always update the name field with the new value
 		form.setValue(`packaging_materials.${index}.material_name`, value);
 	};
 
-	// Update the existing handlePackagingMaterialCodeChange function
+	// Auto-fill related fields when a packaging material code is selected
 	const handlePackagingMaterialCodeChange = (index: number, value: string) => {
 		const selectedMaterial = packagingMaterials.find((m) => m.packaging_material_code === value);
 
 		if (selectedMaterial) {
-			// Update related fields
 			form.setValue(`packaging_materials.${index}.material_name`, selectedMaterial.packaging_material_name || '');
 
-			// Also set purchase price if available
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
 			}
-
-			// Also set units if available
 			if (selectedMaterial.units) {
 				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
 			}
 		}
 
-		// Always update the code field with the new value
 		form.setValue(`packaging_materials.${index}.material_code`, value);
 	};
 
-	// Add new handler for labor
+	// Auto-fill related fields when a labor name is selected
 	const handleLaborChange = (index: number, value: string) => {
 		const selectedLabor = labor.find((l) => l.task === value);
 
@@ -409,7 +384,7 @@ export default function Page() {
 		form.setValue(`labor.${index}.labor_name`, value);
 	};
 
-	// Add this function to calculate total cost
+	// Calculate total cost for labor
 	const calculateLaborTotalCost = (labor: any) => {
 		if (!labor) return 0;
 
@@ -421,11 +396,10 @@ export default function Page() {
 		return timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion));
 	};
 
-	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
+
 		try {
-			// Create FormData to handle file uploads
 			const formData = new FormData();
 
 			// Add all non-file fields
@@ -435,23 +409,19 @@ export default function Page() {
 				}
 			});
 
-			// Add image files if they exist
 			if (values.image_urls) {
 				values.image_urls.forEach((file, index) => {
 					formData.append(`image_urls`, file);
 				});
 			}
 
-			// Add technical sheet if it exists
 			if (values.technical_sheet) {
 				formData.append('technical_sheet', values.technical_sheet);
 			}
 
-			// Post the form data to the API
-			const response = await fetch('/api/products/product_form_submit', {
+			const response = await fetch('/api/products', {
 				method: 'POST',
 				body: formData,
-				// Don't set Content-Type header - browser will set it with boundary for FormData
 			});
 
 			const result = await response.json();
@@ -460,22 +430,24 @@ export default function Page() {
 				throw new Error(result.error || 'Failed to create product');
 			}
 
-			// Show success message
 			toast.success('Product created successfully');
 
-			// Redirect to products page
 			router.push('/dashboard/products');
 		} catch (error) {
 			console.error('Error submitting form:', error);
-			toast.error(error instanceof Error ? error.message : 'Failed to create product');
 		} finally {
 			setLoading(false);
 			setIsPending(false);
 		}
 	}
 
-	// Loading state
-	if (loading) return <Loader />;
+	if (loading) {
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
+	}
 
 	return (
 		<>

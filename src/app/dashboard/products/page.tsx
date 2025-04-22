@@ -141,7 +141,6 @@ export default function Page() {
 		getProducts();
 	}, []);
 
-	// Loading state
 	if (loading) {
 		return (
 			<LoaderContainer>

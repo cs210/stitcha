@@ -118,7 +118,6 @@ export default function Page() {
 		getOrders();
 	}, []);
 
-	// Loading state
 	if (loading) {
 		return (
 			<LoaderContainer>

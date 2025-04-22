@@ -23,21 +23,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		if (!user) return;
 
 		(async () => {
-			// TODO: Consolidate this into a single API call
-
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
 			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
 
 			if (!seamstressError) {
-				setSeamstress(seamstressData);
+				const { product_users, ...seamstressWithoutProducts } = seamstressData;
+				setSeamstress(seamstressWithoutProducts);
 
-				// Get products assigned to seamstress
-				const productsResponse = await fetch(`/api/seamstresses/${seamstressId}/products`);
-				const { data: productsData, error: productsError } = await productsResponse.json();
-
-				if (!productsError) {
-					setProducts(productsData);
+				// Set products from seamstress data
+				if (product_users && product_users.length > 0) {
+					const products = product_users.map((productUser: any) => productUser.products).flat();
+					setProducts(products);
 				}
 			}
 

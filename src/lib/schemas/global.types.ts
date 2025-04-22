@@ -1,4 +1,4 @@
-import { Tables } from '@/lib/types/supabase';
+import { Database, Tables } from '@/lib/types/supabase';
 
 // These are not dynamically generated and will need to be updated manually if any changes are made to the database
 export type LaborType = Tables<'labor_types'>;
@@ -14,3 +14,5 @@ export type ProductAndRawMaterial = Tables<'products_and_raw_materials'>;
 export type Progress = Tables<'progress'>;
 export type RawMaterial = Tables<'raw_materials'>;
 export type User = Tables<'users'>;
+
+export type ProgressLevel = Database['public']['Enums']['progress_level'];

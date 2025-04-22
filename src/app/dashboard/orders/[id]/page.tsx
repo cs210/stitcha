@@ -56,7 +56,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		fetchOrder();
 	}, [id]);
 
-	// Loading state
 	if (loading || productLoading) {
 		return (
 			<LoaderContainer>
