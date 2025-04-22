@@ -16,6 +16,7 @@ import { Tables } from '@/lib/types/supabase';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { parse } from 'path';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -140,6 +141,7 @@ type Labor = Tables<'labor_types'>;
 export default function Page() {
 	const { user } = useUser();
 	const router = useRouter();
+	const [scanning, setScanning] = useState(false);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [isPending, setIsPending] = useState<boolean>(false);
 	const [materials, setMaterials] = useState<RawMaterial[]>([]);
@@ -157,6 +159,291 @@ export default function Page() {
 	const [collapsedMaterials, setCollapsedMaterials] = useState<boolean[]>([]);
 	const [collapsedPackagingMaterials, setCollapsedPackagingMaterials] = useState<boolean[]>([]);
 	const [collapsedLabor, setCollapsedLabor] = useState<boolean[]>([]);
+
+	 // Function to handle PDF scanning and text extraction
+	 const handlePDFScan = async (file: File) => {
+
+		try {
+			setScanning(true);
+	
+			// Call your API endpoint that handles Google Vision API
+			const response = await fetch('/api/scan-pdf', {
+				method: 'POST',
+				body: file
+			});
+	
+			if (!response.ok) {
+				throw new Error('Failed to scan PDF');
+			}
+	
+			const data = await response.json();
+
+			console.log("API RESPONSE DATA:",data);
+	
+			// Auto-populate form fields based on extracted text
+			if (data.extractedData) {
+				// Extract text content
+				const text = data.extractedData.document.text;
+
+				// Helper function to extract value after label
+				const extractValue = (label: string, text: string) => {
+					const regex = new RegExp(`${label}\\s*([\\w\\d]+)`, 'i');
+					const match = text.match(regex);
+					return match ? match[1] : '';
+				};
+
+				// Extract product details
+				const startIndexName = text.indexOf("NOME");
+				const endIndexName = text.indexOf("COD SISTEMA");
+				const name = text.slice(startIndexName + 4, endIndexName).trim();
+				const systemCode = extractValue('COD SISTEMA', text) || '';
+				let inmetroCert = extractValue('INMETRO', text) || '';
+
+				if (isNaN(Number(inmetroCert))) {
+					console.log("INMETRO CERT IS NOT A NUMBER, MEANS BLANK");
+					inmetroCert = '';
+				}
+
+				let barcode = extractValue('COD BARRAS', text) || '';
+
+				if (isNaN(Number(barcode))) {
+					console.log("BARCODE IS NOT A NUMBER, MEANS BLANK");
+					barcode = '';
+				}
+
+				console.log("NAME:",name);
+				console.log("SYSTEM CODE:",systemCode);
+				console.log("INMETRO CERT:",inmetroCert);
+				console.log("BARCODE:",barcode);
+
+				// Extract dimensions
+				const weight = parseFloat(extractValue('PESO', text)) || 0;
+				const width = parseFloat(extractValue('LARGURA', text)) || 0;
+				const height = parseFloat(extractValue('ALTURA', text)) || 0;
+
+				// Update form values
+				form.setValue('name', name);
+				form.setValue('system_code', systemCode);
+				form.setValue('inmetro_cert_number', inmetroCert);
+				form.setValue('barcode', barcode);
+				form.setValue('weight', weight);
+				form.setValue('width', width);
+				form.setValue('height', height);
+				
+				// Extract materials
+				// Find the start of material data after "DESCRICAO DO MATERIA"
+				const startIndex = text.indexOf("quantidade");
+				const endIndex = text.indexOf("% PEÇAS PERDIDAS");
+				const materialSection = text.slice(startIndex + 18, endIndex);
+
+				console.log("MATERIAL SECTION:",materialSection);
+
+				const lines = materialSection.split(/\n/).filter((line: string) => line.trim() !== '');
+				const materials = [];
+
+				console.log("LINES:",lines);
+				
+				for (let i = 0; i < lines.length; i += 9) {
+
+					let codigo = lines[i].trim();
+
+					if (!isNaN(Number(codigo))) {
+						console.log("CODIGO IS A NUMBER, SKIPPING TO NEXT LINE");
+						i += 1;
+						codigo = lines[i].trim();
+						console.log("CODIGO:",codigo);
+					}
+
+					let material = lines[i + 1].trim();
+					console.log("MATERIAL:",material);
+
+					if (material == '0' || material == '°') {
+						console.log("MATERIAL IS EMPTY, BREAKING");
+						break;
+					}
+
+					if (!isNaN(Number(material))) {
+						console.log("MATERIAL IS A NUMBER, SKIPPING TO NEXT LINE");
+						i += 1;
+						material = lines[i + 1].trim();
+					}
+					
+					const precoValorStr = lines[i + 3].replace(/[^\d,]/g, '').replace(',', '.');
+					console.log("PRECO VALOR:",precoValorStr);
+
+					const precoUnidade = lines[i + 4].trim();
+					console.log("UNIDADE:",precoUnidade);
+
+					const consumoQuantidadeStr = lines[i + 5].replace(',', '.');
+					console.log("CONSUMO QUANTIDADE:",consumoQuantidadeStr);
+
+					const consumoUnidade = lines[i + 6].trim();
+					console.log("CONSUMO UNIDADE:",consumoUnidade);
+
+					const totalPrice = lines[i + 8].trim();
+					console.log("TOTAL PRICE:",totalPrice);
+
+					materials.push({
+						"codigo": codigo,
+						"material": material,
+						"precoCompra": {
+							"valor": precoValorStr,
+							"unidade": precoUnidade,
+						},
+						"consumoUnitario": {
+							"quantidade": consumoQuantidadeStr,
+							"unidade": consumoUnidade,
+						},
+						"total": totalPrice,
+					});
+				}
+
+				console.log("MATERIALS:", materials);
+				console.log("MATERIALs[0]", materials[0]);
+
+				// Update materials if found
+				if (materials.length) {
+					form.setValue('materials', materials.map(material => ({
+						material_code: material.codigo.toString(),
+						material_name: material.material,
+						purchase_price: parseFloat(material.precoCompra.valor),
+						unit_consumption: parseFloat(material.consumoUnitario.quantidade),
+						units: material.consumoUnitario.unidade,
+						total_cost: parseFloat(material.total)
+					})));
+				}
+
+				// Extract labor
+				const startIndexLabor = text.indexOf("quantidade de peças");
+				const endIndexLabor = text.indexOf("CUSTO TOTAL MÃO DE OBRA");
+				const laborSection = text.slice(startIndexLabor + 34, endIndexLabor);
+
+				console.log("LABOR SECTION:",laborSection);
+
+				// const linesLabor = laborSection.split(/\n/).filter((line: string) => line.trim() !== '');
+
+				// Remove 'R$' from all lines
+				const linesLabor = laborSection.split(/\n/)
+					.filter((line: string) => line.trim() !== '' && !line.trim().match(/^R\$$/))
+				
+				console.log("LINES LABOR:",linesLabor);
+
+				const labor = [];
+
+				for (let i = 0; i < linesLabor.length; i += 8) {
+					let tipo = linesLabor[i].trim();
+
+					if (tipo == '0' || tipo == '°') {
+						console.log("TIPO IS EMPTY, BREAKING");
+						break;
+					}
+
+					if (!isNaN(Number(tipo))) {
+						console.log("TIPO IS A NUMBER, SKIPPING TO NEXT LINE");
+						i += 1;
+						tipo = linesLabor[i].trim();;
+					}
+
+					if ( i == linesLabor.length - 1) {
+						console.log("TIPO IS THE LAST LINE, BREAKING");
+						break;
+					}
+
+					console.log("TIPO:",tipo);
+
+					const quantidade = linesLabor[i + 1].trim();
+					console.log("QUANTIDADE DE PECAS:",quantidade);
+
+					let tempo = linesLabor[i + 2].trim();
+					console.log("TEMPO:",tempo);
+
+					if (isNaN(Number(tempo))) {
+						console.log("TEMPO IS NOT A NUMBER, MEANS BLANK");
+						tempo = 0;
+						i -= 1;
+					}
+
+					const unidade = linesLabor[i + 3].trim();
+					console.log("UNIDADE:",unidade);
+
+					const conversao = linesLabor[i + 4].trim();
+					console.log("CONVERSAO:", conversao)
+
+					let retrabalho = linesLabor[i + 5].trim();
+					console.log("RETRABALHO:",retrabalho);
+
+					if (!retrabalho.includes('%')) {
+						console.log("RETRABALHO MISSING PERCENTAGE SYMBOL, SKIPPING");
+						i += 1;
+						retrabalho = linesLabor[i + 5].trim();
+					}
+
+					const custoPorMinuto = linesLabor[i + 6].trim().replace(" R$", "");
+					console.log("CUSTO POR MINUTO:",custoPorMinuto);
+
+					if (i + 6 == linesLabor.length - 1) {
+						console.log("CUSTO POR MINUTO IS THE LAST LINE, BREAKING");
+						break;
+					}
+
+					const total = linesLabor[i + 7].trim();
+					console.log("TOTAL:",total);
+
+					if (!/^\d+,\d+$/.test(total)) {
+						console.log("TOTAL IS NOT IN VALID FORMAT (X,XX), MEANS BLANK");
+						i -= 1;
+					}
+
+					labor.push({
+						"tipo": tipo,
+						"quantidade": quantidade,
+						"tempo": tempo,
+						"unidade": unidade,
+						"conversao": conversao,
+						"retrabalho": retrabalho,
+						"custoPorMinuto": custoPorMinuto,
+					})
+				}
+
+				console.log("LABOR:",labor);
+
+				const totalLabor = parseFloat(extractValue('CUSTO TOTAL MÃO DE OBRA', text)) || 0;
+
+				// Update materials if found
+				if (labor.length) {
+					form.setValue('labor', labor.map(labor => ({
+						labor_name: labor.tipo,
+						time_per_unit: parseFloat(labor.tempo),
+						conversion: parseFloat(labor.conversao),
+						rework: parseFloat(labor.retrabalho),
+						cost_per_minute: 0.40,  // this should be fixed to the labor cost per minute
+						total_cost: totalLabor
+					})));
+				}
+
+				// Extract other costs
+				const generalExpenses = parseFloat(extractValue('RATEIO DE DESPESAS GERAIS\nR$', text)) || 0;
+				const royalties = parseFloat(extractValue('CUSTO DE ROYALTIES R\\$', text)) || 0;
+				const sellingPrice = parseFloat(extractValue('PREÇO DE VENDA\nR$', text)) || 0;
+
+				console.log("GENERAL EXPENSES:",generalExpenses);
+				console.log("ROYALTIES:",royalties);
+				console.log("SELLING PRICE:",sellingPrice);
+
+				form.setValue('general_expenses', generalExpenses);
+				form.setValue('royalties', royalties);
+				form.setValue('selling_price', sellingPrice);
+
+				toast.success('PDF scanned and fields populated successfully');
+			}
+	
+		} catch (error) {
+			console.error('Error scanning PDF:', error);
+			toast.error('Failed to scan PDF');
+		} finally {
+			setScanning(false);
+		}
+	};
 
 	// 1. Define your form.
 	const form = useForm<ProductFormData>({
@@ -482,6 +769,60 @@ export default function Page() {
 				<CardContent>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+
+							 {/* Add PDF Upload and Scan Button */}
+							 <div className='space-y-4'>
+                                <FormField
+                                    control={form.control}
+                                    name="technical_sheet"
+                                    render={({ field: { value, onChange, ...field } }) => (
+                                        <FormItem>
+                                            <FormLabel>Autofill Using Product Sheet (PDF)</FormLabel>
+                                            <FormControl>
+                                                <div className="flex gap-4 items-center">
+                                                    <div className="flex-1">
+                                                        <Input
+                                                            type="file"
+                                                            accept=".pdf"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    onChange(file);
+                                                                    handlePDFScan(file);
+                                                                }
+                                                            }}
+                                                            // disabled={scanning}
+                                                            className="h-10"
+                                                            {...field}
+                                                        />
+                                                    </div>
+                                                    {scanning && "Scanning PDF ..."}
+                                                </div>
+                                            </FormControl>
+                                            <FormDescription>
+                                                Upload a PDF product sheet to automatically populate form fields
+                                            </FormDescription>
+                                            {value && (
+                                                <div className="mt-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm">{value.name}</span>
+                                                        <Button
+                                                            type="button"
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => onChange(null)}
+                                                        >
+                                                            Remove
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+
 							<div className='grid gap-4 md:grid-cols-2'>
 								<FormField
 									control={form.control}
