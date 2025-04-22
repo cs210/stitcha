@@ -1,21 +1,13 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Product } from '@/lib/schemas/global.types';
 import { Draggable } from '@hello-pangea/dnd';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
 
-interface ProductCardProps {
-	product: Product;
-	index: number;
-	onDelete: (productId: string) => void;
-}
-
-export function ProductCard({ product, index, onDelete }: ProductCardProps) {
+export function KanbanProductCard({ product, index, onDelete }: { product: Product; index: number; onDelete: (productId: string) => void }) {
 	const router = useRouter();
-
-	console.log('product', product);
 
 	return (
 		<Draggable draggableId={product.id} index={index}>
@@ -28,16 +20,6 @@ export function ProductCard({ product, index, onDelete }: ProductCardProps) {
 					onClick={() => router.push(`/dashboard/products/${product.id}`)}
 				>
 					<div className='absolute top-3 right-5 flex gap-2 z-10'>
-						{/* <Button
-							size='sm'
-							variant='ghost'
-							className='text-gray-400 hover:text-gray-600 h-7 w-7 bg-white/80 backdrop-blur-sm'
-							onClick={(e) => {
-								e.stopPropagation();
-							}}
-						>
-							<Pencil className='h-4 w-4' />
-						</Button> */}
 						<Button
 							size='sm'
 							variant='ghost'

@@ -1,7 +1,7 @@
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { KanbanBoard } from '@/components/custom/kanban-board';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { KanbanBoard } from '@/components/custom/kanban/kanban';
 
 export default function Page() {
 	return (

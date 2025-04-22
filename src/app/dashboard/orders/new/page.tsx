@@ -1,9 +1,10 @@
 'use client';
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -28,10 +29,9 @@ export default function Page() {
 	const { user } = useUser();
 	const router = useRouter();
 
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
 
-	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -44,36 +44,32 @@ export default function Page() {
 	});
 
 	useEffect(() => {
-		if (!user) return;
+		async function fetchOrder() {
+			try {
+				const response = await fetch('/api/products');
 
-		// Anonymous function to fetch products from Supabase
-		(async () => {
-			setLoading(true);
+				const { data, error } = await response.json();
 
-			const response = await fetch('/api/products');
+				if (!error && data) {
+					setProducts(data);
 
-			const { data, error } = await response.json();
-
-			if (!error && data) {
-				setProducts(data);
-
-				// If products are available, set the first product as default
-				if (data.length > 0) {
-					form.setValue('product_id', data[0].id);
+					// If products are available, set the first product as default
+					if (data.length > 0) {
+						form.setValue('product_id', data[0].id);
+					}
 				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setLoading(false);
 			}
+		}
 
-			setLoading(false);
-		})();
+		fetchOrder();
 	}, [user, form]);
 
-	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		// Show loading state while submitting
-		setLoading(true);
-
 		try {
-			// Post the form values to the API
 			const response = await fetch('/api/orders/', {
 				method: 'POST',
 				headers: {
@@ -88,23 +84,25 @@ export default function Page() {
 				throw new Error(result.error || 'Failed to create order');
 			}
 
-			// Reset form after successful submission
 			form.reset();
 
-			// Show success message and redirect
 			toast.success('Order created successfully');
 
 			router.push('/dashboard/orders');
 		} catch (error) {
 			console.error(error);
-			// toast.error(error);
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	// Loading state
-	if (loading) return <Loader />;
+	if (loading) {
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
+	}
 
 	return (
 		<>

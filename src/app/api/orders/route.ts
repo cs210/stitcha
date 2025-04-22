@@ -1,11 +1,11 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
+// Retrieves all orders
 export async function GET() {
 	const { userId } = await auth();
 
-	// Check if the user is authenticated
 	if (!userId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -19,16 +19,16 @@ export async function GET() {
 			throw new Error(error.message);
 		}
 
-		return Response.json({ data }, { status: 200 });
+		return NextResponse.json({ data }, { status: 200 });
 	} catch (error) {
-		return Response.json({ error }, { status: 500 });
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }
 
-export async function POST(request: Request) {
+// Creates a new order
+export async function POST(req: NextRequest) {
 	const { userId } = await auth();
 
-	// Check if the user is authenticated
 	if (!userId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -36,18 +36,16 @@ export async function POST(request: Request) {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		// Parse the request body
-		const body = await request.json();
+		const { client, contact, order_quantity, due_date, product_id } = await req.json();
 
-		// Insert the order data into the database
 		const { data, error } = await supabase
 			.from('orders')
 			.insert({
-				client: body.client,
-				contact: body.contact,
-				order_quantity: body.order_quantity,
-				due_date: body.due_date,
-				product_id: body.product_id,
+				client,
+				contact,
+				order_quantity,
+				due_date,
+				product_id,
 			})
 			.select()
 			.single();
@@ -56,8 +54,8 @@ export async function POST(request: Request) {
 			throw new Error(error.message);
 		}
 
-		return Response.json({ data, success: true }, { status: 201 });
+		return NextResponse.json({ data, success: true }, { status: 201 });
 	} catch (error) {
-		return Response.json({ error }, { status: 500 });
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }

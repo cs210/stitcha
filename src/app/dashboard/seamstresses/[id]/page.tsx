@@ -1,18 +1,19 @@
 'use client';
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
-import { LoaderContainer } from '@/components/custom/loader-container';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
+import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Product, Progress, User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import { Mail, Phone } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: seamstressId } = use(params);
@@ -31,32 +32,36 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		if (!user) return;
 
 		(async () => {
-			// Fetch seamstress data
+			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
 			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
 
 			if (!seamstressError) {
-				setSeamstress(seamstressData);
+				const { product_users, ...seamstressWithoutProducts } = seamstressData;
+				setSeamstress(seamstressWithoutProducts);
 
-				// Fetch products data
-				const productsResponse = await fetch(`/api/seamstresses/${seamstressId}/products`);
-				const { data: productsData, error: productsError } = await productsResponse.json();
+				// Set products from seamstress data
+				if (product_users && product_users.length > 0) {
+					// Fetch products data
+					const productsResponse = await fetch(`/api/seamstresses/${seamstressId}/products`);
+					const { data: productsData, error: productsError } = await productsResponse.json();
 
-				if (!productsError) {
-					setProducts(productsData);
-					
-					// Fetch progress updates for each product
-					const progressPromises = productsData.map((product: Product) =>
-						fetch(`/api/products/${product.id}/progress`).then(res => res.json())
-					);
-					
-					const progressResults = await Promise.all(progressPromises);
-					const allProgressUpdates = progressResults
-						.flatMap(result => result.data || [])
-						.filter(update => update.user_id === seamstressId)
-						.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-					
-					setProgressUpdates(allProgressUpdates);
+					if (!productsError) {
+						setProducts(productsData);
+						
+						// Fetch progress updates for each product
+						const progressPromises = productsData.map((product: Product) =>
+							fetch(`/api/products/${product.id}/progress`).then(res => res.json())
+						);
+						
+						const progressResults = await Promise.all(progressPromises);
+						const allProgressUpdates = progressResults
+							.flatMap(result => result.data || [])
+							.filter(update => update.user_id === seamstressId)
+							.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+						
+						setProgressUpdates(allProgressUpdates);
+					}
 				}
 			}
 
@@ -110,78 +115,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 			<div className='py-4'>
 				<div className='flex flex-wrap gap-6'>
-					{seamstress && (
-						<div className='flex gap-8'>
-							<div className='w-48 h-48 rounded-lg overflow-hidden'>
-								<Image
-									src={seamstress.image_url || ''}
-									alt={`${seamstress.first_name} ${seamstress.last_name}`}
-									className='w-full h-full object-cover'
-									width={200}
-									height={200}
-								/>
-							</div>
-							<div className='space-y-6'>
-								<div className='space-y-4'>
-									<div className='flex items-center gap-3 text-gray-700'>
-										<Phone className='w-5 h-5' />
-										<span>{seamstress.phone_number}</span>
-									</div>
-									<div className='flex items-center gap-3 text-gray-700'>
-										<Mail className='w-5 h-5' />
-										<span>{seamstress.email}</span>
-									</div>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Activity Timeline */}
-					{progressUpdates.length > 0 && (
-						<div className='w-full mt-8'>
-							<h3 className='text-xl font-semibold mb-4'>Activity Timeline</h3>
-							<div className='space-y-4'>
-								{progressUpdates.map((update, index) => (
-									<div key={index} className='flex items-center gap-4 p-4 bg-white rounded-lg border'>
-										<div className='text-4xl'>{update.emotion}</div>
-										<div>
-											<p className='text-sm text-gray-500'>
-												{new Date(update.created_at).toLocaleDateString('en-US', {
-													year: 'numeric',
-													month: 'long',
-													day: 'numeric',
-													hour: '2-digit',
-													minute: '2-digit'
-												})}
-											</p>
-											<p className='text-gray-700'>{update.description}</p>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-					)}
+					{seamstress && <SeamstressProfile seamstress={seamstress} />}
 
 					{products && products.length > 0 && (
 						<div className='w-full mt-8'>
 							<h3 className='text-xl font-semibold mb-4'>Assigned Products</h3>
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
 								{products.map((product) => (
-									<div key={product.id} className='bg-white rounded-lg p-6 border hover:border-gray-300 transition-colors flex flex-col h-full'>
-										<div className='w-full h-48 rounded-lg overflow-hidden mb-4'>
-											<Image src={product.image_urls[0] || ''} alt={product.name} className='w-full h-full object-cover' width={100} height={100} />
+									<>
+										<SeamstressProductCard key={product.id} product={product} />
+
+										<div key={product.id} className='bg-white rounded-lg p-6 border hover:border-gray-300 transition-colors flex flex-col h-full'>
+											<div className='w-full h-48 rounded-lg overflow-hidden mb-4'>
+												<Image src={product.image_urls[0] || ''} alt={product.name} className='w-full h-full object-cover' width={100} height={100} />
+											</div>
+											<Link href={`/dashboard/products/${product.id}`}>
+												<h4 className='text-lg font-semibold mb-2 hover:text-blue-600'>{product.name}</h4>
+											</Link>
+											<p className='text-gray-600 mb-3 flex-grow'>{product.description}</p>
+											<button
+												onClick={() => handleKitValidation(product)}
+												className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-auto'
+											>
+												Validate Kit
+											</button>
 										</div>
-										<Link href={`/dashboard/products/${product.id}`}>
-											<h4 className='text-lg font-semibold mb-2 hover:text-blue-600'>{product.name}</h4>
-										</Link>
-										<p className='text-gray-600 mb-3 flex-grow'>{product.description}</p>
-										<button
-											onClick={() => handleKitValidation(product)}
-											className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-auto'
-										>
-											Validate Kit
-										</button>
-									</div>
+									</>
 								))}
 							</div>
 						</div>
