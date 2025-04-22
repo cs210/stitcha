@@ -1,11 +1,11 @@
 'use client';
 
+import { FormContainer } from '@/components/custom/form/form-container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
-import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -113,104 +113,100 @@ export default function Page() {
 
 			<div className='py-4'>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-full'>
-						<div className='grid grid-cols-2 gap-6'>
-							<FormField
-								control={form.control}
-								name='client'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Client</FormLabel>
+					<FormContainer onSubmit={form.handleSubmit(onSubmit)}>
+						<FormField
+							control={form.control}
+							name='client'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Client</FormLabel>
+									<FormControl>
+										<Input placeholder='Client Name' {...field} />
+									</FormControl>
+									<FormDescription>This is the name of the client.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='contact'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Contact Email</FormLabel>
+									<FormControl>
+										<Input placeholder='Contact Email' {...field} />
+									</FormControl>
+									<FormDescription>This is the email address of the client.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='order_quantity'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Order Quantity</FormLabel>
+									<FormControl>
+										<Input type='number' placeholder='Order Quantity' {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
+									</FormControl>
+									<FormDescription>This is the quantity of the order.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='due_date'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Due Date</FormLabel>
+									<FormControl>
+										<Input
+											type='date'
+											placeholder='Due Date'
+											{...field}
+											value={field.value ? field.value.toISOString().split('T')[0] : ''}
+											onChange={(e) => {
+												const date = new Date(e.target.value);
+												if (!isNaN(date.getTime())) {
+													field.onChange(date);
+												}
+											}}
+										/>
+									</FormControl>
+									<FormDescription>This is the due date for the order.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='product_id'
+							render={({ field }) => (
+								<FormItem className='col-span-2'>
+									<FormLabel>Product</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
-											<Input placeholder='Client Name' {...field} />
+											<SelectTrigger>
+												<SelectValue placeholder='Select a product' />
+											</SelectTrigger>
 										</FormControl>
-										<FormDescription>This is the name of the client.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='contact'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Contact Email</FormLabel>
-										<FormControl>
-											<Input placeholder='Contact Email' {...field} />
-										</FormControl>
-										<FormDescription>This is the email address of the client.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='order_quantity'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Order Quantity</FormLabel>
-										<FormControl>
-											<Input type='number' placeholder='Order Quantity' {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
-										</FormControl>
-										<FormDescription>This is the quantity of the order.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='due_date'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Due Date</FormLabel>
-										<FormControl>
-											<Input
-												type='date'
-												placeholder='Due Date'
-												{...field}
-												value={field.value ? field.value.toISOString().split('T')[0] : ''}
-												onChange={(e) => {
-													const date = new Date(e.target.value);
-													if (!isNaN(date.getTime())) {
-														field.onChange(date);
-													}
-												}}
-											/>
-										</FormControl>
-										<FormDescription>This is the due date for the order.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='product_id'
-								render={({ field }) => (
-									<FormItem className='col-span-2'>
-										<FormLabel>Product</FormLabel>
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder='Select a product' />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{products.map((product) => (
-													<SelectItem key={product.id} value={product.id}>
-														{product.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										<FormDescription>This is the ID of the product.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-
-						<Button type='submit'>Submit</Button>
-					</form>
+										<SelectContent>
+											{products.map((product) => (
+												<SelectItem key={product.id} value={product.id}>
+													{product.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormDescription>This is the ID of the product.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</FormContainer>					
 				</Form>
 			</div>
 		</>

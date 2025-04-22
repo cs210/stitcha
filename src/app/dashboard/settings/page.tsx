@@ -39,30 +39,30 @@ export default function Page() {
 			</HeaderContainer>
 
 			<div className='py-4'>
-				<div className='grid gap-4'>
-					<div className='space-y-2'>
-						<Label>Full Name</Label>
-						<Input value={user?.fullName || ''} disabled />
+				<div className='space-y-8 w-full'>
+					<div className='grid grid-cols-2 gap-6'>
+						<div className='space-y-2'>
+								<Label>Full Name</Label>
+								<Input value={user?.fullName || ''} disabled />
+							</div>
+							<div className='space-y-2'>
+								<Label>Email</Label>
+								<Input value={user?.primaryEmailAddress?.emailAddress || ''} disabled />
+							</div>
+							<div className='space-y-2'>
+								<Label>Language</Label>
+								<Select defaultValue='pt'>
+								<SelectTrigger>
+									<SelectValue placeholder='Select language' />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value='pt'>Português</SelectItem>
+									<SelectItem value='en'>English</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
-					<div className='space-y-2'>
-						<Label>Email</Label>
-						<Input value={user?.primaryEmailAddress?.emailAddress || ''} disabled />
-					</div>
-					<div className='space-y-2'>
-						<Label>Language</Label>
-						<Select defaultValue='pt'>
-							<SelectTrigger>
-								<SelectValue placeholder='Select language' />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value='pt'>Português</SelectItem>
-								<SelectItem value='en'>English</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
-				</div>
 
-				<div className='pt-8'>
 					<Button>Save Changes</Button>
 				</div>
 			</div>

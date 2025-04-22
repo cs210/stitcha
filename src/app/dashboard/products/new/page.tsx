@@ -1,12 +1,13 @@
 'use client';
 
+import { FormContainer } from '@/components/custom/form/form-container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { ComboboxFormField } from '@/components/ui/combobox-form-field';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
@@ -461,104 +462,95 @@ export default function Page() {
 				<Description text='Manage and track customer products.' />
 			</HeaderContainer>
 
-			<Card className='w-full max-w-2xl mx-auto'>
-				<CardHeader>
-					<CardTitle>Product Details</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<Form {...form}>
-						<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
-							<div className='grid gap-4 md:grid-cols-2'>
-								<FormField
-									control={form.control}
-									name='name'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Product Name *</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
+			<div className='py-4'>
+				<Form {...form}>
+					<FormContainer onSubmit={form.handleSubmit(onSubmit)}>
+						<FormField
+							control={form.control}
+							name='name'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Product Name *</FormLabel>
+									<FormControl>
+										<Input {...field} />
+									</FormControl>
 
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name='image_urls'
-									render={({ field: { value, onChange, ...fieldProps } }) => (
-										<FormItem>
-											<FormLabel>Product Images</FormLabel>
-											<FormControl>
-												<div>
-													<Input
-														{...fieldProps}
-														type='file'
-														accept='image/*'
-														multiple
-														onChange={(e) => {
-															const newFiles = Array.from(e.target.files || []);
-															onChange([...(value || []), ...newFiles]);
-														}}
-													/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='image_urls'
+							render={({ field: { value, onChange, ...fieldProps } }) => (
+								<FormItem>
+									<FormLabel>Product Images</FormLabel>
+									<FormControl>
+										<div>
+											<Input
+												{...fieldProps}
+												type='file'
+												accept='image/*'
+												multiple
+												onChange={(e) => {
+													const newFiles = Array.from(e.target.files || []);
+													onChange([...(value || []), ...newFiles]);
+												}}
+											/>
 
-													{/* Display selected files */}
-													<div className='mt-2 space-y-2'>
-														{value?.map((file, index) => (
-															<div key={index} className='flex items-center gap-2'>
-																<span className='text-sm'>{file.name}</span>
-																<Button
-																	type='button'
-																	variant='ghost'
-																	size='sm'
-																	onClick={() => {
-																		const newFiles = value.filter((_, i) => i !== index);
-																		onChange(newFiles);
-																	}}
-																>
-																	Remove
-																</Button>
-															</div>
-														))}
+											{/* Display selected files */}
+											<div className='mt-2 space-y-2'>
+												{value?.map((file, index) => (
+													<div key={index} className='flex items-center gap-2'>
+														<span className='text-sm'>{file.name}</span>
+														<Button
+															type='button'
+															variant='ghost'
+															size='sm'
+															onClick={() => {
+																const newFiles = value.filter((_, i) => i !== index);
+																onChange(newFiles);
+															}}
+														>
+															Remove
+														</Button>
 													</div>
-												</div>
-											</FormControl>
-											<FormDescription>Optional: You can select multiple images</FormDescription>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-							<div className='grid gap-4 md:grid-cols-2'>
-								<FormField
-									control={form.control}
-									name='system_code'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>System Code *</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-								<FormField
-									control={form.control}
-									name='inmetro_cert_number'
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel>Inmetro Certification Number</FormLabel>
-											<FormControl>
-												<Input {...field} />
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+												))}
+											</div>
+										</div>
+									</FormControl>
+									<FormDescription>Optional: You can select multiple images</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+						control={form.control}
+						name='system_code'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>System Code *</FormLabel>
+								<FormControl>
+									<Input {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
+					<FormField
+						control={form.control}
+						name='inmetro_cert_number'
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Inmetro Certification Number</FormLabel>
+								<FormControl>
+									<Input {...field} />
+								</FormControl>
+								<FormMessage />
+							</FormItem>
+						)}
+					/>
 
-							<div className='grid gap-4 md:grid-cols-2'>
 								<FormField
 									control={form.control}
 									name='barcode'
@@ -585,8 +577,6 @@ export default function Page() {
 										</FormItem>
 									)}
 								/>
-							</div>
-
 							<FormField
 								control={form.control}
 								name='description'
@@ -1760,19 +1750,9 @@ export default function Page() {
 									</FormItem>
 								)}
 							/>
-
-							<div className='flex justify-end gap-4'>
-								<Button type='button' variant='outline' onClick={() => router.push('/dashboard/products')}>
-									Cancel
-								</Button>
-								<Button type='submit' disabled={isPending}>
-									{isPending ? 'Saving...' : 'Save Product'}
-								</Button>
-							</div>
-						</form>
-					</Form>
-				</CardContent>
-			</Card>
+					</FormContainer>
+				</Form>
+			</div>
 		</>
 	);
 }
