@@ -3,9 +3,12 @@ import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 // Retrieves a specific order by id
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+	request: Request,
+	{ params }: { params: { id: string } }
+) {
 	const { userId } = await auth();
-	const { id: orderId } = await params;
+	const orderId = params.id;
 
 	if (!userId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -23,7 +26,10 @@ export async function GET({ params }: { params: Promise<{ id: string }> }) {
 }
 
 // Deletes a specific order by id
-export async function DELETE({ params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+	request: Request,
+	{ params }: { params: { id: string } }
+) {
 	const { userId } = await auth();
 	const { id: orderId } = await params;
 

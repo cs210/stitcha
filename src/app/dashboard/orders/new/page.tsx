@@ -16,13 +16,14 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { Button } from '@/components/ui/button';
 
 const formSchema = z.object({
 	client: z.string().min(2).max(50),
 	contact: z.string().email({ message: 'Invalid email address' }),
 	order_quantity: z.coerce.number().min(1),
 	due_date: z.date(),
-	product_id: z.string().uuid({ message: 'Must be a valid UUID' }),
+	product_ids: z.array(z.string().uuid({ message: 'Must be a valid UUID' })).min(1, { message: 'Select at least one product' }),
 });
 
 export default function Page() {
@@ -31,6 +32,7 @@ export default function Page() {
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
+	const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -39,7 +41,7 @@ export default function Page() {
 			contact: '',
 			order_quantity: 0,
 			due_date: new Date(),
-			product_id: '',
+			product_ids: [],
 		},
 	});
 
@@ -52,11 +54,6 @@ export default function Page() {
 
 				if (!error && data) {
 					setProducts(data);
-
-					// If products are available, set the first product as default
-					if (data.length > 0) {
-						form.setValue('product_id', data[0].id);
-					}
 				}
 			} catch (error) {
 				console.error(error);
@@ -66,16 +63,26 @@ export default function Page() {
 		}
 
 		fetchOrder();
-	}, [user, form]);
+	}, [user]);
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
+
+		console.log("VALUES", values);
+		console.log("SELECTED PRODUCTS", selectedProducts);
+		
 		try {
 			const response = await fetch('/api/orders/', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify(values),
+				body: JSON.stringify({
+					client: values.client,
+					contact: values.contact,
+					order_quantity: values.order_quantity,
+					due_date: values.due_date,
+					product_ids: selectedProducts,
+				}),
 			});
 
 			const result = await response.json();
@@ -85,6 +92,7 @@ export default function Page() {
 			}
 
 			form.reset();
+			setSelectedProducts([]);
 
 			toast.success('Order created successfully');
 
@@ -94,7 +102,17 @@ export default function Page() {
 		} finally {
 			setLoading(false);
 		}
+
 	}
+
+	const handleProductSelect = (productId: string) => {
+		if (selectedProducts.includes(productId)) {
+			setSelectedProducts(selectedProducts.filter(id => id !== productId));
+		} else {
+			setSelectedProducts([...selectedProducts, productId]);
+		}
+		form.setValue('product_ids', selectedProducts);
+	};
 
 	if (loading) {
 		return (
@@ -183,25 +201,25 @@ export default function Page() {
 						/>
 						<FormField
 							control={form.control}
-							name='product_id'
-							render={({ field }) => (
+							name='product_ids'
+							render={() => (
 								<FormItem className='col-span-2'>
-									<FormLabel>Product</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
-										<FormControl>
-											<SelectTrigger>
-												<SelectValue placeholder='Select a product' />
-											</SelectTrigger>
-										</FormControl>
-										<SelectContent>
-											{products.map((product) => (
-												<SelectItem key={product.id} value={product.id}>
+									<FormLabel>Products</FormLabel>
+									<FormDescription>Select one or more products for this order.</FormDescription>
+									<div className='space-y-2'>
+										{products.map((product) => (
+											<div key={product.id} className='flex items-center gap-2'>
+												<Button
+													type='button'
+													variant={selectedProducts.includes(product.id) ? 'default' : 'outline'}
+													onClick={() => handleProductSelect(product.id)}
+													className='w-full justify-start'
+												>
 													{product.name}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FormDescription>This is the ID of the product.</FormDescription>
+												</Button>
+											</div>
+										))}
+									</div>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -212,3 +230,4 @@ export default function Page() {
 		</>
 	);
 }
+
