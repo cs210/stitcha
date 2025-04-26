@@ -13,7 +13,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id } = use(params);
 	const [order, setOrder] = useState<Order | null>(null);
 	const [loading, setLoading] = useState(true);
-	const [product, setProduct] = useState<Product | null>(null);
+	const [products, setProducts] = useState<Product[]>([]);
 	const [productLoading, setProductLoading] = useState(true);
 
 	useEffect(() => {
@@ -26,25 +26,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				}
 
 				const data = await response.json();
-
 				setOrder(data);
 
-				// Fetch product data if product_id exists
-				if (data.product_id) {
-					try {
-						const productResponse = await fetch(`/api/products/${data.product_id}`);
+				// Fetch all products associated with the order
+				const productsResponse = await fetch(`/api/orders/${id}/products`);
+				const productsData = await productsResponse.json();
 
-						if (productResponse.ok) {
-							const productData = await productResponse.json();
+				console.log("PRODUCT IDS", productsData);
 
-							setProduct(productData);
+				// Fetch product data for each product_id
+				const allProductsData: Product[] = [];
+				if (productsData.product_ids) {
+					for (const productId of productsData.product_ids) {
+						const productResponse = await fetch(`/api/products/${productId}`);
+
+						if (!productResponse.ok) {
+							throw new Error(`Failed to fetch product: ${productResponse.statusText}`);
 						}
-					} catch (error) {
-						console.error('Error fetching product:', error);
-					} finally {
-						setProductLoading(false);
+
+						const productData = await productResponse.json();
+						allProductsData.push(productData);
 					}
 				}
+
+				console.log("PRODUCT DATA", allProductsData);
+				setProducts(allProductsData); // Set all products instead of just the first one
+
 			} catch (error) {
 				console.error('Error fetching order:', error);
 			} finally {
@@ -75,21 +82,25 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 					<div className='grid grid-cols-1 gap-4 mb-6'>
 						<div>
 							<h2 className='text-xl font-semibold mb-3'>Order Details</h2>
-
 							<OrdersDetails order={order} />
 						</div>
 					</div>
 				</div>
 
-				{product && (
-					<div className='bg-white shadow rounded-lg p-6'>
+				{products.length > 0 && (
+					<div className='space-y-6'>
 						<h2 className='text-xl font-semibold mb-3'>Product Information</h2>
-						<div className='flex items-center gap-4'>
-							<OrdersProduct product={product} />
-						</div>
+						{products.map((product) => (
+							<div key={product.id} className='bg-white shadow rounded-lg p-6'>
+								<div className='flex items-center gap-4'>
+									<OrdersProduct product={product} />
+								</div>
+							</div>
+						))}
 					</div>
 				)}
 			</div>
 		</>
 	);
 }
+
