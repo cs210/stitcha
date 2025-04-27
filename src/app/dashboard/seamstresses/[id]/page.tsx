@@ -32,6 +32,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		if (!user) return;
 
 		(async () => {
+			console.log("seamstressId", seamstressId);
+			
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
 			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
@@ -69,33 +71,33 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		})();
 	}, [user, seamstressId]);
 
-	const handleKitValidation = async (product: Product) => {
-		try {
-			setSelectedProduct(product);
-			setCheckedItems({}); // Reset checked items
+	// const handleKitValidation = async (product: Product) => {
+	// 	try {
+	// 		setSelectedProduct(product);
+	// 		setCheckedItems({}); // Reset checked items
 			
-			// Fetch materials for specific product from join table
-			const response = await fetch(`/api/products/raw_materials`);
-			if (!response.ok) throw new Error('Failed to fetch kit materials');
+	// 		// Fetch materials for specific product from join table
+	// 		const response = await fetch(`/api/products/raw_materials`);
+	// 		if (!response.ok) throw new Error('Failed to fetch kit materials');
 			
-			const { data } = await response.json();
+	// 		const { data } = await response.json();
 
-			const productRawMaterials = await fetch(`/api/product-raw-materials`);
-			const { data: productRawMaterialsData } = await productRawMaterials.json();
+	// 		const productRawMaterials = await fetch(`/api/product-raw-materials`);
+	// 		const { data: productRawMaterialsData } = await productRawMaterials.json();
 
-			const filteredProductRawMaterials = productRawMaterialsData.filter((item: any) => item.product_id === product.id);
+	// 		const filteredProductRawMaterials = productRawMaterialsData.filter((item: any) => item.product_id === product.id);
 
-			const filteredRawMaterials = data.filter((item: any) => filteredProductRawMaterials.some((rawMaterial: any) => rawMaterial.material_code === item.material_id));
+	// 		const filteredRawMaterials = data.filter((item: any) => filteredProductRawMaterials.some((rawMaterial: any) => rawMaterial.material_code === item.material_id));
 
-			console.log("filteredProductRawMaterials", filteredProductRawMaterials);
-			console.log("filteredRawMaterials", filteredRawMaterials);
+	// 		console.log("filteredProductRawMaterials", filteredProductRawMaterials);
+	// 		console.log("filteredRawMaterials", filteredRawMaterials);
 
-			setKitMaterials(filteredRawMaterials || []);
-			setIsKitModalOpen(true);
-		} catch (error) {
-			console.error('Error fetching kit materials:', error);
-		}
-	};
+	// 		setKitMaterials(filteredRawMaterials || []);
+	// 		setIsKitModalOpen(true);
+	// 	} catch (error) {
+	// 		console.error('Error fetching kit materials:', error);
+	// 	}
+	// };
 
 	// Loading state
 	if (loading) {
@@ -133,12 +135,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 												<h4 className='text-lg font-semibold mb-2 hover:text-blue-600'>{product.name}</h4>
 											</Link>
 											<p className='text-gray-600 mb-3 flex-grow'>{product.description}</p>
-											<button
+											{/* <button
 												onClick={() => handleKitValidation(product)}
 												className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-auto'
 											>
 												Validate Kit
-											</button>
+											</button> */}
 										</div>
 									</>
 								))}

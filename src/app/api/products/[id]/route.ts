@@ -1,10 +1,6 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { createClerkSupabaseClient } from "@/utils/supabase/client";
-import { toast } from "sonner";
 
 // get a specific product by id
 export async function GET(
