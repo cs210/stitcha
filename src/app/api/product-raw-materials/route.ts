@@ -15,7 +15,7 @@ export async function GET(
 
   try {
     const { data, error } = await supabase
-      .from("product_users")
+      .from("products_and_raw_materials")
       .select("*");
 
     if (error) {
@@ -33,3 +33,4 @@ export async function GET(
     );
   }
 }
+

@@ -1,10 +1,11 @@
 'use client';
 
-import { Description } from '@/components/custom/description';
-import { Header } from '@/components/custom/header';
-import { HeaderContainer } from '@/components/custom/header-container';
-import { Loader } from '@/components/custom/loader';
-import { Button } from '@/components/ui/button';
+import { FormContainer } from '@/components/custom/form/form-container';
+import { Description } from '@/components/custom/header/description';
+import { Header } from '@/components/custom/header/header';
+import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -28,10 +29,9 @@ export default function Page() {
 	const { user } = useUser();
 	const router = useRouter();
 
-	const [loading, setLoading] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [products, setProducts] = useState<{ id: string; name: string }[]>([]);
 
-	// 1. Define your form.
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -44,36 +44,32 @@ export default function Page() {
 	});
 
 	useEffect(() => {
-		if (!user) return;
+		async function fetchOrder() {
+			try {
+				const response = await fetch('/api/products');
 
-		// Anonymous function to fetch products from Supabase
-		(async () => {
-			setLoading(true);
+				const { data, error } = await response.json();
 
-			const response = await fetch('/api/products');
+				if (!error && data) {
+					setProducts(data);
 
-			const { data, error } = await response.json();
-
-			if (!error && data) {
-				setProducts(data);
-
-				// If products are available, set the first product as default
-				if (data.length > 0) {
-					form.setValue('product_id', data[0].id);
+					// If products are available, set the first product as default
+					if (data.length > 0) {
+						form.setValue('product_id', data[0].id);
+					}
 				}
+			} catch (error) {
+				console.error(error);
+			} finally {
+				setLoading(false);
 			}
+		}
 
-			setLoading(false);
-		})();
+		fetchOrder();
 	}, [user, form]);
 
-	// 2. Define a submit handler.
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-		// Show loading state while submitting
-		setLoading(true);
-
 		try {
-			// Post the form values to the API
 			const response = await fetch('/api/orders/', {
 				method: 'POST',
 				headers: {
@@ -88,23 +84,25 @@ export default function Page() {
 				throw new Error(result.error || 'Failed to create order');
 			}
 
-			// Reset form after successful submission
 			form.reset();
 
-			// Show success message and redirect
 			toast.success('Order created successfully');
 
 			router.push('/dashboard/orders');
 		} catch (error) {
 			console.error(error);
-			// toast.error(error);
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	// Loading state
-	if (loading) return <Loader />;
+	if (loading) {
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
+	}
 
 	return (
 		<>
@@ -115,104 +113,100 @@ export default function Page() {
 
 			<div className='py-4'>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 w-full'>
-						<div className='grid grid-cols-2 gap-6'>
-							<FormField
-								control={form.control}
-								name='client'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Client</FormLabel>
+					<FormContainer onSubmit={form.handleSubmit(onSubmit)}>
+						<FormField
+							control={form.control}
+							name='client'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Client</FormLabel>
+									<FormControl>
+										<Input placeholder='Client Name' {...field} />
+									</FormControl>
+									<FormDescription>This is the name of the client.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='contact'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Contact Email</FormLabel>
+									<FormControl>
+										<Input placeholder='Contact Email' {...field} />
+									</FormControl>
+									<FormDescription>This is the email address of the client.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='order_quantity'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Order Quantity</FormLabel>
+									<FormControl>
+										<Input type='number' placeholder='Order Quantity' {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
+									</FormControl>
+									<FormDescription>This is the quantity of the order.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='due_date'
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Due Date</FormLabel>
+									<FormControl>
+										<Input
+											type='date'
+											placeholder='Due Date'
+											{...field}
+											value={field.value ? field.value.toISOString().split('T')[0] : ''}
+											onChange={(e) => {
+												const date = new Date(e.target.value);
+												if (!isNaN(date.getTime())) {
+													field.onChange(date);
+												}
+											}}
+										/>
+									</FormControl>
+									<FormDescription>This is the due date for the order.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+						<FormField
+							control={form.control}
+							name='product_id'
+							render={({ field }) => (
+								<FormItem className='col-span-2'>
+									<FormLabel>Product</FormLabel>
+									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
-											<Input placeholder='Client Name' {...field} />
+											<SelectTrigger>
+												<SelectValue placeholder='Select a product' />
+											</SelectTrigger>
 										</FormControl>
-										<FormDescription>This is the name of the client.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='contact'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Contact Email</FormLabel>
-										<FormControl>
-											<Input placeholder='Contact Email' {...field} />
-										</FormControl>
-										<FormDescription>This is the email address of the client.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='order_quantity'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Order Quantity</FormLabel>
-										<FormControl>
-											<Input type='number' placeholder='Order Quantity' {...field} onChange={(e) => field.onChange(parseInt(e.target.value) || 0)} />
-										</FormControl>
-										<FormDescription>This is the quantity of the order.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='due_date'
-								render={({ field }) => (
-									<FormItem>
-										<FormLabel>Due Date</FormLabel>
-										<FormControl>
-											<Input
-												type='date'
-												placeholder='Due Date'
-												{...field}
-												value={field.value ? field.value.toISOString().split('T')[0] : ''}
-												onChange={(e) => {
-													const date = new Date(e.target.value);
-													if (!isNaN(date.getTime())) {
-														field.onChange(date);
-													}
-												}}
-											/>
-										</FormControl>
-										<FormDescription>This is the due date for the order.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-							<FormField
-								control={form.control}
-								name='product_id'
-								render={({ field }) => (
-									<FormItem className='col-span-2'>
-										<FormLabel>Product</FormLabel>
-										<Select onValueChange={field.onChange} defaultValue={field.value}>
-											<FormControl>
-												<SelectTrigger>
-													<SelectValue placeholder='Select a product' />
-												</SelectTrigger>
-											</FormControl>
-											<SelectContent>
-												{products.map((product) => (
-													<SelectItem key={product.id} value={product.id}>
-														{product.name}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										<FormDescription>This is the ID of the product.</FormDescription>
-										<FormMessage />
-									</FormItem>
-								)}
-							/>
-						</div>
-
-						<Button type='submit'>Submit</Button>
-					</form>
+										<SelectContent>
+											{products.map((product) => (
+												<SelectItem key={product.id} value={product.id}>
+													{product.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FormDescription>This is the ID of the product.</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
+					</FormContainer>					
 				</Form>
 			</div>
 		</>

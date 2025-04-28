@@ -18,19 +18,19 @@ export async function GET() {
 
         // Fetch all raw materials
         const { data, error } = await supabase
-            .from("labor_types")
+            .from("product_costs")
             .select("*");
 
         if (error) {
             console.error('Database error:', error);
             return NextResponse.json(
-                { error: { message: 'Failed to fetch materials', details: error.message } },
+                { error: { message: 'Failed to fetch product costs', details: error.message } },
                 { status: 500 }
             );
         }
 
         return NextResponse.json(
-            { data, message: 'Materials retrieved successfully' },
+            { data, message: 'Product costs retrieved successfully' },
             { status: 200 }
         );
     } catch (error) {

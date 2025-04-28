@@ -1,26 +1,24 @@
-import { openai } from "@ai-sdk/openai";
-import { jsonSchema, streamText } from "ai";
+import { openai } from '@ai-sdk/openai';
+import { jsonSchema, streamText } from 'ai';
+import { NextRequest } from 'next/server';
 
-export const runtime = "edge";
-export const maxDuration = 30;
+// Stream a response from the OpenAI API
+export async function POST(req: NextRequest) {
+	const { messages, system, tools } = await req.json();
 
-export async function POST(req: Request) {
-  const { messages, system, tools } = await req.json();
+	const result = streamText({
+		model: openai('gpt-4o'),
+		messages,
+		system,
+		tools: Object.fromEntries(
+			Object.entries<{ parameters: any }>(tools).map(([name, tool]) => [
+				name,
+				{
+					parameters: jsonSchema(tool.parameters!),
+				},
+			])
+		),
+	});
 
-  const result = streamText({
-    model: openai("gpt-4o"),
-    messages,
-    // forward system prompt and tools from the frontend
-    system,
-    tools: Object.fromEntries(
-      Object.entries<{ parameters: unknown }>(tools).map(([name, tool]) => [
-        name,
-        {
-          parameters: jsonSchema(tool.parameters!),
-        },
-      ]),
-    ),
-  });
-
-  return result.toDataStreamResponse();
+	return result.toDataStreamResponse();
 }
