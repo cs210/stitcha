@@ -10,10 +10,11 @@ import { Button } from '@/components/ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Product, Progress, User } from '@/lib/schemas/global.types';
-import { ChevronLeft, ChevronRight, Search, Users, X, ZoomIn } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Search, Users, X, ZoomIn } from 'lucide-react';
 import Image from 'next/image';
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useState, useRef } from 'react';
 import { toast } from 'sonner';
+import { generateProductPDF } from '@/lib/pdf/generate';
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
 	const unwrappedParams = use(params);
@@ -30,6 +31,9 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 	const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
 	const [zoomImageIndex, setZoomImageIndex] = useState(0);
+	const productImageRef = useRef<HTMLDivElement>(null);
+	const productDetailsRef = useRef<HTMLDivElement>(null);
+	const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
 	useEffect(() => {
 		// Reset temporary selection when dialog opens
@@ -258,6 +262,39 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 		}
 	};
 
+	const handleGeneratePDF = async () => {
+		if (!productImageRef.current || !productDetailsRef.current || !product) return;
+
+		setIsPdfGenerating(true);
+		try {
+			const pdfData = await generateProductPDF(
+				productImageRef.current,
+				productDetailsRef.current,
+				product
+			);
+
+			// Create a blob from the Uint8Array
+			const blob = new Blob([pdfData], { type: 'application/pdf' });
+			const url = URL.createObjectURL(blob);
+
+			// Create a download link
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = `${product.name}-details.pdf`;
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+
+			toast.success('PDF generated successfully');
+		} catch (error) {
+			console.error('Error generating PDF:', error);
+			toast.error('Failed to generate PDF');
+		} finally {
+			setIsPdfGenerating(false);
+		}
+	};
+
 	// Filter available users
 	const filteredAvailableUsers = users.filter(
 		(user) =>
@@ -271,8 +308,8 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 	const imageUrls = Array.isArray(product?.image_urls)
 		? product?.image_urls
 		: product?.image_urls && typeof product?.image_urls === 'object'
-		? Object.values(product?.image_urls)
-		: [];
+			? Object.values(product?.image_urls)
+			: [];
 
 	if (loading) {
 		return (
@@ -431,6 +468,24 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 						</div>
 					</DialogContent>
 				</Dialog>
+				<Button
+					variant='outline'
+					size='sm'
+					onClick={handleGeneratePDF}
+					disabled={isPdfGenerating}
+				>
+					{isPdfGenerating ? (
+						<>
+							<span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-r-transparent mr-2" />
+							Generating...
+						</>
+					) : (
+						<>
+							<Download className='w-4 h-4 mr-2' />
+							Download PDF
+						</>
+					)}
+				</Button>
 			</div>
 
 			<div className='py-4 space-y-4'>
@@ -462,9 +517,8 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 												{imageUrls.map((imageUrl, index) => (
 													<div
 														key={index}
-														className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
-															selectedImageIndex === index ? 'border-2 border-blue-500 shadow-md' : 'border border-gray-200 hover:border-gray-300'
-														}`}
+														className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${selectedImageIndex === index ? 'border-2 border-blue-500 shadow-md' : 'border border-gray-200 hover:border-gray-300'
+															}`}
 														onClick={() => setSelectedImageIndex(index)}
 													>
 														<Image src={imageUrl} alt={`${product.name} - image ${index + 1}`} className='w-full h-full object-cover' width={80} height={80} />

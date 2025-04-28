@@ -1,30 +1,25 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
-import { createClerkSupabaseClient } from "@/utils/supabase/client";
-import { toast } from "sonner";
+import { NextRequest, NextResponse } from "next/server";
 
-// get a specific product by id
+// Get a specific product by id
 export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   const supabase = await createClerkSupabaseClientSsr();
-  const { id: productId } = await params;
+  const { id: productId } = params;
 
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("id", productId) // Fetch the specific product by ID
+    .eq("id", productId)
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Return the data directly without wrapping it
   return NextResponse.json(data, { status: 200 });
 }
 
