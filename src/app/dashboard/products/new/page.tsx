@@ -400,8 +400,7 @@ export default function Page() {
 			});
 
 			// Calculate and add the total packaging material cost
-			const packagingMaterialsBaseCost = values.packaging_materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
-			const totalPackagingMaterialCost = packagingMaterialsBaseCost;
+			const totalPackagingMaterialCost = values.packaging_materials?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
 			formData.append('packaging_cost', JSON.stringify(totalPackagingMaterialCost));
 			// Calculate and add the total labor cost
 			const totalLaborCost = values.labor?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
@@ -410,7 +409,7 @@ export default function Page() {
 			const totalMaterialCost = totalRawMaterialCost + totalPackagingMaterialCost;
 			formData.append('total_material_cost', JSON.stringify(totalMaterialCost));
 			// Calculate and add the total costs
-			const totalCost = totalMaterialCost + totalLaborCost + values.general_expenses + values.royalties;
+			const totalCost = totalMaterialCost + totalLaborCost + values.general_expenses + (values.royalties / 100) * values.selling_price;
 			formData.append('total_cost', JSON.stringify(totalCost));
 			// Calculate and add the selling price
 			const margin = ((values.selling_price - totalCost) / values.selling_price) * 100;
@@ -1539,8 +1538,11 @@ export default function Page() {
 										// Get general expenses
 										const generalExpenses = form.watch('general_expenses') || 0;
 
+										const royalties = form.watch('royalties') || 0;
+										const sellingPrice = form.watch('selling_price') || 0;
+
 										// Calculate final total
-										const totalCost = totalMaterialCost + laborCost + generalExpenses;
+										const totalCost = totalMaterialCost + laborCost + generalExpenses + (royalties / 100) * sellingPrice;
 
 										return totalCost.toFixed(2);
 									})()}
@@ -1755,6 +1757,6 @@ export default function Page() {
 					</FormContainer>
 				</Form>
 			</div>
-		</>
+		</div>
 	);
 }
