@@ -1,7 +1,6 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { Database } from '@/lib/types/supabase';
 
 export async function GET() {
     try {

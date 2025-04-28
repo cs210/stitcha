@@ -49,8 +49,8 @@ export const columns: ColumnDef<Order>[] = [
 	},
 	{
 		accessorKey: 'client',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Client' />,
-		cell: ({ row }) => <Link href={`/dashboard/orders/${row.original.id}`}>{row.original.client}</Link>,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Client' />,					
+		cell: ({ row }) => <Link href={`/dashboard/orders/${row.original.id}`} className='text-base font-medium'>{row.original.client}</Link>,
 	},
 	{
 		accessorKey: 'contact',

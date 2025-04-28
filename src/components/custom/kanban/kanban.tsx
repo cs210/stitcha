@@ -163,10 +163,10 @@ export function KanbanBoard() {
 	};
 
 	return (
-		<div className='flex flex-col h-full p-3'>
+		<div className='flex flex-col h-full'>
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
-					<div className='flex gap-6 pt-4 h-full'>
+					<div className='flex gap-4 mt-6 h-full'>
 						<KanbanColumn title='Not Started' id='notStarted' products={products.notStarted} onDelete={onDelete} />
 						<KanbanColumn title='In Progress' id='inProgress' products={products.inProgress} onDelete={onDelete} />
 						<KanbanColumn title='Done' id='done' products={products.done} onDelete={onDelete} />

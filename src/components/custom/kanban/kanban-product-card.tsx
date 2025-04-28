@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Product } from '@/lib/schemas/global.types';
 import { Draggable } from '@hello-pangea/dnd';
 import { Trash2 } from 'lucide-react';
@@ -12,13 +13,25 @@ export function KanbanProductCard({ product, index, onDelete }: { product: Produ
 	return (
 		<Draggable draggableId={product.id} index={index}>
 			{(provided) => (
-				<div
+				<Card
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					className='bg-white rounded-lg shadow px-5 py-3 relative group min-w-[380px] cursor-pointer'
+					className='cursor-pointer p-2 w-[320px]'
 					onClick={() => router.push(`/dashboard/products/${product.id}`)}
 				>
+					<div className='relative w-24 h-24 b-1 rounded-lg overflow-hidden flex-shrink-0'>
+						<Image
+							src={product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : '/placeholder-image.jpg'}
+							alt={product.name}
+							fill
+							className='object-cover'
+							sizes='(max-width: 768px) 96px, 96px'
+							priority={index < 2}
+							quality={75}
+						/>
+					</div>
+
 					<div className='absolute top-3 right-5 flex gap-2 z-10'>
 						<Button
 							size='sm'
@@ -48,20 +61,8 @@ export function KanbanProductCard({ product, index, onDelete }: { product: Produ
 								)}
 							</div>
 						</div>
-
-						<div className='relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0'>
-							<Image
-								src={product.image_urls && product.image_urls.length > 0 ? product.image_urls[0] : '/placeholder-image.jpg'}
-								alt={product.name}
-								fill
-								className='object-cover'
-								sizes='(max-width: 768px) 96px, 96px'
-								priority={index < 2}
-								quality={75}
-							/>
-						</div>
 					</div>
-				</div>
+				</Card>
 			)}
 		</Draggable>
 	);
