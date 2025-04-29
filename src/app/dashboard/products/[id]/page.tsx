@@ -32,9 +32,13 @@ import {
   ZoomIn,
 } from "lucide-react";
 import Image from "next/image";
-import { use, useEffect, useState, useRef } from "react";
+import { use, useEffect, useState, useRef, useMemo } from "react";
 import { toast } from "sonner";
 import { generateProductPDF } from "@/lib/pdf/generate";
+
+interface TimelineUpdate extends Progress {
+  status?: string;
+}
 
 export default function ProductDetails({
   params,
@@ -48,7 +52,7 @@ export default function ProductDetails({
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
   const [tempSelectedUsers, setTempSelectedUsers] = useState<User[]>([]);
-  const [progressUpdates, setProgressUpdates] = useState<Progress[]>([]);
+  const [progressUpdates, setProgressUpdates] = useState<TimelineUpdate[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isCommandOpen, setIsCommandOpen] = useState(false);
@@ -59,74 +63,85 @@ export default function ProductDetails({
   const productDetailsRef = useRef<HTMLDivElement>(null);
   const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
+  // Fetch initial product data
   useEffect(() => {
-    // Reset temporary selection when dialog opens
-    if (isDialogOpen) {
-      setTempSelectedUsers(selectedUsers);
-    }
+    let isMounted = true;
 
-    // Reset command open state when dialog closes
-    if (!isDialogOpen) {
-      setIsCommandOpen(false);
-    }
-
-    async function fetchData() {
+    async function fetchInitialData() {
       try {
-        const productResponse = await fetch(
-          `/api/products/${unwrappedParams.id}`
-        );
-        const productData = await productResponse.json();
+        setLoading(true);
+        const [productResponse, usersResponse] = await Promise.all([
+          fetch(`/api/products/${unwrappedParams.id}`),
+          fetch("/api/seamstresses")
+        ]);
+
+        const [productData, { data: usersData }] = await Promise.all([
+          productResponse.json(),
+          usersResponse.json()
+        ]);
+
+        if (!isMounted) return;
 
         if (!productResponse.ok) {
           throw new Error(productData.error);
         }
 
         setProduct(productData);
-
-        const usersResponse = await fetch("/api/seamstresses");
-        const { data: usersData } = await usersResponse.json();
-
         if (Array.isArray(usersData)) {
           setUsers(usersData);
         }
 
+        // Fetch assigned users
         const assignedResponse = await fetch(
           `/api/products/${unwrappedParams.id}/assigned`
         );
         const { data: assignedData } = await assignedResponse.json();
 
+        if (!isMounted) return;
+
         // Find the full user objects for assigned seamstresses
         if (Array.isArray(assignedData)) {
           const assignedUsers = usersData.filter((user: User) =>
-            assignedData.some((assigned: any) => assigned.user_id === user.id)
+            assignedData.some((assigned) => assigned.user_id === user.id)
           );
-
           setSelectedUsers(assignedUsers);
           setTempSelectedUsers(assignedUsers);
         }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching initial data:", error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
-    async function fetchTimelineUpdates() {
+    fetchInitialData();
+    return () => {
+      isMounted = false;
+    };
+  }, [unwrappedParams.id]);
+
+  // Fetch timeline and progress updates separately with a delay
+  useEffect(() => {
+    let isMounted = true;
+    const timeoutId = setTimeout(async () => {
       if (!product) return;
 
       try {
-        // Fetch both timeline and progress updates
         const [timelineResponse, progressResponse] = await Promise.all([
           fetch(`/api/products/${unwrappedParams.id}/timeline`),
-          fetch(`/api/products/${unwrappedParams.id}/progress`),
+          fetch(`/api/products/${unwrappedParams.id}/progress`)
         ]);
 
         const [timelineData, progressData] = await Promise.all([
           timelineResponse.json(),
-          progressResponse.json(),
+          progressResponse.json()
         ]);
 
-        let updates: any[] = [];
+        if (!isMounted) return;
+
+        let updates: TimelineUpdate[] = [];
 
         // Add timeline data
         if (Array.isArray(timelineData.data)) {
@@ -135,9 +150,9 @@ export default function ProductDetails({
           if (!updates.some((update) => update.status === "created")) {
             updates.unshift({
               id: "created",
-              created_at: "2025-03-10T13:20:00.000Z",
-              description: `Batch 2024-001 entered production phase`,
-              status: "created",
+              created_at: new Date().toISOString(),
+              description: `Batch ${product.system_code} entered production phase`,
+              emotion: null,
               user_id: "system",
               image_urls: [],
             });
@@ -148,14 +163,7 @@ export default function ProductDetails({
         if (Array.isArray(progressData.data)) {
           updates = [
             ...updates,
-            ...progressData.data.map((progress: Progress) => ({
-              ...progress,
-              emotion: progress.emotion,
-              user_id: progress.user_id,
-              description: `Progress update: ${
-                progress.description || "No additional notes"
-              }`,
-            })),
+            ...progressData.data
           ];
         }
 
@@ -169,11 +177,22 @@ export default function ProductDetails({
       } catch (error) {
         console.error("Error fetching updates:", error);
       }
-    }
+    }, 1000);
 
-    fetchData();
-    fetchTimelineUpdates();
-  }, [isDialogOpen, selectedUsers, unwrappedParams.id, product]);
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [unwrappedParams.id, product?.id]);
+
+  // Reset temporary selection when dialog opens
+  useEffect(() => {
+    if (isDialogOpen) {
+      setTempSelectedUsers(selectedUsers);
+    } else {
+      setIsCommandOpen(false);
+    }
+  }, [isDialogOpen, selectedUsers]);
 
   // Handle user selection
   const handleUserSelect = (userId: string) => {
@@ -221,7 +240,7 @@ export default function ProductDetails({
 
       // Create progress event if there are new assignments
       if (newlyAssignedUsers.length > 0) {
-        const newEvent: Progress = {
+        const newEvent: TimelineUpdate = {
           id: `assigned-${Date.now()}`,
           created_at: new Date().toISOString(),
           description:
@@ -278,7 +297,7 @@ export default function ProductDetails({
       const removedUser = selectedUsers.find((user) => user.id === userId);
 
       if (removedUser) {
-        const newEvent: Progress = {
+        const newEvent: TimelineUpdate = {
           id: `unassigned-${Date.now()}`,
           created_at: new Date().toISOString(),
           description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
@@ -308,13 +327,13 @@ export default function ProductDetails({
 
   // Function to navigate to next/previous image in zoom view
   const navigateZoomImage = (direction: "next" | "prev") => {
-    if (!imageUrls.length) return;
+    if (!safeImageUrls.length) return;
 
     if (direction === "next") {
-      setZoomImageIndex((prev) => (prev + 1) % imageUrls.length);
+      setZoomImageIndex((prev) => (prev + 1) % safeImageUrls.length);
     } else {
       setZoomImageIndex(
-        (prev) => (prev - 1 + imageUrls.length) % imageUrls.length
+        (prev) => (prev - 1 + safeImageUrls.length) % safeImageUrls.length
       );
     }
   };
@@ -366,12 +385,21 @@ export default function ProductDetails({
         ))
   );
 
-  // Check if image_urls is an array or needs to be converted
-  const imageUrls = Array.isArray(product?.image_urls)
-    ? product?.image_urls
-    : product?.image_urls && typeof product?.image_urls === "object"
-    ? Object.values(product?.image_urls)
-    : [];
+  // Type guard for image URLs
+  const safeImageUrls: string[] = useMemo(() => {
+    if (!product?.image_urls) return [];
+    
+    if (Array.isArray(product.image_urls)) {
+      return product.image_urls.filter((url): url is string => typeof url === 'string');
+    }
+    
+    if (typeof product.image_urls === 'object') {
+      return Object.values(product.image_urls)
+        .filter((url): url is string => typeof url === 'string');
+    }
+    
+    return [];
+  }, [product?.image_urls]);
 
   if (loading) {
     return (
@@ -381,10 +409,18 @@ export default function ProductDetails({
     );
   }
 
+  if (!product) {
+    return (
+      <div className="p-4 text-center">
+        <p>Product not found</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <HeaderContainer>
-        <Header text={product?.name || ""} />
+        <Header text={product.name} />
       </HeaderContainer>
 
       <div className="flex items-center gap-4 mt-4">
@@ -437,11 +473,10 @@ export default function ProductDetails({
                     <input
                       placeholder="Search seamstresses..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onClick={(e) => {
+                      onChange={(e) => { 
+                        setSearchQuery(e.target.value); 
                         e.stopPropagation();
-                        setIsCommandOpen(true);
-                      }}
+                        setIsCommandOpen(true);}}
                       className="flex-1 outline-none bg-transparent placeholder:text-gray-500"
                     />
                   </div>
@@ -575,58 +610,38 @@ export default function ProductDetails({
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-8 shadow-sm border">
               <div className="mb-8">
-                {imageUrls.length > 0 ? (
-                  <div className="space-y-4">
-                    <div
-                      className="w-full h-96 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative group cursor-zoom-in"
-                      onClick={() => openZoomModal(selectedImageIndex)}
-                    >
-                      <Image
-                        src={imageUrls[selectedImageIndex]}
-                        alt={product.name}
-                        className="w-full h-full object-contain"
-                        width={800}
-                        height={600}
-                        priority
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <ZoomIn className="w-10 h-10 text-white drop-shadow-lg" />
-                      </div>
-                    </div>
+                <div className="w-full h-96 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative group cursor-zoom-in">
+                  <Image
+                    src={safeImageUrls[selectedImageIndex] || "/placeholder-image.jpg"}
+                    alt={product.name}
+                    className="w-full h-full object-contain"
+                    width={800}
+                    height={600}
+                    priority
+                  />
+                </div>
 
-                    {imageUrls.length > 1 && (
-                      <div className="flex gap-2 overflow-x-auto pb-2">
-                        {imageUrls.map((imageUrl, index) => (
-                          <div
-                            key={index}
-                            className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
-                              selectedImageIndex === index
-                                ? "border-2 border-blue-500 shadow-md"
-                                : "border border-gray-200 hover:border-gray-300"
-                            }`}
-                            onClick={() => setSelectedImageIndex(index)}
-                          >
-                            <Image
-                              src={imageUrl}
-                              alt={`${product.name} - image ${index + 1}`}
-                              className="w-full h-full object-cover"
-                              width={80}
-                              height={80}
-                            />
-                          </div>
-                        ))}
+                {safeImageUrls.length > 1 && (
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {safeImageUrls.map((imageUrl, index) => (
+                      <div
+                        key={index}
+                        className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
+                          selectedImageIndex === index
+                            ? "border-2 border-blue-500 shadow-md"
+                            : "border border-gray-200 hover:border-gray-300"
+                        }`}
+                        onClick={() => setSelectedImageIndex(index)}
+                      >
+                        <Image
+                          src={imageUrl}
+                          alt={`${product.name} - image ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          width={80}
+                          height={80}
+                        />
                       </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="w-full h-64 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
-                    <Image
-                      src="/placeholder-image.jpg"
-                      alt={product.name}
-                      className="w-full h-full object-contain"
-                      width={500}
-                      height={300}
-                    />
+                    ))}
                   </div>
                 )}
               </div>
@@ -723,62 +738,21 @@ export default function ProductDetails({
       </div>
 
       {isZoomModalOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center"
-          onClick={() => setIsZoomModalOpen(false)}
-        >
-          <div className="relative w-full h-full flex items-center justify-center">
-            <button
-              className="absolute top-6 right-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
-              onClick={() => setIsZoomModalOpen(false)}
-            >
-              <X className="w-8 h-8" />
-            </button>
-
-            {imageUrls.length > 1 && (
-              <>
-                <button
-                  className="absolute left-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateZoomImage("prev");
-                  }}
-                >
-                  <ChevronLeft className="w-10 h-10" />
-                </button>
-                <button
-                  className="absolute right-6 text-white hover:text-gray-300 z-10 bg-black bg-opacity-50 rounded-full p-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigateZoomImage("next");
-                  }}
-                >
-                  <ChevronRight className="w-10 h-10" />
-                </button>
-              </>
-            )}
-
-            <div
-              className="w-[95%] h-[95%] relative flex items-center justify-center"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Image
-                src={imageUrls[zoomImageIndex]}
-                alt={`${product.name} - zoomed image`}
-                className="max-w-full max-h-full object-contain"
-                width={2000}
-                height={2000}
-                priority
-                quality={100}
-              />
-
-              {imageUrls.length > 1 && (
-                <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm font-medium">
-                  {zoomImageIndex + 1} / {imageUrls.length}
-                </div>
-              )}
+        <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center">
+          <Image
+            src={safeImageUrls[zoomImageIndex] || "/placeholder-image.jpg"}
+            alt={`${product.name} - zoomed image`}
+            className="max-w-full max-h-full object-contain"
+            width={2000}
+            height={2000}
+            priority
+            quality={100}
+          />
+          {safeImageUrls.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-70 text-white px-4 py-2 rounded-full text-sm font-medium">
+              {zoomImageIndex + 1} / {safeImageUrls.length}
             </div>
-          </div>
+          )}
         </div>
       )}
     </>

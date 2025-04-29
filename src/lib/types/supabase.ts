@@ -257,7 +257,7 @@ export type Database = {
           image_urls: Json | null
           inmetro_cert_number: string | null
           name: string
-          order_id: string
+          order_id: string | null
           parts: string[] | null
           percent_pieces_lost: number | null
           product_type: string | null
@@ -274,7 +274,7 @@ export type Database = {
           image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
-          order_id?: string
+          order_id?: string | null
           parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null
@@ -291,7 +291,7 @@ export type Database = {
           image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
-          order_id?: string
+          order_id?: string | null
           parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null

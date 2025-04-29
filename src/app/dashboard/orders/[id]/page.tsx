@@ -3,7 +3,7 @@
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Order, Product } from '@/lib/schemas/global.types';
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useState, useCallback } from 'react';
 import { ProductParts } from '@/components/custom/orders/orders-product-parts';
 import { Progress } from '@/components/ui/progress';
 import { ArrowLeft } from 'lucide-react';
@@ -23,7 +23,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const [totalParts, setTotalParts] = useState(0);
     const [completedParts, setCompletedParts] = useState(0);
 
-    async function fetchOrder() {
+    const fetchOrder = useCallback(async () => {
         try {
             const response = await fetch(`/api/orders/${id}`);
 
@@ -75,16 +75,32 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             setProductLoading(false);
             setLoading(false);
         }
-    }
+    }, [id]);
 
-    const handleProductRemoved = () => {
+    const handleProductRemoved = async (productId: string) => {
+        // Update the product's order_id to null
+        const patchResponse = await fetch(`/api/products/${productId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_id: null
+            }),
+        });
+
+        if (!patchResponse.ok) {
+            const errorData = await patchResponse.json();
+            throw new Error(errorData.error || 'Failed to update product');
+        }
+
         // Refetch the order data to update the UI
         fetchOrder();
     };
 
     useEffect(() => {
         fetchOrder();
-    }, [id]);
+    }, [fetchOrder]);
 
     const progressPercentage = totalParts > 0 ? Math.round((completedParts / totalParts) * 100) : 0;
     const totalUnits = products.length * (order?.order_quantity || 0);
