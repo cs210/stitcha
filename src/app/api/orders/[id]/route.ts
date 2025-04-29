@@ -7,20 +7,24 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 	const { userId } = await auth();
 	const { id: orderId } = await params;
 
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
-  const supabase = await createClerkSupabaseClientSsr();
+	const supabase = await createClerkSupabaseClientSsr();
 
-  const { data, error } = await supabase.from('orders').select('*').eq('id', orderId).single();
+	// Get all product IDs associated with this order
+	const { data, error } = await supabase
+		.from('orders')
+		.select('*')
+		.eq('id', orderId)
+		.single();
 
-  if (error) {
-    console.error("Supabase error:", error);
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+	if (error) {
+		return NextResponse.json({ error: error.message }, { status: 400 });
+	}
 
-  return NextResponse.json(data, { status: 200 });
+	return NextResponse.json({ data }, { status: 200 });
 }
 
 // Updates a specific order's progress level
@@ -40,59 +44,81 @@ export async function PATCH(
     const { progress_level } = body;
 
     if (!progress_level) {
-      return NextResponse.json(
-        { error: "Progress level is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Progress level is required" }, { status: 400 });
     }
 
     const supabase = await createClerkSupabaseClientSsr();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("orders")
       .update({ progress_level })
       .eq("id", orderId);
 
     if (error) {
-      console.error("Supabase error:", error);
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { message: "Order updated successfully" },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error updating order:", error);
-    return NextResponse.json(
-      { error: "Failed to update order" },
-      { status: 500 }
-    );
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {    
+    return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
   }
 }
 
 // Deletes a specific order by id
-export async function DELETE(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
-) {
-    const { userId } = await auth();
-    const { id } = await params;
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	const { userId } = await auth();
+	const { id } = await params;
 
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+	if (!userId) {
+		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+	}
 
-    const supabase = await createClerkSupabaseClientSsr();
+	const supabase = await createClerkSupabaseClientSsr();
 
-    const { error } = await supabase.from("orders").delete().eq("id", id);
+	const { data, error } = await supabase.from("orders").delete().eq("id", id);
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 400 });
-    }
+	if (error) {
+		return NextResponse.json({ error: error.message }, { status: 400 });
+	}
 
-    return NextResponse.json(
-        { message: "Order deleted successfully" },
-        { status: 200 }
-    );
+	return NextResponse.json(data, { status: 200 });
 }
+
+// // Updates the products associated with a specific order
+// export async function PATCH(
+//     request: Request,
+//     { params }: { params: Promise<{ id: string }> }
+// ) {
+//     const { userId } = await auth();
+//     const { id: orderId } = await params;
+
+//     if (!userId) {
+//         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+//     }
+
+//     // Get product IDs from request body
+//     const { product_ids } = await request.json();
+
+//     if (!Array.isArray(product_ids)) {
+//         return NextResponse.json(
+//             { error: "product_ids must be an array" },
+//             { status: 400 }
+//         );
+//     }
+
+//     const supabase = await createClerkSupabaseClientSsr();
+
+//     // Update the order with new product IDs
+//     const { data, error } = await supabase
+//         .from('orders')
+//         .update({ product_ids })
+//         .eq('id', orderId)
+//         .select()
+//         .single();
+
+//     if (error) {
+//         return NextResponse.json({ error: error.message }, { status: 400 });
+//     }
+
+//     return NextResponse.json({ data }, { status: 200 });
+// }

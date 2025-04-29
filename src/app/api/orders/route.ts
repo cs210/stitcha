@@ -50,8 +50,8 @@ export async function POST(req: NextRequest) {
 		.single();
 
 	if (orderError) {
-		return NextResponse.json({ orderError }, { status: 400 });
+		return NextResponse.json({ error: orderError }, { status: 400 });
 	}
 
-	return NextResponse.json({ data: orderData, success: true }, { status: 201 });
+	return NextResponse.json({ data: orderData }, { status: 200 });
 }
