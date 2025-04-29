@@ -8,33 +8,30 @@ import ProductsActivityTimelineItem from "@/components/custom/products/products-
 import ProductsSeamstressAvatar from "@/components/custom/products/products-seamstress-avatar";
 import { Button } from "@/components/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
+	Command,
+	CommandEmpty,
+	CommandGroup,
+	CommandItem,
+	CommandList,
 } from "@/components/ui/command";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
+import { generateProductPDF } from "@/lib/pdf/generate";
 import { Product, Progress, User } from "@/lib/schemas/global.types";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Download,
-  Search,
-  Users,
-  X,
-  ZoomIn,
+	Download,
+	Search,
+	Users,
+	X
 } from "lucide-react";
 import Image from "next/image";
-import { use, useEffect, useState, useRef, useMemo } from "react";
+import { use, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { generateProductPDF } from "@/lib/pdf/generate";
 
 interface TimelineUpdate extends Progress {
   status?: string;
@@ -183,7 +180,7 @@ export default function ProductDetails({
       isMounted = false;
       clearTimeout(timeoutId);
     };
-  }, [unwrappedParams.id, product?.id]);
+  }, [unwrappedParams.id, product]);
 
   // Reset temporary selection when dialog opens
   useEffect(() => {

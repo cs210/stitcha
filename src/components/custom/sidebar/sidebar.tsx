@@ -32,7 +32,7 @@ export function Sidebar() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-		<div className={cn('flex h-full flex-col border-r p-4 transition-all duration-300', isExpanded ? 'w-[200px]' : 'w-[72px]')}>
+		<div className={cn('flex h-full flex-col border-r px-4 py-6 transition-all duration-300', isExpanded ? 'w-[200px]' : 'w-[72px]')}>
 			<div className='flex justify-center items-center mb-6'>
 				<div className={cn('flex items-center w-full', isExpanded ? 'justify-between' : 'justify-center')}>
 					<div className='flex items-center' onClick={() => setIsExpanded(!isExpanded)}>

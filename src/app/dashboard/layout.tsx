@@ -67,12 +67,10 @@ export default function Layout({
   // Determine what to show in the breadcrumb
   const isProductDetails = segments[1] === "products" && segments.length === 3;
   const isOrderDetails = segments[1] === "orders" && segments.length === 3;
-  const isSeamstressDetails =
-    segments[1] === "seamstresses" && segments.length === 3;
+  const isSeamstressDetails = segments[1] === "seamstresses" && segments.length === 3;
 
   const currentPage = segments[segments.length - 1];
-  let formattedPage =
-    currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+  const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
 
 	return (
 		<div className='flex h-screen'>
