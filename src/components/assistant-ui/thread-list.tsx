@@ -1,12 +1,12 @@
-import type { FC } from "react";
 import {
-  ThreadListItemPrimitive,
-  ThreadListPrimitive,
+	ThreadListItemPrimitive,
+	ThreadListPrimitive,
 } from "@assistant-ui/react";
 import { ArchiveIcon, PlusIcon } from "lucide-react";
+import type { FC } from "react";
 
-import { Button } from "@/components/ui/button";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
+import { Button } from "@/components/ui/button";
 
 export const ThreadList: FC = () => {
   return (
@@ -53,14 +53,14 @@ const ThreadListItemTitle: FC = () => {
 
 const ThreadListItemArchive: FC = () => {
   return (
-    <ThreadListItemPrimitive.Archive asChild>
-      <TooltipIconButton
-        className="hover:text-primary text-foreground ml-auto mr-3 size-4 p-0"
-        variant="ghost"
-        tooltip="Archive thread"
-      >
-        <ArchiveIcon />
-      </TooltipIconButton>
+    <ThreadListItemPrimitive.Archive asChild>      
+			<TooltipIconButton
+				className="hover:text-primary text-foreground ml-auto mr-3 size-4 p-0"
+				variant="ghost"
+				tooltip="Archive thread"
+			>
+				<ArchiveIcon />
+			</TooltipIconButton>
     </ThreadListItemPrimitive.Archive>
   );
 };

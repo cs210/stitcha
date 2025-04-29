@@ -1,5 +1,6 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
 import { Description } from '@/components/custom/header/description';
@@ -7,6 +8,7 @@ import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -61,7 +63,7 @@ export default function Page() {
 				<Image
 					src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/placeholder-image.jpg'}
 					alt={row.original.name}
-					className='w-32 h-32 object-contain rounded-lg bg-white p-2 border'
+					className='w-32 h-32 object-contain'
 					width={128}
 					height={128}
 				/>
@@ -72,7 +74,7 @@ export default function Page() {
 			header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
 			cell: ({ row }) => (
 				<div className='flex flex-col gap-2 items-start space-y-1'>
-					<Link href={`/dashboard/products/${row.original.id}`} className='text-base font-medium'>
+					<Link href={`/dashboard/products/${row.original.id}`} className='font-medium'>
 						{row.original.name}
 					</Link>
 					<div className='text-xs text-gray-500'>Type: {row.original.product_type}</div>
@@ -80,18 +82,15 @@ export default function Page() {
 			),
 		},
 		{
-			accessorKey: 'progress_level',
-			header: ({ column }) => <DataTableColumnHeader column={column} title='Progress' />,
-			cell: ({ row }) => (
-				<div className='flex items-center gap-1 text-sm'>
-					<div
-						className={`h-3 w-3 rounded-full ${row.original.progress_level === 'In Progress' ? 'bg-yellow-400' : row.original.progress_level === 'Done' ? 'bg-green-500' : 'bg-red-500'
-							}`}
-					/>
-					{row.original.progress_level}
-				</div>
-			),
+			accessorKey: 'type',
+			header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+			cell: ({ row }) => <Badge variant='outline'>{row.original.product_type}</Badge>,
 		},
+		{
+			accessorKey: 'system_code',
+			header: ({ column }) => <DataTableColumnHeader column={column} title='System Code' />,
+		},
+
 		{
 			id: 'actions',
 			cell: ({ row }) => {
@@ -157,9 +156,9 @@ export default function Page() {
 				<Description text='View and manage all products' />
 			</HeaderContainer>
 
-			<div className='py-4'>
-				<DataTable columns={columns} searchPlaceholder='Search products by name, progress, or type...' path='products' data={products} />
-			</div>
+			<Container>
+				<DataTable columns={columns} searchPlaceholder='Search products by name, type, or system code...' path='products' data={products} />
+			</Container>
 		</>
 	);
 }

@@ -1,17 +1,17 @@
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
-import { HeaderContainer } from '@/components/custom/header/header-container';
-import { KanbanBoard } from '@/components/custom/kanban/kanban';
+import { Description } from "@/components/custom/header/description";
+import { Header } from "@/components/custom/header/header";
+import { HeaderContainer } from "@/components/custom/header/header-container";
+import { KanbanBoard } from "@/components/custom/kanban/kanban";
 
 export default function Page() {
-	return (
-		<>
-			<HeaderContainer>
-				<Header text='Kanban' />
-				<Description text='Manage and track product progress' />
-			</HeaderContainer>
+  return (
+    <div>
+      <HeaderContainer>
+        <Header text="Kanban" />
+        <Description text="Manage and track order progress" />
+      </HeaderContainer>
 
-			<KanbanBoard />
-		</>
-	);
+      <KanbanBoard />
+    </div>
+  );
 }

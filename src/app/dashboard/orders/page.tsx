@@ -1,5 +1,6 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
 import { Description } from '@/components/custom/header/description';
@@ -49,12 +50,12 @@ export const columns: ColumnDef<Order>[] = [
 	},
 	{
 		accessorKey: 'client',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Client' />,
-		cell: ({ row }) => <Link href={`/dashboard/orders/${row.original.id}`}>{row.original.client}</Link>,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Client' />,					
+		cell: ({ row }) => <Link href={`/dashboard/orders/${row.original.id}`} className='font-medium'>{row.original.client}</Link>,
 	},
 	{
 		accessorKey: 'contact',
-		header: ({ column }) => <DataTableColumnHeader column={column} title='Contact' />,
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Email' />,
 	},
 	{
 		accessorKey: 'order_quantity',
@@ -133,9 +134,9 @@ export default function Page() {
 				<Description text='Manage and track customer orders' />
 			</HeaderContainer>
 
-			<div className='py-4'>
-				<DataTable columns={columns} searchPlaceholder='Search orders by ID, client, or contact...' path='orders' data={orders} />
-			</div>
+			<Container>
+				<DataTable columns={columns} searchPlaceholder='Search orders by client, email, or due date...' path='orders' data={orders} />
+			</Container>
 		</>
 	);
 }

@@ -1,23 +1,45 @@
-import { Product } from '@/lib/schemas/global.types';
-import { Droppable, DroppableProvided } from '@hello-pangea/dnd';
-import { KanbanProductCard } from './kanban-product-card';
+import { Order } from "@/lib/schemas/global.types";
+import { Droppable, DroppableProvided } from "@hello-pangea/dnd";
+import { KanbanOrderCard } from "./kanban-order-card";
 
-export function KanbanColumn({ title, id, products, onDelete }: { title: string; id: string; products: Product[]; onDelete: (productId: string) => void }) {
-	return (
-		<div className='flex flex-col w-full h-full bg-gray-50 p-4 rounded-md'>
-			<div className='flex items-center justify-between mb-4'>
-				<h2 className='text-lg font-semibold'>{title}</h2>
-			</div>
-			<Droppable droppableId={id}>
-				{(provided: DroppableProvided) => (
-					<div {...provided.droppableProps} ref={provided.innerRef} className='flex-1 space-y-4'>
-						{products.map((product, index) => (
-							<KanbanProductCard key={product.id} product={product} index={index} onDelete={onDelete} />
-						))}
-						{provided.placeholder}
-					</div>
-				)}
-			</Droppable>
-		</div>
-	);
+export function KanbanColumn({
+  title,
+  id,
+  orders = [],
+  onDelete,
+}: {
+  title: string;
+  id: string;
+  orders: Order[];
+  onDelete: (orderId: string) => void;
+}) {
+  return (
+    <div className="flex flex-col w-full min-w-[350px] max-w-md h-full bg-white">
+      <div className="flex items-center gap-2 mb-4 px-3">
+        <div className="bg-gray-100 px-2 py-1 rounded-full">
+          <h2 className="text-sm font-medium text-gray-700">{title}</h2>
+        </div>
+        <span className="text-sm text-gray-500">({orders.length})</span>
+      </div>
+      <Droppable droppableId={id}>
+        {(provided: DroppableProvided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="flex-1 space-y-2 overflow-y-auto px-3"
+          >
+            {(orders || []).map((order, index) => (
+              <KanbanOrderCard
+                key={order.id}
+                order={order}
+                index={index}
+                onDelete={onDelete}
+              />
+            ))}
+            {provided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </div>
+  );
 }

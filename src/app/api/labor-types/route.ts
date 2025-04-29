@@ -2,9 +2,7 @@ import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-) {
+export async function GET() {
   const { userId } = await auth();
 
   if (!userId) {
@@ -15,8 +13,9 @@ export async function GET(
 
   try {
     const { data, error } = await supabase
-      .from("products_and_raw_materials")
-      .select("*");
+      .from("labor_types")
+      .select("*")
+      .order("task");
 
     if (error) {
       throw new Error(error.message);
@@ -33,4 +32,3 @@ export async function GET(
     );
   }
 }
-

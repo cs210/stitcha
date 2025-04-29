@@ -1,30 +1,29 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 import { auth } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-// get a specific product by id
+// Get a specific product by id
 export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   const supabase = await createClerkSupabaseClientSsr();
-  const { id: productId } = await params;
+  const { id } = await params;
 
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("id", productId) // Fetch the specific product by ID
+    .eq("id", id)
     .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  // Return the data directly without wrapping it
   return NextResponse.json(data, { status: 200 });
 }
 
-// update the progress_level of a specific product (dragged in kanban)
+// update the order_id of a specific product
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -41,9 +40,18 @@ export async function PATCH(
 
   const body = await request.json();
 
+  // Build update object based on provided fields
+  const updateData: {
+    order_id?: string | null;
+  } = {};
+
+  if (body.order_id !== undefined) {
+    updateData.order_id = body.order_id;
+  }
+
   const { data, error } = await supabase
     .from("products")
-    .update({ progress_level: body.progress_level })
+    .update(updateData)
     .eq("id", productId)
     .select();
 
@@ -53,6 +61,7 @@ export async function PATCH(
 
   return NextResponse.json({ data }, { status: 200 });
 }
+
 
 // Delete a specific product
 export async function DELETE(
