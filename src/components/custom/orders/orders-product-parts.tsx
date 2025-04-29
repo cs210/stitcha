@@ -273,7 +273,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <h3 className="text-lg font-semibold">{productName}</h3>
-                    <span className="bg-black text-white text-sm px-2 py-1 rounded">
+                    <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
                         {orderQuantity} units
                     </span>
                 </div>
@@ -289,7 +289,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                         {completedParts} of {totalParts} parts completed ({Math.round(progressPercentage)}%)
                     </span>
                 </div>
-                <Progress value={progressPercentage} className="h-4" />
+                <Progress value={progressPercentage} className="h-2" />
             </div>
 
             <div>
@@ -380,8 +380,6 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                             ) : (
                                 parts.map((part) => {
                                     const status = getPartStatus(part.units_completed, part.total_units);
-                                    const progressPercentage = (part.units_completed / part.total_units) * 100;
-                                    
                                     return (
                                         <tr key={`part-${part.part_id}`}>
                                             <td className="px-6 py-4 whitespace-nowrap">
@@ -418,7 +416,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center justify-between w-full">
-                                                    <div className="flex-1 min-w-[300px] max-w-[500px] mr-4">
+                                                    <div className="flex-1 min-w-[200px] max-w-[300px] mr-4">
                                                         <div className="flex items-center justify-between mb-1">
                                                             <span className="text-sm text-gray-500">
                                                                 {part.units_completed} of {part.total_units}
@@ -429,7 +427,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                                         </div>
                                                         <Progress value={(part.units_completed / part.total_units) * 100} className="h-2" />
                                                     </div>
-                                                    <div className="flex items-center gap-2 pl-4">
+                                                    <div className="flex items-center gap-2">
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
