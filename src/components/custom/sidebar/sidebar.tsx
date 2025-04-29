@@ -28,34 +28,31 @@ const navRoutes = [
 
 export function Sidebar() {
   const pathname = usePathname();
+
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-		<div className={cn('flex h-full flex-col border-r py-5 transition-all duration-300', isExpanded ? 'w-[200px]' : 'w-[72px]')}>
-			<div className='px-3 mb-6'>
-				<div className='flex justify-center items-center'>
-					{!isExpanded ? (
-						<button onClick={() => setIsExpanded(true)} className='flex items-center justify-center rounded-lg overflow-hidden'>
-							<Image src='/images/orientavida.jpeg' alt='Stitcha Logo' width={30} height={30} className='object-cover' />
-						</button>
-					) : (
-						<div className='flex items-center justify-between w-full'>
-							<div className='flex items-center'>
-								<Image src='/images/orientavida.jpeg' alt='Stitcha Logo' width={30} height={30} className='rounded-lg' />
-								<span className='ml-3 font-semibold'>Stitcha</span>
-							</div>
-							<Button variant='ghost' size='icon' onClick={() => setIsExpanded(false)} className='h-8 w-8'>
-								<ChevronLeft className='h-4 w-4' />
-							</Button>
-						</div>
+		<div className={cn('flex h-full flex-col border-r p-4 transition-all duration-300', isExpanded ? 'w-[200px]' : 'w-[72px]')}>
+			<div className='flex justify-center items-center mb-6'>
+				<div className={cn('flex items-center w-full', isExpanded ? 'justify-between' : 'justify-center')}>
+					<div className='flex items-center' onClick={() => setIsExpanded(!isExpanded)}>
+						<Image src='/images/orientavida.jpeg' alt='Stitcha Logo' width={30} height={30} className={cn('rounded-lg', !isExpanded && 'cursor-pointer')} />
+
+						{isExpanded && <span className='ml-3 font-semibold'>Stitcha</span>}
+					</div>
+					{isExpanded && (
+						<Button variant='ghost' size='icon' onClick={() => setIsExpanded(false)} className='h-8 w-8'>
+							<ChevronLeft className='h-4 w-4' />
+						</Button>
 					)}
-				</div>
+				</div>				
 			</div>
 
-			<div className='flex flex-col gap-4 px-4'>
+			<div className='flex flex-col gap-4'>
 				{navRoutes.map(({ href, icon: Icon, label }) => {
 					const isActive = pathname === href;
 
+					// TODO: We should use a Link component instead of a Button
 					return (
 						<Button
 							key={href}

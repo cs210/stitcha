@@ -17,7 +17,6 @@ import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-// Handle delete order
 const handleDeleteOrder = async (orderId: string) => {
 	try {
 		const response = await fetch(`/api/orders/${orderId}`, {
@@ -99,8 +98,7 @@ export default function Page() {
 	const [orders, setOrders] = useState<Order[]>([]);
 
 	useEffect(() => {
-		// Get orders from the database
-		async function getOrders() {
+		(async () => {
 			try {
 				const response = await fetch('/api/orders');
 				const result = await response.json();
@@ -114,9 +112,7 @@ export default function Page() {
 			} catch (error) {
 				console.error('Error fetching orders:', error);
 			}
-		}
-
-		getOrders();
+		})();
 	}, []);
 
 	if (loading) {

@@ -20,8 +20,7 @@ export default function Page() {
 	useEffect(() => {
 		if (!user) return;
 
-		(async () => {
-			// Get all seamstresses
+		(async () => {			
 			const response = await fetch('/api/seamstresses');
 			const { data, error } = await response.json();
 

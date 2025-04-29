@@ -19,110 +19,103 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
+const handleDeleteProduct = async (productId: string) => {
+	try {
+		const response = await fetch(`/api/products/${productId}`, {
+			method: 'DELETE',
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.error || 'Failed to delete product');
+		}
+	} catch (error) {
+		console.error('Error deleting product:', error);
+	}
+};
+
+const columns: ColumnDef<Product>[] = [
+	{
+		id: 'select',
+		header: ({ table }) => (
+			<Checkbox
+				checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+				aria-label='Select all'
+			/>
+		),
+		cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label='Select row' />,
+		enableSorting: false,
+		enableHiding: false,
+	},
+	{
+		id: 'image',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Image' />,
+		cell: ({ row }) => (
+			<Image
+				src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/placeholder-image.jpg'}
+				alt={row.original.name}
+				className='w-32 h-32 object-contain'
+				width={128}
+				height={128}
+			/>
+		),
+	},
+	{
+		accessorKey: 'name',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
+		cell: ({ row }) => (
+			<Link href={`/dashboard/products/${row.original.id}`} className='font-medium'>
+				{row.original.name}
+			</Link>
+		),
+	},
+	{
+		accessorKey: 'type',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
+		cell: ({ row }) => <Badge variant='outline'>{row.original.product_type}</Badge>,
+	},
+	{
+		accessorKey: 'system_code',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='System Code' />,
+	},
+
+	{
+		id: 'actions',
+		cell: ({ row }) => {
+			const product = row.original;
+
+			return (
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant='ghost' className='h-8 w-8 p-0'>
+							<span className='sr-only'>Open menu</span>
+							<MoreHorizontal className='h-4 w-4' />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align='end'>
+						<DropdownMenuItem>
+							<Pencil className='mr-2 h-4 w-4' />
+							Edit
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => handleDeleteProduct(product.id)}>
+							<Trash className='mr-2 h-4 w-4' />
+							Delete
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			);
+		},
+	},
+];
+
 export default function Page() {
 	const [loading, setLoading] = useState(true);
 	const [products, setProducts] = useState<Product[]>([]);
 
-	const handleDeleteProduct = async (productId: string) => {
-		try {
-			const response = await fetch(`/api/products/${productId}`, {
-				method: 'DELETE',
-			});
-
-			const data = await response.json();
-
-			if (!response.ok) {
-				throw new Error(data.error || 'Failed to delete product');
-			}
-
-			setProducts((prevProducts) => prevProducts.filter(product => product.id !== productId));
-
-		} catch (error) {
-			console.error('Error deleting product:', error);
-		}
-	};
-
-	const columns: ColumnDef<Product>[] = [
-		{
-			id: 'select',
-			header: ({ table }) => (
-				<Checkbox
-					checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-					onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-					aria-label='Select all'
-				/>
-			),
-			cell: ({ row }) => <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label='Select row' />,
-			enableSorting: false,
-			enableHiding: false,
-		},
-		{
-			id: 'image',
-			header: ({ column }) => <DataTableColumnHeader column={column} title='Image' />,
-			cell: ({ row }) => (
-				<Image
-					src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/placeholder-image.jpg'}
-					alt={row.original.name}
-					className='w-32 h-32 object-contain'
-					width={128}
-					height={128}
-				/>
-			),
-		},
-		{
-			accessorKey: 'name',
-			header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
-			cell: ({ row }) => (
-				<div className='flex flex-col gap-2 items-start space-y-1'>
-					<Link href={`/dashboard/products/${row.original.id}`} className='font-medium'>
-						{row.original.name}
-					</Link>
-					<div className='text-xs text-gray-500'>Type: {row.original.product_type}</div>
-				</div>
-			),
-		},
-		{
-			accessorKey: 'type',
-			header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
-			cell: ({ row }) => <Badge variant='outline'>{row.original.product_type}</Badge>,
-		},
-		{
-			accessorKey: 'system_code',
-			header: ({ column }) => <DataTableColumnHeader column={column} title='System Code' />,
-		},
-
-		{
-			id: 'actions',
-			cell: ({ row }) => {
-				const product = row.original;
-
-				return (
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button variant='ghost' className='h-8 w-8 p-0'>
-								<span className='sr-only'>Open menu</span>
-								<MoreHorizontal className='h-4 w-4' />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align='end'>
-							<DropdownMenuItem>
-								<Pencil className='mr-2 h-4 w-4' />
-								Edit
-							</DropdownMenuItem>
-							<DropdownMenuItem onClick={() => handleDeleteProduct(product.id)}>
-								<Trash className='mr-2 h-4 w-4' />
-								Delete
-							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				);
-			},
-		},
-	];
-
 	useEffect(() => {
-		// Get products from the database
-		async function getProducts() {
+		(async () => {
 			try {
 				const response = await fetch('/api/products');
 				const result = await response.json();
@@ -136,9 +129,7 @@ export default function Page() {
 			} catch (error) {
 				console.error('Error fetching products:', error);
 			}
-		}
-
-		getProducts();
+		})();
 	}, []);
 
 	if (loading) {

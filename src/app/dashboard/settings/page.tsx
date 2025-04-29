@@ -43,16 +43,16 @@ export default function Page() {
 				<div className='space-y-8 w-full'>
 					<div className='grid grid-cols-2 gap-6'>
 						<div className='space-y-2'>
-								<Label>Full Name</Label>
-								<Input value={user?.fullName || ''} disabled />
-							</div>
-							<div className='space-y-2'>
-								<Label>Email</Label>
-								<Input value={user?.primaryEmailAddress?.emailAddress || ''} disabled />
-							</div>
-							<div className='space-y-2'>
-								<Label>Language</Label>
-								<Select defaultValue='pt'>
+							<Label>Full Name</Label>
+							<Input value={user?.fullName || ''} disabled />
+						</div>
+						<div className='space-y-2'>
+							<Label>Email</Label>
+							<Input value={user?.primaryEmailAddress?.emailAddress || ''} disabled />
+						</div>
+						<div className='space-y-2'>
+							<Label>Language</Label>
+							<Select defaultValue='pt'>
 								<SelectTrigger>
 									<SelectValue placeholder='Select language' />
 								</SelectTrigger>

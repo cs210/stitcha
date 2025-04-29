@@ -1,5 +1,7 @@
+import { Badge } from "@/components/ui/badge";
 import { Order } from "@/lib/schemas/global.types";
 import { Droppable, DroppableProvided } from "@hello-pangea/dnd";
+import { P } from "../text/text";
 import { KanbanOrderCard } from "./kanban-order-card";
 
 export function KanbanColumn({
@@ -16,10 +18,10 @@ export function KanbanColumn({
   return (
     <div className="flex flex-col w-full min-w-[300px] max-w-md h-full bg-white">
       <div className="flex items-center gap-2 mb-4">
-        <div className="bg-gray-100 px-2 py-1 rounded-full">
-          <h2 className="text-sm font-medium text-gray-700">{title}</h2>
-        </div>
-        <span className="text-sm text-gray-500">({orders.length})</span>
+        <Badge variant="secondary" className="text-sm px-4 py-1">
+          {title}
+        </Badge>
+        <P text={`(${orders.length})`} color="light-gray" className="text-sm" />
       </div>
       <Droppable droppableId={id}>
         {(provided: DroppableProvided) => (
@@ -28,7 +30,7 @@ export function KanbanColumn({
             ref={provided.innerRef}
             className="flex-1 space-y-2 overflow-y-auto"
           >
-            {(orders || []).map((order, index) => (
+            {orders.map((order, index) => (
               <KanbanOrderCard
                 key={order.id}
                 order={order}
@@ -36,6 +38,7 @@ export function KanbanColumn({
                 onDelete={onDelete}
               />
             ))}
+						
             {provided.placeholder}
           </div>
         )}

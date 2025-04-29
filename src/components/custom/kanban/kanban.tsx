@@ -34,7 +34,11 @@ export function KanbanBoard() {
   });
   const [currentSort, setCurrentSort] = useState<string>("Custom");
 
-  // Fetch orders from API route on mount
+	const sortOptions = [
+		{ label: "Latest to earliest", ascending: false },
+		{ label: "Earliest to latest", ascending: true },
+	];
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -47,7 +51,6 @@ export function KanbanBoard() {
 
         const { data } = result;
 
-        // Map status to column IDs
         const getColumnId = (progress_level: string) => {
           return (
             REVERSE_STATUS_MAPPING[
@@ -56,7 +59,6 @@ export function KanbanBoard() {
           );
         };
 
-        // Organize orders by status
         const organized = data.reduce(
           (acc: Record<string, Order[]>, order: Order) => {
             const columnId = getColumnId(order.progress_level || "notStarted");
@@ -80,10 +82,6 @@ export function KanbanBoard() {
     };
 
     fetchOrders();
-
-    const intervalId = setInterval(fetchOrders, 30000);
-
-    return () => clearInterval(intervalId);
   }, []);
 
   const onDragEnd = async (result: DropResult) => {
@@ -97,10 +95,8 @@ export function KanbanBoard() {
         ? sourceColumn
         : [...newOrders[destination.droppableId]];
 
-    // Remove from source
     const [removed] = sourceColumn.splice(source.index, 1);
-
-    // Add to destination
+    
     if (source.droppableId === destination.droppableId) {
       sourceColumn.splice(destination.index, 0, removed);
     } else {
@@ -117,7 +113,7 @@ export function KanbanBoard() {
     }
 
     setOrders(updated);
-    setCurrentSort("Custom"); // Set to custom when cards are manually moved
+    setCurrentSort("Custom");
 
     // Only make API call if moving between columns
     if (source.droppableId !== destination.droppableId) {
@@ -141,26 +137,21 @@ export function KanbanBoard() {
         }
       } catch (error) {
         console.error("Error updating order status:", error);
-
-        // Revert local state if update fails
+        
         setOrders(newOrders);
       }
     }
   };
 
   const onDelete = async (orderId: string) => {
-    try {
-      console.log("Deleting order:", orderId);
+    try {    
       const response = await fetch(`/api/orders/${orderId}`, {
-        // delete orders
         method: "DELETE",
       });
 
       if (!response.ok) {
         throw new Error("Failed to delete order");
       }
-
-      // Update local state after successful deletion
       const newOrders = { ...orders };
 
       Object.keys(newOrders).forEach((key) => {
@@ -204,24 +195,18 @@ export function KanbanBoard() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="w-[180px]">
-            <DropdownMenuItem
-              onClick={() => sortOrdersByDueDate(false)}
-              className="flex items-center justify-between"
-            >
-              <span>Latest to earliest</span>
-              {currentSort === "Latest to earliest" && (
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => sortOrdersByDueDate(true)}
-              className="flex items-center justify-between"
-            >
-              <span>Earliest to latest</span>
-              {currentSort === "Earliest to latest" && (
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-              )}
-            </DropdownMenuItem>
+            {sortOptions.map(({ label, ascending }) => (
+              <DropdownMenuItem
+                key={label}
+                onClick={() => sortOrdersByDueDate(ascending)}
+                className="flex items-center justify-between"
+              >
+                <span>{label}</span>
+                {currentSort === label && (
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                )}
+              </DropdownMenuItem>
+            ))}
             {currentSort === "Custom" && (
               <DropdownMenuItem
                 className="flex items-center justify-between"
@@ -234,6 +219,7 @@ export function KanbanBoard() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+			
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex-1 overflow-x-auto">
           <div className="flex gap-4 h-full">
