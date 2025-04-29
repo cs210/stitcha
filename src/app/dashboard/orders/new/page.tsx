@@ -8,7 +8,6 @@ import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -17,6 +16,12 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+
+interface Product {
+	id: string;
+	name: string;
+	order_id: string | null;
+}
 
 const formSchema = z.object({
 	client: z.string().min(2).max(50),
@@ -49,11 +54,13 @@ export default function Page() {
 		async function fetchOrder() {
 			try {
 				const response = await fetch('/api/products');
-
 				const { data, error } = await response.json();
 
 				if (!error && data) {
-					setProducts(data);
+					// Filter out products that have a null order_id
+					const availableProducts = data.filter((product: Product) => product.order_id === null);
+					console.log("AVAILABLE PRODUCTS", availableProducts);
+					setProducts(availableProducts);
 				}
 			} catch (error) {
 				console.error(error);
@@ -66,10 +73,6 @@ export default function Page() {
 	}, [user]);
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
-
-		console.log("VALUES", values);
-		console.log("SELECTED PRODUCTS", selectedProducts);
-		
 		try {
 			const response = await fetch('/api/orders/', {
 				method: 'POST',
@@ -85,41 +88,43 @@ export default function Page() {
 				}),
 			});
 
-			const result = await response.json();
+			if (!response.ok) {
+				throw new Error('Failed to create order');
+			}
 
-			// update the order_id of the selected products
-			selectedProducts.forEach(async (productId) => {
-				await fetch(`/api/products/${productId}`, {
-					method: 'PATCH',
-					body: JSON.stringify({ order_id: result.id }),
-				});
+			const result = await response.json();
+			console.log("NEW ORDER RESULT", result.data);
+
+			// update the order_id of the selected product
+			const productId = selectedProducts[0]; // Since we only have one product
+			const updateResponse = await fetch(`/api/products/${productId}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ order_id: result.data.id }),
 			});
 
-			if (!response.ok) {
-				throw new Error(result.error || 'Failed to create order');
+			if (!updateResponse.ok) {
+				const errorData = await updateResponse.json();
+				throw new Error(errorData.error || `Failed to update product ${productId}`);
 			}
 
 			form.reset();
 			setSelectedProducts([]);
-
 			toast.success('Order created successfully');
-
 			router.push('/dashboard/orders');
 		} catch (error) {
 			console.error(error);
-		} finally {
-			setLoading(false);
+			toast.error('Failed to create order');
 		}
-
 	}
 
 	const handleProductSelect = (productId: string) => {
-		if (selectedProducts.includes(productId)) {
-			setSelectedProducts(selectedProducts.filter(id => id !== productId));
-		} else {
-			setSelectedProducts([...selectedProducts, productId]);
-		}
-		form.setValue('product_ids', selectedProducts);
+		// For single product selection, just set the selected product
+		setSelectedProducts([productId]);
+		// Update the form value immediately
+		form.setValue('product_ids', [productId], { shouldValidate: true });
 	};
 
 	if (loading) {
