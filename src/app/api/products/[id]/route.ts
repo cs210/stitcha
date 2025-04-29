@@ -8,12 +8,12 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const supabase = await createClerkSupabaseClientSsr();
-  const { id: productId } = params;
+  const { id } = await params;
 
   const { data, error } = await supabase
     .from("products")
     .select("*")
-    .eq("id", productId)
+    .eq("id", id)
     .single();
 
   if (error) {

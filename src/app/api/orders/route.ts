@@ -35,27 +35,23 @@ export async function POST(req: NextRequest) {
 
 	const supabase = await createClerkSupabaseClientSsr();
 
-	try {
-		const { client, contact, order_quantity, due_date, product_id } = await req.json();
+	const { client, contact, order_quantity, due_date, product_ids } = await req.json();
 
-		const { data, error } = await supabase
-			.from('orders')
-			.insert({
-				client,
-				contact,
-				order_quantity,
-				due_date,
-				product_id,
-			})
-			.select()
-			.single();
+	const { data: orderData, error: orderError } = await supabase
+		.from('orders')
+		.insert({
+			client,
+			contact,
+			order_quantity,
+			due_date,
+			product_ids
+		})
+		.select()
+		.single();
 
-		if (error) {
-			throw new Error(error.message);
-		}
-
-		return NextResponse.json({ data, success: true }, { status: 201 });
-	} catch (error) {
-		return NextResponse.json({ error }, { status: 500 });
+	if (orderError) {
+		return NextResponse.json({ orderError }, { status: 400 });
 	}
+
+	return NextResponse.json({ data: orderData, success: true }, { status: 201 });
 }

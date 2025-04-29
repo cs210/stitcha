@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   const { userId } = await auth();
-  const { id: orderId } = params;
+  const { id } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -18,7 +18,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("orders")
     .select("*")
-    .eq("id", orderId)
+    .eq("id", id)
     .single();
 
   if (error) {
@@ -35,7 +35,7 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   const { userId } = await auth();
-  const { id: orderId } = params;
+  const { id: orderId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
