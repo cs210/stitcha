@@ -8,7 +8,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
 	const { data, error } = await supabase
 		.from('product_progress')
-		.select('progress_id, progress(id, description, image_urls, emotion, created_at, user_id, user:user_id(first_name, last_name))')
+		.select('progress_id, progress(id, description, image_urls, emotion, user_id, user:user_id(first_name, last_name))')
 		.eq('product_id', productId);
 
 	if (data && data.length > 0) {

@@ -31,8 +31,7 @@ export async function POST(
     // create records for new assignments
     const productUserRecords = seamstressIds.map((seamstressId: string) => ({
       product_id: productId,
-      user_id: seamstressId,
-      created_at: new Date().toISOString(),
+      user_id: seamstressId
     }));
 
     // upsert the records (insert if not exists, update if exists)
