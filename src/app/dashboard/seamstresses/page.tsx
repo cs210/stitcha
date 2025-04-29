@@ -1,5 +1,6 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
@@ -47,13 +48,13 @@ export default function Page() {
 				<Description text='View and manage all seamstresses' />
 			</HeaderContainer>
 
-			<div className='py-4'>
-				<div className='flex flex-wrap gap-6'>
+			<Container>
+				<div className='grid grid-cols-4 gap-6'>
 					{seamstresses.map((seamstress: User) => (
 						<SeamstressCard key={seamstress.id} seamstress={seamstress} />
 					))}
 				</div>
-			</div>
+			</Container>
 		</>
 	);
 }

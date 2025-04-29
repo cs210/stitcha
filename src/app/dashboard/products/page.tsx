@@ -1,5 +1,6 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
 import { Description } from '@/components/custom/header/description';
@@ -66,7 +67,7 @@ export const columns: ColumnDef<Product>[] = [
 		accessorKey: 'name',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Name' />,
 		cell: ({ row }) => (
-			<Link href={`/dashboard/products/${row.original.id}`} className='text-base font-medium'>
+			<Link href={`/dashboard/products/${row.original.id}`} className='font-medium'>
 				{row.original.name}
 			</Link>
 		),
@@ -149,9 +150,9 @@ export default function Page() {
 				<Description text='View and manage all products' />
 			</HeaderContainer>
 
-			<div className='py-4'>
-				<DataTable columns={columns} searchPlaceholder='Search products by name, progress, or type...' path='products' data={products} />
-			</div>
+			<Container>
+				<DataTable columns={columns} searchPlaceholder='Search products by name, type, or system code...' path='products' data={products} />
+			</Container>
 		</>
 	);
 }

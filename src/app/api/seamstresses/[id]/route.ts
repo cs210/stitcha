@@ -1,9 +1,9 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Retrieves a specific seamstress by id
-export async function GET({ params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
 	const { userId } = await auth();
 	const { id: seamstressId } = await params;
 

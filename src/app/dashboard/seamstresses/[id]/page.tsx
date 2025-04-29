@@ -1,18 +1,14 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
-import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Product, Progress, User } from '@/lib/schemas/global.types';
+import { Product, User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import Image from 'next/image';
-import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -22,11 +18,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [seamstress, setSeamstress] = useState<User | null>(null);
 	const [products, setProducts] = useState<Product[]>([]);
-	const [progressUpdates, setProgressUpdates] = useState<Progress[]>([]);
-	const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-	const [isKitModalOpen, setIsKitModalOpen] = useState(false);
-	const [checkedItems, setCheckedItems] = useState<{[key: string]: boolean}>({});
-	const [kitMaterials, setKitMaterials] = useState<{material_id: string, material_name: string, units: number}[]>([]);
+	// const [progressUpdates, setProgressUpdates] = useState<Progress[]>([]);
+	// const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+	// const [isKitModalOpen, setIsKitModalOpen] = useState(false);
+	// const [checkedItems, setCheckedItems] = useState<{[key: string]: boolean}>({});
+	// const [kitMaterials, setKitMaterials] = useState<{material_id: string, material_name: string, units: number}[]>([]);
 
 	useEffect(() => {
 		if (!user) return;
@@ -34,68 +30,69 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		(async () => {
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
-			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
 
+			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
+			
 			if (!seamstressError) {
 				const { product_users, ...seamstressWithoutProducts } = seamstressData;
 				setSeamstress(seamstressWithoutProducts);
 
 				// Set products from seamstress data
-				if (product_users && product_users.length > 0) {
+				// if (product_users && product_users.length > 0) {
 					// Fetch products data
-					const productsResponse = await fetch(`/api/seamstresses/${seamstressId}/products`);
-					const { data: productsData, error: productsError } = await productsResponse.json();
+					// const productsResponse = await fetch(`/api/seamstresses/${seamstressId}/products`);
+					// const { data: productsData, error: productsError } = await productsResponse.json();
 
-					if (!productsError) {
-						setProducts(productsData);
+					// if (!productsError) {
+					// 	setProducts(productsData);
 						
-						// Fetch progress updates for each product
-						const progressPromises = productsData.map((product: Product) =>
-							fetch(`/api/products/${product.id}/progress`).then(res => res.json())
-						);
+					// 	// Fetch progress updates for each product
+					// 	const progressPromises = productsData.map((product: Product) =>
+					// 		fetch(`/api/products/${product.id}/progress`).then(res => res.json())
+					// 	);
 						
-						const progressResults = await Promise.all(progressPromises);
-						const allProgressUpdates = progressResults
-							.flatMap(result => result.data || [])
-							.filter(update => update.user_id === seamstressId)
-							.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+					// 	const progressResults = await Promise.all(progressPromises);
+					// 	const allProgressUpdates = progressResults
+					// 		.flatMap(result => result.data || [])
+					// 		.filter(update => update.user_id === seamstressId)
+					// 		.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 						
-						setProgressUpdates(allProgressUpdates);
-					}
-				}
+					// 	setProgressUpdates(allProgressUpdates);
+					// }
+				// }
 			}
 
 			setLoading(false);
 		})();
 	}, [user, seamstressId]);
 
-	const handleKitValidation = async (product: Product) => {
-		try {
-			setSelectedProduct(product);
-			setCheckedItems({}); // Reset checked items
+	// const handleKitValidation = async (product: Product) => {
+	// 	try {
+	// 		setSelectedProduct(product);
+	// 		setCheckedItems({}); // Reset checked items
 			
-			// Fetch materials for specific product from join table
-			const response = await fetch(`/api/products/raw_materials`);
-			if (!response.ok) throw new Error('Failed to fetch kit materials');
+	// 		// Fetch materials for specific product from join table
+	// 		const response = await fetch(`/api/products/raw_materials`);
+	// 		if (!response.ok) throw new Error('Failed to fetch kit materials');
 			
-			const { data } = await response.json();
+	// 		const { data } = await response.json();
 
-			const productRawMaterials = await fetch(`/api/product-raw-materials`);
-			const { data: productRawMaterialsData } = await productRawMaterials.json();
+	// 		const productRawMaterials = await fetch(`/api/product-raw-materials`);
+	// 		const { data: productRawMaterialsData } = await productRawMaterials.json();
 
-			const filteredProductRawMaterials = productRawMaterialsData.filter((item: any) => item.product_id === product.id);
+	// 		const filteredProductRawMaterials = productRawMaterialsData.filter((item: any) => item.product_id === product.id);
 
-			const filteredRawMaterials = data.filter((item: any) => filteredProductRawMaterials.some((rawMaterial: any) => rawMaterial.material_code === item.material_id));
+	// 		const filteredRawMaterials = data.filter((item: any) => filteredProductRawMaterials.some((rawMaterial: any) => rawMaterial.material_code === item.material_id));
 
-			console.log("filteredProductRawMaterials", filteredProductRawMaterials);
-			console.log("filteredRawMaterials", filteredRawMaterials);
+	// 		console.log("filteredProductRawMaterials", filteredProductRawMaterials);
+	// 		console.log("filteredRawMaterials", filteredRawMaterials);
 
-			setKitMaterials(filteredRawMaterials || []);
-			setIsKitModalOpen(true);
-		} catch (error) {
-			console.error('Error fetching kit materials:', error);
-		}
-	};
+	// 		setKitMaterials(filteredRawMaterials || []);
+	// 		setIsKitModalOpen(true);
+	// 	} catch (error) {
+	// 		console.error('Error fetching kit materials:', error);
+	// 	}
+	// };
 
 	// Loading state
 	if (loading) {
@@ -113,11 +110,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				<Description text={`${seamstress?.location}`} />
 			</HeaderContainer>
 
-			<div className='py-4'>
+			<Container>
 				<div className='flex flex-wrap gap-6'>
 					{seamstress && <SeamstressProfile seamstress={seamstress} />}
 
-					{products && products.length > 0 && (
+					{/* {products && products.length > 0 && (
 						<div className='w-full mt-8'>
 							<h3 className='text-xl font-semibold mb-4'>Assigned Products</h3>
 							<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
@@ -144,11 +141,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 								))}
 							</div>
 						</div>
-					)}
+					)} */}
 				</div>
-			</div>
+			</Container>
 
-			<Dialog open={isKitModalOpen} onOpenChange={setIsKitModalOpen}>
+			{/* <Dialog open={isKitModalOpen} onOpenChange={setIsKitModalOpen}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Kit Validation - {selectedProduct?.name}</DialogTitle>
@@ -198,7 +195,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 						)}
 					</div>
 				</DialogContent>
-			</Dialog>
+			</Dialog> */}
 		</>
 	);
 }

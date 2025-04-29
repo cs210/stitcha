@@ -1,5 +1,6 @@
 'use client';
 
+import { Container } from '@/components/custom/container/container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
@@ -38,7 +39,7 @@ export default function Page() {
 				<Description text='Manage your account settings and preferences' />
 			</HeaderContainer>
 
-			<div className='py-4'>
+			<Container>
 				<div className='space-y-8 w-full'>
 					<div className='grid grid-cols-2 gap-6'>
 						<div className='space-y-2'>
@@ -65,7 +66,7 @@ export default function Page() {
 
 					<Button>Save Changes</Button>
 				</div>
-			</div>
+			</Container>
 		</>
 	);
 }

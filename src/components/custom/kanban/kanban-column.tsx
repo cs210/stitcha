@@ -1,13 +1,13 @@
 import { Product } from '@/lib/schemas/global.types';
 import { Droppable, DroppableProvided } from '@hello-pangea/dnd';
-import { HeaderSecondary } from '../header/header-secondary';
+import { H3 } from '../text/headings';
 import { KanbanProductCard } from './kanban-product-card';
 
 export function KanbanColumn({ title, id, products, onDelete }: { title: string; id: string; products: Product[]; onDelete: (productId: string) => void }) {
 	return (
 		<div className='flex flex-col w-full h-full'>
 			<div className='flex items-center justify-between mb-6'>
-				<HeaderSecondary text={title} />
+				<H3 text={title} />
 			</div>
 				<Droppable droppableId={id}>
 					{(provided: DroppableProvided) => (
