@@ -60,24 +60,30 @@ export type Database = {
           contact: string
           due_date: string
           id: string
+          logo_url: string | null
           order_quantity: number
           product_ids: string[] | null
+          progress_level: Database["public"]["Enums"]["progress_level"] | null
         }
         Insert: {
           client: string
           contact: string
           due_date: string
           id?: string
+          logo_url?: string | null
           order_quantity: number
           product_ids?: string[] | null
+          progress_level?: Database["public"]["Enums"]["progress_level"] | null
         }
         Update: {
           client?: string
           contact?: string
           due_date?: string
           id?: string
+          logo_url?: string | null
           order_quantity?: number
           product_ids?: string[] | null
+          progress_level?: Database["public"]["Enums"]["progress_level"] | null
         }
         Relationships: []
       }
@@ -157,21 +163,21 @@ export type Database = {
       }
       product_parts: {
         Row: {
-          part_id: string
+          part_id: string | null
           part_name: string | null
           seamstress_id: string | null
           total_units: number | null
           units_completed: number | null
         }
         Insert: {
-          part_id?: string
+          part_id?: string | null
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null
           units_completed?: number | null
         }
         Update: {
-          part_id?: string
+          part_id?: string | null
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null
