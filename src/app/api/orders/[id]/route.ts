@@ -74,10 +74,10 @@ export async function PATCH(
 // Deletes a specific order by id
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const { userId } = await auth();
-    const { id } = params;
+    const { id } = await params;
 
     if (!userId) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

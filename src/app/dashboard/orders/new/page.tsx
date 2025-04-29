@@ -72,6 +72,18 @@ export default function Page() {
 		fetchOrder();
 	}, [user]);
 
+	const handleProductSelect = (productId: string) => {
+		if (selectedProducts.includes(productId)) {
+			const newSelected = selectedProducts.filter(id => id !== productId);
+			setSelectedProducts(newSelected);
+			form.setValue('product_ids', newSelected, { shouldValidate: true });
+		} else {
+			const newSelected = [...selectedProducts, productId];
+			setSelectedProducts(newSelected);
+			form.setValue('product_ids', newSelected, { shouldValidate: true });
+		}
+	};
+
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		try {
 			const response = await fetch('/api/orders/', {
@@ -95,20 +107,21 @@ export default function Page() {
 			const result = await response.json();
 			console.log("NEW ORDER RESULT", result.data);
 
-			// update the order_id of the selected product
-			const productId = selectedProducts[0]; // Since we only have one product
-			const updateResponse = await fetch(`/api/products/${productId}`, {
-				method: 'PATCH',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({ order_id: result.data.id }),
-			});
+			// update the order_id of all selected products
+			await Promise.all(selectedProducts.map(async (productId) => {
+				const updateResponse = await fetch(`/api/products/${productId}`, {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({ order_id: result.data.id }),
+				});
 
-			if (!updateResponse.ok) {
-				const errorData = await updateResponse.json();
-				throw new Error(errorData.error || `Failed to update product ${productId}`);
-			}
+				if (!updateResponse.ok) {
+					const errorData = await updateResponse.json();
+					throw new Error(errorData.error || `Failed to update product ${productId}`);
+				}
+			}));
 
 			form.reset();
 			setSelectedProducts([]);
@@ -119,13 +132,6 @@ export default function Page() {
 			toast.error('Failed to create order');
 		}
 	}
-
-	const handleProductSelect = (productId: string) => {
-		// For single product selection, just set the selected product
-		setSelectedProducts([productId]);
-		// Update the form value immediately
-		form.setValue('product_ids', [productId], { shouldValidate: true });
-	};
 
 	if (loading) {
 		return (
