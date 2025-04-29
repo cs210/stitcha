@@ -149,6 +149,7 @@ export function KanbanBoard() {
 
   const onDelete = async (orderId: string) => {
     try {
+      console.log("Deleting order:", orderId);
       const response = await fetch(`/api/orders/${orderId}`, {
         // delete orders
         method: "DELETE",

@@ -3,11 +3,11 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const supabase = await createClerkSupabaseClientSsr();
-        const { id } = params;
+        const { id } = await params;
 
         // First get the parts array from the product
         const { data: product, error: productError } = await supabase
@@ -47,10 +47,10 @@ export async function GET(
 
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     const supabase = await createClerkSupabaseClientSsr();
-    const { id } = params;
+    const { id } = await params;
     const { name, seamstress_id, total_units } = await request.json();
 
     // First create the new part

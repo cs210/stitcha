@@ -87,6 +87,14 @@ export default function Page() {
 
 			const result = await response.json();
 
+			// update the order_id of the selected products
+			selectedProducts.forEach(async (productId) => {
+				await fetch(`/api/products/${productId}`, {
+					method: 'PATCH',
+					body: JSON.stringify({ order_id: result.id }),
+				});
+			});
+
 			if (!response.ok) {
 				throw new Error(result.error || 'Failed to create order');
 			}

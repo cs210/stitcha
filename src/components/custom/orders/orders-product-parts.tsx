@@ -44,7 +44,7 @@ interface ProductPartsProps {
     productName: string;
     orderQuantity: number;
     orderId: string;
-    onProductRemoved?: () => void;
+    onProductRemoved?: (productId: string) => void;
 }
 
 interface UpdatePartData {
@@ -262,7 +262,23 @@ export function ProductParts({ productId, productName, orderQuantity, orderId, o
 
     const handleRemoveProduct = async () => {
         try {
-            // First get current product IDs
+            // First fetch all parts for this product
+            const partsResponse = await fetch(`/api/products/${productId}/parts`);
+            const partsData = await partsResponse.json();
+            
+            // Delete all parts using the existing DELETE endpoint
+            if (partsData.data) {
+                await Promise.all(partsData.data.map(async (part: Part) => {
+                    const deleteResponse = await fetch(`/api/products/${productId}/parts/${part.part_id}`, {
+                        method: 'DELETE',
+                    });
+                    if (!deleteResponse.ok) {
+                        throw new Error(`Failed to delete part ${part.part_id}`);
+                    }
+                }));
+            }
+
+            // Update orders to remove product_id from product_ids array
             const response = await fetch(`/api/orders/${orderId}/products`);
             const data = await response.json();
             
@@ -288,8 +304,8 @@ export function ProductParts({ productId, productName, orderQuantity, orderId, o
                 throw new Error('Failed to remove product');
             }
 
-            // Notify parent component
-            onProductRemoved?.();
+            // Notify parent component with the productId
+            onProductRemoved?.(productId);
         } catch (error) {
             console.error('Error removing product:', error);
             setError(error instanceof Error ? error.message : 'Failed to remove product');
