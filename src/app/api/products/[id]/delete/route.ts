@@ -5,7 +5,7 @@ import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
 // Delete a specific product
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
   ) {
 
     const { id } = await params;

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface Seamstress {
     id: string;
@@ -46,6 +47,7 @@ interface ProductPartsProps {
 interface UpdatePartData {
     id: string;
     units_completed: number;
+    total_units: number;
     seamstress_id: string;
 }
 
@@ -64,6 +66,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
     const [updatePart, setUpdatePart] = useState<UpdatePartData>({
         id: '',
         units_completed: 0,
+        total_units: 0,
         seamstress_id: ''
     });
 
@@ -119,7 +122,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                 },
                 body: JSON.stringify({
                     name: newPart.name,
-                    total_units: orderQuantity,
+                    total_units: newPart.units,
                     seamstress_id: newPart.seamstress_id || null,
                     units_completed: 0
                 }),
@@ -151,6 +154,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         setUpdatePart({
             id: partId,
             units_completed: part.units_completed,
+            total_units: part.total_units,
             seamstress_id: part.seamstress_id || ''
         });
         setIsUpdatingPart(true);
@@ -166,6 +170,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                 },
                 body: JSON.stringify({
                     units_completed: updatePart.units_completed,
+                    total_units: updatePart.total_units,
                     seamstress_id: updatePart.seamstress_id || null
                 }),
             });
@@ -185,6 +190,29 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         } catch (error) {
             console.error('Error updating part:', error);
             setError(error instanceof Error ? error.message : 'Failed to update part');
+        }
+    };
+
+    const handleDeletePart = async (partId: string) => {
+        try {
+            const response = await fetch(`/api/products/${productId}/parts/${partId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete part');
+            }
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Remove the deleted part from state
+            setParts(parts.filter(p => p.part_id !== partId));
+        } catch (error) {
+            console.error('Error deleting part:', error);
+            setError(error instanceof Error ? error.message : 'Failed to delete part');
         }
     };
 
@@ -253,9 +281,13 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                     <Label>Total Units</Label>
                                     <Input
                                         value={newPart.units}
-                                        onChange={(e) => setNewPart({ ...newPart, units: parseInt(e.target.value) })}
+                                        onChange={(e) => {
+                                            const value = parseInt(e.target.value) || 0;
+                                            setNewPart({ ...newPart, units: value });
+                                        }}
                                         placeholder="Number of total units"
                                         type="number"
+                                        min="1"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -298,21 +330,18 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Completed
                                 </th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {parts.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
                                         No parts added yet
                                     </td>
                                 </tr>
                             ) : (
                                 parts.map((part) => (
-                                    <tr key={`part-${part.id}`}>
+                                    <tr key={`part-${part.part_id}`}>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div>
                                                 <div className="font-medium text-gray-900">
@@ -342,23 +371,26 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                         <td className="px-6 py-4 whitespace-nowrap text-gray-900">
                                             {part.total_units}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                                        <td className="px-6 py-4 whitespace-nowrap text-gray-900 flex items-center gap-4">
                                             {part.units_completed}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <Progress 
-                                                value={(part.units_completed / part.total_units) * 100}
-                                                className="w-24"
-                                            />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleUpdatePart(part.part_id)}
-                                            >
-                                                Update
-                                            </Button>
+                                            <div className="flex items-center gap-2 ml-auto">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8"
+                                                    onClick={() => handleUpdatePart(part.part_id)}
+                                                >
+                                                    <Pencil className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                    onClick={() => handleDeletePart(part.part_id)}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -375,19 +407,34 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
                         <div className="space-y-2">
+                            <Label>Total Units</Label>
+                            <Input
+                                type="number"
+                                value={updatePart.total_units}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value) || 0;
+                                    setUpdatePart({
+                                        ...updatePart,
+                                        total_units: Math.max(1, value)
+                                    });
+                                }}
+                                min="1"
+                            />
+                        </div>
+                        <div className="space-y-2">
                             <Label>Completed Units</Label>
                             <Input
                                 type="number"
                                 value={updatePart.units_completed}
-                                onChange={(e) => setUpdatePart({
-                                    ...updatePart,
-                                    units_completed: Math.min(
-                                        Math.max(0, parseInt(e.target.value) || 0),
-                                        orderQuantity
-                                    )
-                                })}
-                                min={0}
-                                max={orderQuantity}
+                                onChange={(e) => {
+                                    const value = parseInt(e.target.value) || 0;
+                                    setUpdatePart({
+                                        ...updatePart,
+                                        units_completed: Math.max(0, value)
+                                    });
+                                }}
+                                min="0"
+                                max={updatePart.total_units}
                             />
                         </div>
                         <div className="space-y-2">

@@ -3,16 +3,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { id: string, "part-id": string } }
+    { params }: { params: Promise<{ id: string, "part-id": string }> }
 ) {
     try {
         const supabase = await createClerkSupabaseClientSsr();
         const { "part-id": partId } = await params;
-        const { units_completed, seamstress_id } = await request.json();
+        const { units_completed, seamstress_id, total_units } = await request.json();
 
         console.log("WITHIN API");
         console.log("PART ID", partId);
         console.log("UNITS COMPLETED", units_completed);
+        console.log("TOTAL UNITS", total_units);
         console.log("SEAMSTRESS ID", seamstress_id);
         
         // Update the part
@@ -20,6 +21,7 @@ export async function PATCH(
             .from("product_parts")
             .update({
                 units_completed,
+                total_units,
                 seamstress_id
             })
             .eq("part_id", partId)
@@ -43,10 +45,13 @@ export async function PATCH(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string, "part-id": string } }
+    { params }: { params: Promise<{ id: string, "part-id": string }> }
 ) {
     const supabase = await createClerkSupabaseClientSsr();
-    const { "part-id": partId } = params;
+    const { "part-id": partId } = await params;
+
+    console.log("WITHIN DELETE API");
+    console.log("PART ID", partId);
 
     // Delete the part
     const { error: deleteError } = await supabase
