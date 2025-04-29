@@ -59,7 +59,8 @@ export function KanbanBoard() {
         // Organize orders by status
         const organized = data.reduce(
           (acc: Record<string, Order[]>, order: Order) => {
-            const columnId = getColumnId(order.progress_level);
+            const columnId = getColumnId(order.progress_level || "notStarted");
+						
             return {
               ...acc,
               [columnId]: [...(acc[columnId] || []), order],
@@ -188,7 +189,7 @@ export function KanbanBoard() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4 pt-4">
+      <div className="mb-4">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
@@ -234,7 +235,7 @@ export function KanbanBoard() {
       </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex-1 overflow-x-auto">
-          <div className="flex gap-4 pt-4 h-full">
+          <div className="flex gap-4 h-full">
             <KanbanColumn
               title="Not Started"
               id="notStarted"

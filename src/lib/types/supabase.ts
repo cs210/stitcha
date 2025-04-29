@@ -58,6 +58,7 @@ export type Database = {
         Row: {
           client: string
           contact: string
+          date_created: string | null
           due_date: string
           id: string
           logo_url: string | null
@@ -68,6 +69,7 @@ export type Database = {
         Insert: {
           client: string
           contact: string
+          date_created?: string | null
           due_date: string
           id?: string
           logo_url?: string | null
@@ -78,6 +80,7 @@ export type Database = {
         Update: {
           client?: string
           contact?: string
+          date_created?: string | null
           due_date?: string
           id?: string
           logo_url?: string | null
@@ -163,21 +166,21 @@ export type Database = {
       }
       product_parts: {
         Row: {
-          part_id: string | null
+          part_id: string
           part_name: string | null
           seamstress_id: string | null
           total_units: number | null
           units_completed: number | null
         }
         Insert: {
-          part_id?: string | null
+          part_id?: string
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null
           units_completed?: number | null
         }
         Update: {
-          part_id?: string | null
+          part_id?: string
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null

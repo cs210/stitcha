@@ -4,7 +4,7 @@ import { NavigationBreadcrumb } from "@/components/custom/navigation/navigation-
 import { Sidebar } from "@/components/custom/sidebar/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Layout({
   children,
@@ -14,9 +14,9 @@ export default function Layout({
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
-  const [productName, setProductName] = useState<string>("");
-  const [orderClient, setOrderClient] = useState<string>("");
-  const [seamstressName, setSeamstressName] = useState<string>("");
+  // const [productName, setProductName] = useState<string>("");
+  // const [orderClient, setOrderClient] = useState<string>("");
+  // const [seamstressName, setSeamstressName] = useState<string>("");
 
 	useEffect(() => {
 		// async function getDetails() {

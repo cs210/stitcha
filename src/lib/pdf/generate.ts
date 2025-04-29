@@ -1,110 +1,105 @@
-import { Product } from '../schemas/global.types';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Product } from '../schemas/global.types';
 
-/**
- * Captures a specific DOM element and returns both the canvas and data URL
- * @param element - The DOM element to capture
- * @returns Promise<{dataUrl: string; canvas: HTMLCanvasElement}> - The captured image data and canvas
- */
 async function captureElement(element: HTMLElement): Promise<{ dataUrl: string; canvas: HTMLCanvasElement }> {
-    // Force the element to be fully expanded before measuring
-    const originalStyles = {
-        height: element.style.height,
-        maxHeight: element.style.maxHeight,
-        overflow: element.style.overflow,
-        display: element.style.display
-    };
+	// Force the element to be fully expanded before measuring
+	const originalStyles = {
+			height: element.style.height,
+			maxHeight: element.style.maxHeight,
+			overflow: element.style.overflow,
+			display: element.style.display
+	};
 
-    // Temporarily modify the element to ensure full content is visible
-    element.style.height = 'auto';
-    element.style.maxHeight = 'none';
-    element.style.overflow = 'visible';
-    element.style.display = 'block';
+	// Temporarily modify the element to ensure full content is visible
+	element.style.height = 'auto';
+	element.style.maxHeight = 'none';
+	element.style.overflow = 'visible';
+	element.style.display = 'block';
 
-    // Get the full dimensions including any overflow
-    const rect = element.getBoundingClientRect();
+	// Get the full dimensions including any overflow
+	const rect = element.getBoundingClientRect();
 
-    // Calculate the maximum dimensions by checking all child elements
-    let maxBottom = 0;
-    let maxRight = 0;
-    const allChildren = element.getElementsByTagName('*');
-    for (let i = 0; i < allChildren.length; i++) {
-        const child = allChildren[i] as HTMLElement;
-        const childRect = child.getBoundingClientRect();
-        maxBottom = Math.max(maxBottom, childRect.bottom - rect.top);
-        maxRight = Math.max(maxRight, childRect.right - rect.left);
-    }
+	// Calculate the maximum dimensions by checking all child elements
+	let maxBottom = 0;
+	let maxRight = 0;
+	const allChildren = element.getElementsByTagName('*');
+	for (let i = 0; i < allChildren.length; i++) {
+			const child = allChildren[i] as HTMLElement;
+			const childRect = child.getBoundingClientRect();
+			maxBottom = Math.max(maxBottom, childRect.bottom - rect.top);
+			maxRight = Math.max(maxRight, childRect.right - rect.left);
+	}
 
-    // Use the maximum of all possible measurements
-    const fullHeight = Math.max(
-        element.scrollHeight,
-        element.offsetHeight,
-        element.clientHeight,
-        rect.height,
-        maxBottom
-    );
-    const fullWidth = Math.max(
-        element.scrollWidth,
-        element.offsetWidth,
-        element.clientWidth,
-        rect.width,
-        maxRight
-    );
+	// Use the maximum of all possible measurements
+	const fullHeight = Math.max(
+			element.scrollHeight,
+			element.offsetHeight,
+			element.clientHeight,
+			rect.height,
+			maxBottom
+	);
+	const fullWidth = Math.max(
+			element.scrollWidth,
+			element.offsetWidth,
+			element.clientWidth,
+			rect.width,
+			maxRight
+	);
 
-    // Restore original styles
-    element.style.height = originalStyles.height;
-    element.style.maxHeight = originalStyles.maxHeight;
-    element.style.overflow = originalStyles.overflow;
-    element.style.display = originalStyles.display;
+	// Restore original styles
+	element.style.height = originalStyles.height;
+	element.style.maxHeight = originalStyles.maxHeight;
+	element.style.overflow = originalStyles.overflow;
+	element.style.display = originalStyles.display;
 
-    const canvas = await html2canvas(element, {
-        scale: 2, // Higher resolution
-        useCORS: true,
-        logging: true, // Enable logging to debug capture issues
-        backgroundColor: '#ffffff',
-        height: fullHeight,
-        windowHeight: fullHeight,
-        width: fullWidth,
-        windowWidth: fullWidth,
-        onclone: (clonedDoc) => {
-            const clonedElement = clonedDoc.body.querySelector('[data-html2canvas-clone]') as HTMLElement;
-            if (clonedElement) {
-                // Force the cloned element to show all content
-                clonedElement.style.width = `${fullWidth}px`;
-                clonedElement.style.height = `${fullHeight}px`;
-                clonedElement.style.maxHeight = 'none';
-                clonedElement.style.maxWidth = 'none';
-                clonedElement.style.overflow = 'visible';
-                clonedElement.style.display = 'block';
-                clonedElement.style.position = 'relative';
-                clonedElement.style.transform = 'none';
+	const canvas = await html2canvas(element, {
+			scale: 2, // Higher resolution
+			useCORS: true,
+			logging: true, // Enable logging to debug capture issues
+			backgroundColor: '#ffffff',
+			height: fullHeight,
+			windowHeight: fullHeight,
+			width: fullWidth,
+			windowWidth: fullWidth,
+			onclone: (clonedDoc) => {
+					const clonedElement = clonedDoc.body.querySelector('[data-html2canvas-clone]') as HTMLElement;
+					if (clonedElement) {
+							// Force the cloned element to show all content
+							clonedElement.style.width = `${fullWidth}px`;
+							clonedElement.style.height = `${fullHeight}px`;
+							clonedElement.style.maxHeight = 'none';
+							clonedElement.style.maxWidth = 'none';
+							clonedElement.style.overflow = 'visible';
+							clonedElement.style.display = 'block';
+							clonedElement.style.position = 'relative';
+							clonedElement.style.transform = 'none';
 
-                // Handle all child elements
-                const allChildren = clonedElement.getElementsByTagName('*');
-                for (let i = 0; i < allChildren.length; i++) {
-                    const child = allChildren[i] as HTMLElement;
-                    // Force each child to be fully visible
-                    child.style.overflow = 'visible';
-                    child.style.maxHeight = 'none';
-                    child.style.maxWidth = 'none';
-                    child.style.height = 'auto';
-                    child.style.display = child.style.display === 'none' ? 'none' : 'block';
-                    // Remove any fixed positioning that might affect layout
-                    if (child.style.position === 'fixed') {
-                        child.style.position = 'absolute';
-                    }
-                    // Remove any transforms that might affect layout
-                    child.style.transform = 'none';
-                }
-            }
-        }
-    });
+							// Handle all child elements
+							const allChildren = clonedElement.getElementsByTagName('*');
+							for (let i = 0; i < allChildren.length; i++) {
+									const child = allChildren[i] as HTMLElement;
+									// Force each child to be fully visible
+									child.style.overflow = 'visible';
+									child.style.maxHeight = 'none';
+									child.style.maxWidth = 'none';
+									child.style.height = 'auto';
+									child.style.display = child.style.display === 'none' ? 'none' : 'block';
+									// Remove any fixed positioning that might affect layout
+									if (child.style.position === 'fixed') {
+											child.style.position = 'absolute';
+									}
+									// Remove any transforms that might affect layout
+									child.style.transform = 'none';
+							}
+					}
+			}
+	});
 
-    return {
-        dataUrl: canvas.toDataURL('image/png'),
-        canvas: canvas
-    };
+	return {
+			dataUrl: canvas.toDataURL('image/png'),
+			canvas: canvas
+	};
 }
 
 /**

@@ -14,8 +14,8 @@ export function KanbanColumn({
   onDelete: (orderId: string) => void;
 }) {
   return (
-    <div className="flex flex-col w-full min-w-[350px] max-w-md h-full bg-white">
-      <div className="flex items-center gap-2 mb-4 px-3">
+    <div className="flex flex-col w-full min-w-[300px] max-w-md h-full bg-white">
+      <div className="flex items-center gap-2 mb-4">
         <div className="bg-gray-100 px-2 py-1 rounded-full">
           <h2 className="text-sm font-medium text-gray-700">{title}</h2>
         </div>
@@ -26,7 +26,7 @@ export function KanbanColumn({
           <div
             {...provided.droppableProps}
             ref={provided.innerRef}
-            className="flex-1 space-y-2 overflow-y-auto px-3"
+            className="flex-1 space-y-2 overflow-y-auto"
           >
             {(orders || []).map((order, index) => (
               <KanbanOrderCard

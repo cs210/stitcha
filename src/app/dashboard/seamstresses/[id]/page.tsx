@@ -7,7 +7,7 @@ import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
-import { Product, User } from '@/lib/schemas/global.types';
+import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { use, useEffect, useState } from 'react';
 
@@ -17,7 +17,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const [seamstress, setSeamstress] = useState<User | null>(null);
-	const [products, setProducts] = useState<Product[]>([]);
+	// const [products, setProducts] = useState<Product[]>([]);
 	// const [progressUpdates, setProgressUpdates] = useState<Progress[]>([]);
 	// const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 	// const [isKitModalOpen, setIsKitModalOpen] = useState(false);
@@ -27,16 +27,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	useEffect(() => {
 		if (!user) return;
 
-		(async () => {
-			console.log("seamstressId", seamstressId);
-			
+		(async () => {			
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
-
 			const { data: seamstressData, error: seamstressError } = await seamstressResponse.json();
 			
 			if (!seamstressError) {
 				const { product_users, ...seamstressWithoutProducts } = seamstressData;
+
 				setSeamstress(seamstressWithoutProducts);
 
 				// Set products from seamstress data
@@ -137,7 +135,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 												className='w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors mt-auto'
 											>
 												Validate Kit
-											</button> */}
+											</button>
 										</div>
 									</>
 								))}
