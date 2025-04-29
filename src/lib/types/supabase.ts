@@ -157,21 +157,21 @@ export type Database = {
       }
       product_parts: {
         Row: {
-          part_id: number
+          part_id: string
           part_name: string | null
           seamstress_id: string | null
           total_units: number | null
           units_completed: number | null
         }
         Insert: {
-          part_id?: number
+          part_id?: string
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null
           units_completed?: number | null
         }
         Update: {
-          part_id?: number
+          part_id?: string
           part_name?: string | null
           seamstress_id?: string | null
           total_units?: number | null
@@ -249,6 +249,7 @@ export type Database = {
           inmetro_cert_number: string | null
           name: string
           order_id: string
+          parts: string[] | null
           percent_pieces_lost: number | null
           product_type: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
@@ -265,6 +266,7 @@ export type Database = {
           inmetro_cert_number?: string | null
           name?: string
           order_id?: string
+          parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
@@ -281,6 +283,7 @@ export type Database = {
           inmetro_cert_number?: string | null
           name?: string
           order_id?: string
+          parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null
           progress_level?: Database["public"]["Enums"]["progress_level"]
@@ -367,39 +370,6 @@ export type Database = {
           },
           {
             foreignKeyName: "products_and_packaging_materials_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      products_and_parts: {
-        Row: {
-          id: string
-          part_id: string | null
-          product_id: string
-        }
-        Insert: {
-          id?: string
-          part_id?: string | null
-          product_id: string
-        }
-        Update: {
-          id?: string
-          part_id?: string | null
-          product_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "products_and_parts_order_id_fkey"
-            columns: ["part_id"]
-            isOneToOne: false
-            referencedRelation: "raw_materials"
-            referencedColumns: ["material_id"]
-          },
-          {
-            foreignKeyName: "products_and_parts_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"

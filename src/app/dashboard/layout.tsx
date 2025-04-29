@@ -26,18 +26,18 @@ export default function Layout({
           const response = await fetch(`/api/products/${segments[2]}`);
           const data = await response.json();
 
-          if (data?.name) {
-            setProductName(data.name);
-          }
-        } catch (error) {
-          console.error("Error fetching product:", error);
-        }
-      }
-      // Get order details based on segments
-      else if (segments[1] === "orders" && segments.length === 3) {
-        try {
-          const response = await fetch(`/api/orders/${segments[2]}`);
-          const data = await response.json();
+					if (data?.name) {
+						setProductName(data.name);
+					}
+				} catch (error) {
+					console.error('Error fetching product:', error);
+				}
+			}
+			// Get order details based on segments
+			else if (segments[1] === 'orders' && segments.length === 3) {
+				try {
+					const response = await fetch(`/api/orders/${segments[2]}`);
+					const { data } = await response.json();
 
           if (data?.client) {
             setOrderClient(data.client);
