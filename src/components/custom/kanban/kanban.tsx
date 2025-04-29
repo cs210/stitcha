@@ -5,6 +5,14 @@ import type { DropResult } from "@hello-pangea/dnd";
 import { DragDropContext } from "@hello-pangea/dnd";
 import { useEffect, useState } from "react";
 import { KanbanColumn } from "./kanban-column";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const STATUS_MAPPING = {
   notStarted: "Not Started",
@@ -24,6 +32,7 @@ export function KanbanBoard() {
     inProgress: [],
     done: [],
   });
+  const [currentSort, setCurrentSort] = useState<string>("Custom");
 
   // Fetch orders from API route on mount
   useEffect(() => {
@@ -107,6 +116,7 @@ export function KanbanBoard() {
     }
 
     setOrders(updated);
+    setCurrentSort("Custom"); // Set to custom when cards are manually moved
 
     // Only make API call if moving between columns
     if (source.droppableId !== destination.droppableId) {
@@ -161,11 +171,70 @@ export function KanbanBoard() {
     }
   };
 
+  const sortOrdersByDueDate = (ascending: boolean) => {
+    const newOrders = { ...orders };
+
+    Object.keys(newOrders).forEach((key) => {
+      newOrders[key] = [...newOrders[key]].sort((a, b) => {
+        const comparison =
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+        return ascending ? comparison : -comparison;
+      });
+    });
+
+    setOrders(newOrders);
+    setCurrentSort(ascending ? "Earliest to latest" : "Latest to earliest");
+  };
+
   return (
-    <div className="flex flex-col h-full p-3">
+    <div className="flex flex-col h-full">
+      <div className="mb-4 pt-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-sm bg-white hover:bg-gray-50"
+            >
+              <span className="text-gray-500 mr-2">Sort by</span>
+              <span>{currentSort}</span>
+              <ChevronDown className="h-4 w-4 ml-2 text-gray-500" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-[180px]">
+            <DropdownMenuItem
+              onClick={() => sortOrdersByDueDate(false)}
+              className="flex items-center justify-between"
+            >
+              <span>Latest to earliest</span>
+              {currentSort === "Latest to earliest" && (
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+              )}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => sortOrdersByDueDate(true)}
+              className="flex items-center justify-between"
+            >
+              <span>Earliest to latest</span>
+              {currentSort === "Earliest to latest" && (
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+              )}
+            </DropdownMenuItem>
+            {currentSort === "Custom" && (
+              <DropdownMenuItem
+                className="flex items-center justify-between"
+                disabled
+              >
+                <span>Custom</span>
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex-1 overflow-x-auto">
-          <div className="flex gap-6 pt-4 h-full">
+          <div className="flex gap-4 pt-4 h-full">
             <KanbanColumn
               title="Not Started"
               id="notStarted"
