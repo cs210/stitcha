@@ -9,12 +9,6 @@ export async function PATCH(
         const supabase = await createClerkSupabaseClientSsr();
         const { "part-id": partId } = await params;
         const { units_completed, seamstress_id, total_units } = await request.json();
-
-        console.log("WITHIN API");
-        console.log("PART ID", partId);
-        console.log("UNITS COMPLETED", units_completed);
-        console.log("TOTAL UNITS", total_units);
-        console.log("SEAMSTRESS ID", seamstress_id);
         
         // Update the part
         const { data: updatedPart, error: updateError } = await supabase
@@ -49,9 +43,6 @@ export async function DELETE(
 ) {
     const supabase = await createClerkSupabaseClientSsr();
     const { "part-id": partId } = await params;
-
-    console.log("WITHIN DELETE API");
-    console.log("PART ID", partId);
 
     // Delete the part
     const { error: deleteError } = await supabase

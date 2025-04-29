@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface Seamstress {
     id: string;
@@ -50,6 +51,25 @@ interface UpdatePartData {
     total_units: number;
     seamstress_id: string;
 }
+
+// Add a helper function to determine part status
+const getPartStatus = (completedUnits: number, totalUnits: number) => {
+    if (completedUnits === 0) return 'Not Started';
+    if (completedUnits === totalUnits) return 'Completed';
+    return 'In Progress';
+};
+
+// Add a helper function to get status color
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case 'Completed':
+            return 'bg-green-100 text-green-800';
+        case 'In Progress':
+            return 'bg-blue-100 text-blue-800';
+        default:
+            return 'bg-gray-100 text-gray-800';
+    }
+};
 
 export function ProductParts({ productId, productName, orderQuantity }: ProductPartsProps) {
     const [parts, setParts] = useState<Part[]>([]);
@@ -150,11 +170,11 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         const part = parts.find(p => p.part_id === partId);
         if (!part) return;
 
-        // Just set the update state without making an API call
+        // Initialize the update state with existing values
         setUpdatePart({
             id: partId,
-            units_completed: part.units_completed,
-            total_units: part.total_units,
+            units_completed: part.units_completed || 0,
+            total_units: part.total_units || 0,
             seamstress_id: part.seamstress_id || ''
         });
         setIsUpdatingPart(true);
@@ -162,6 +182,21 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
 
     const handleSaveUpdate = async () => {
         try {
+            // Only send the update if values have changed and completed units don't exceed total
+            const part = parts.find(p => p.part_id === updatePart.id);
+            if (!part) return;
+
+            // Ensure completed units don't exceed total units
+            const cappedCompletedUnits = Math.min(updatePart.units_completed, updatePart.total_units);
+            
+            // Check if any values have actually changed
+            if (part.units_completed === cappedCompletedUnits &&
+                part.total_units === updatePart.total_units &&
+                part.seamstress_id === (updatePart.seamstress_id || null)) {
+                setIsUpdatingPart(false);
+                return;
+            }
+
             console.log("UPDATE PART", updatePart);
             const response = await fetch(`/api/products/${productId}/parts/${updatePart.id}`, {
                 method: 'PATCH',
@@ -169,7 +204,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    units_completed: updatePart.units_completed,
+                    units_completed: cappedCompletedUnits,
                     total_units: updatePart.total_units,
                     seamstress_id: updatePart.seamstress_id || null
                 }),
@@ -251,10 +286,10 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-sm text-gray-600">Progress</span>
                     <span className="text-sm text-gray-600">
-                        {completedParts} of {totalParts} parts completed
+                        {completedParts} of {totalParts} parts completed ({Math.round(progressPercentage)}%)
                     </span>
                 </div>
-                <Progress value={progressPercentage} />
+                <Progress value={progressPercentage} className="h-4" />
             </div>
 
             <div>
@@ -280,14 +315,17 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                 <div className="space-y-2">
                                     <Label>Total Units</Label>
                                     <Input
-                                        value={newPart.units}
+                                        value={newPart.units === 0 ? '' : String(newPart.units)}
                                         onChange={(e) => {
-                                            const value = parseInt(e.target.value) || 0;
-                                            setNewPart({ ...newPart, units: value });
+                                            const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                            if (!isNaN(value)) {
+                                                setNewPart({ ...newPart, units: value });
+                                            }
                                         }}
                                         placeholder="Number of total units"
-                                        type="number"
-                                        min="1"
+                                        type="text"
+                                        inputMode="numeric"
+                                        pattern="[0-9]*"
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -328,7 +366,7 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                     Total Units
                                 </th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Completed
+                                    Progress
                                 </th>
                             </tr>
                         </thead>
@@ -340,60 +378,80 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                                     </td>
                                 </tr>
                             ) : (
-                                parts.map((part) => (
-                                    <tr key={`part-${part.part_id}`}>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div>
-                                                <div className="font-medium text-gray-900">
-                                                    {part.part_name}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            {part.seamstress_id ? (
-                                                <div className="flex items-center">
-                                                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                                        {seamstresses.find(s => s.id === part.seamstress_id)?.first_name.charAt(0)}
+                                parts.map((part) => {
+                                    const status = getPartStatus(part.units_completed, part.total_units);
+                                    const progressPercentage = (part.units_completed / part.total_units) * 100;
+                                    
+                                    return (
+                                        <tr key={`part-${part.part_id}`}>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div>
+                                                    <div className="font-medium text-gray-900">
+                                                        {part.part_name}
                                                     </div>
-                                                    <div className="ml-3">
-                                                        <div className="font-medium text-gray-900">
-                                                            {seamstresses.find(s => s.id === part.seamstress_id)?.first_name} {seamstresses.find(s => s.id === part.seamstress_id)?.last_name}
+                                                    <Badge variant="secondary" className={getStatusColor(status)}>
+                                                        {status}
+                                                    </Badge>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                {part.seamstress_id ? (
+                                                    <div className="flex items-center">
+                                                        <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
+                                                            {seamstresses.find(s => s.id === part.seamstress_id)?.first_name.charAt(0)}
                                                         </div>
-                                                        <div className="text-sm text-gray-500">
-                                                            {seamstresses.find(s => s.id === part.seamstress_id)?.role}
+                                                        <div className="ml-3">
+                                                            <div className="font-medium text-gray-900">
+                                                                {seamstresses.find(s => s.id === part.seamstress_id)?.first_name} {seamstresses.find(s => s.id === part.seamstress_id)?.last_name}
+                                                            </div>
+                                                            <div className="text-sm text-gray-500">
+                                                                {seamstresses.find(s => s.id === part.seamstress_id)?.role}
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                ) : (
+                                                    <span className="text-gray-500">Unassigned</span>
+                                                )}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-gray-900">
+                                                {part.total_units}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center justify-between w-full">
+                                                    <div className="flex-1 min-w-[300px] max-w-[500px] mr-4">
+                                                        <div className="flex items-center justify-between mb-1">
+                                                            <span className="text-sm text-gray-500">
+                                                                {part.units_completed} of {part.total_units}
+                                                            </span>
+                                                            <span className="text-sm text-gray-500">
+                                                                {Math.round((part.units_completed / part.total_units) * 100)}%
+                                                            </span>
+                                                        </div>
+                                                        <Progress value={(part.units_completed / part.total_units) * 100} className="h-2" />
+                                                    </div>
+                                                    <div className="flex items-center gap-2 pl-4">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                            onClick={() => handleUpdatePart(part.part_id)}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                            onClick={() => handleDeletePart(part.part_id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
                                                 </div>
-                                            ) : (
-                                                <span className="text-gray-500">Unassigned</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-900">
-                                            {part.total_units}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-900 flex items-center gap-4">
-                                            {part.units_completed}
-                                            <div className="flex items-center gap-2 ml-auto">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8"
-                                                    onClick={() => handleUpdatePart(part.part_id)}
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                    onClick={() => handleDeletePart(part.part_id)}
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             )}
                         </tbody>
                     </table>
@@ -409,32 +467,39 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                         <div className="space-y-2">
                             <Label>Total Units</Label>
                             <Input
-                                type="number"
-                                value={updatePart.total_units}
+                                value={updatePart.total_units?.toString() || '0'}
                                 onChange={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setUpdatePart({
-                                        ...updatePart,
-                                        total_units: Math.max(1, value)
-                                    });
+                                    const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                    if (!isNaN(value)) {
+                                        setUpdatePart({
+                                            ...updatePart,
+                                            total_units: value
+                                        });
+                                    }
                                 }}
-                                min="1"
+                                placeholder="Number of total units"
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                             />
                         </div>
                         <div className="space-y-2">
                             <Label>Completed Units</Label>
                             <Input
-                                type="number"
-                                value={updatePart.units_completed}
+                                value={updatePart.units_completed?.toString() || '0'}
                                 onChange={(e) => {
-                                    const value = parseInt(e.target.value) || 0;
-                                    setUpdatePart({
-                                        ...updatePart,
-                                        units_completed: Math.max(0, value)
-                                    });
+                                    const value = e.target.value === '' ? 0 : parseInt(e.target.value);
+                                    if (!isNaN(value)) {
+                                        setUpdatePart({
+                                            ...updatePart,
+                                            units_completed: Math.min(value, updatePart.total_units)
+                                        });
+                                    }
                                 }}
-                                min="0"
-                                max={updatePart.total_units}
+                                placeholder="Number of completed units"
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
                             />
                         </div>
                         <div className="space-y-2">
