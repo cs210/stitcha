@@ -23,61 +23,66 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     const [totalParts, setTotalParts] = useState(0);
     const [completedParts, setCompletedParts] = useState(0);
 
-    useEffect(() => {
-        async function fetchOrder() {
-            try {
-                const response = await fetch(`/api/orders/${id}`);
+    async function fetchOrder() {
+        try {
+            const response = await fetch(`/api/orders/${id}`);
 
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch order: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                setOrder(data);
-
-                // Fetch all products associated with the order
-                const productsResponse = await fetch(`/api/orders/${id}/products`);
-                const productsData = await productsResponse.json();
-
-                // Fetch product data for each product_id
-                const allProductsData: Product[] = [];
-                let totalPartsCount = 0;
-                let completedPartsCount = 0;
-
-                if (productsData.product_ids) {
-                    for (const productId of productsData.product_ids) {
-                        const productResponse = await fetch(`/api/products/${productId}`);
-                        const partsResponse = await fetch(`/api/products/${productId}/parts`);
-
-                        if (!productResponse.ok) {
-                            throw new Error(`Failed to fetch product: ${productResponse.statusText}`);
-                        }
-
-                        const productData = await productResponse.json();
-                        const partsData = await partsResponse.json();
-                        
-                        if (partsData.data) {
-                            partsData.data.forEach((part: Part) => {
-                                totalPartsCount += part.total_units;
-                                completedPartsCount += part.units_completed;
-                            });
-                        }
-                        
-                        allProductsData.push(productData);
-                    }
-                }
-
-                setTotalParts(totalPartsCount);
-                setCompletedParts(completedPartsCount);
-                setProducts(allProductsData);
-            } catch (error) {
-                console.error('Error fetching order:', error);
-            } finally {
-                setProductLoading(false);
-                setLoading(false);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch order: ${response.statusText}`);
             }
-        }
 
+            const data = await response.json();
+            setOrder(data);
+
+            // Fetch all products associated with the order
+            const productsResponse = await fetch(`/api/orders/${id}/products`);
+            const productsData = await productsResponse.json();
+
+            // Fetch product data for each product_id
+            const allProductsData: Product[] = [];
+            let totalPartsCount = 0;
+            let completedPartsCount = 0;
+
+            if (productsData.product_ids) {
+                for (const productId of productsData.product_ids) {
+                    const productResponse = await fetch(`/api/products/${productId}`);
+                    const partsResponse = await fetch(`/api/products/${productId}/parts`);
+
+                    if (!productResponse.ok) {
+                        throw new Error(`Failed to fetch product: ${productResponse.statusText}`);
+                    }
+
+                    const productData = await productResponse.json();
+                    const partsData = await partsResponse.json();
+                    
+                    if (partsData.data) {
+                        partsData.data.forEach((part: Part) => {
+                            totalPartsCount += part.total_units;
+                            completedPartsCount += part.units_completed;
+                        });
+                    }
+                    
+                    allProductsData.push(productData);
+                }
+            }
+
+            setTotalParts(totalPartsCount);
+            setCompletedParts(completedPartsCount);
+            setProducts(allProductsData);
+        } catch (error) {
+            console.error('Error fetching order:', error);
+        } finally {
+            setProductLoading(false);
+            setLoading(false);
+        }
+    }
+
+    const handleProductRemoved = () => {
+        // Refetch the order data to update the UI
+        fetchOrder();
+    };
+
+    useEffect(() => {
         fetchOrder();
     }, [id]);
 
@@ -95,13 +100,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="bg-white border-b">
-                <div className="container mx-auto px-4 py-4">
+                <div className="container mx-auto px-8 py-6">
                     <div className="flex items-center gap-3 mb-6">
                         <Link href="/dashboard/orders" className="text-gray-500 hover:text-gray-700">
                             <ArrowLeft className="h-5 w-5" />
                         </Link>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-xl font-semibold">Order #{id}</h1>
+                            <h1 className="text-2xl font-semibold">Order #{id}</h1>
                             <span className="bg-black text-white text-xs px-2 py-1 rounded">New</span>
                         </div>
                     </div>
@@ -109,42 +114,42 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         {/* Customer Info */}
                         <div>
-                            <h2 className="text-sm font-medium text-gray-500 mb-2">Customer</h2>
-                            <h3 className="text-lg font-semibold mb-1">{order?.client}</h3>
-                            <p className="text-sm text-gray-600">{order?.contact}</p>
+                            <h2 className="text-base font-medium text-gray-500 mb-3">Customer</h2>
+                            <h3 className="text-xl font-semibold mb-2">{order?.client}</h3>
+                            <p className="text-base text-gray-600">{order?.contact}</p>
                         </div>
 
                         {/* Deadline */}
                         <div>
-                            <h2 className="text-sm font-medium text-gray-500 mb-2">Deadline</h2>
-                            <h3 className="text-lg font-semibold mb-1">
+                            <h2 className="text-base font-medium text-gray-500 mb-3">Deadline</h2>
+                            <h3 className="text-xl font-semibold mb-2">
                                 {new Date(order?.due_date || '').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </h3>
                         </div>
 
                         {/* Order Value */}
                         <div>
-                            <h2 className="text-sm font-medium text-gray-500 mb-2">Order Value</h2>
-                            <h3 className="text-lg font-semibold mb-1">N/A</h3>
-                            <p className="text-gray-500">{products.length} products</p>
+                            <h2 className="text-base font-medium text-gray-500 mb-3">Order Value</h2>
+                            <h3 className="text-xl font-semibold mb-2">N/A</h3>
+                            <p className="text-base text-gray-600">{products.length} products</p>
                         </div>
 
                         {/* Production Progress */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <h2 className="text-sm font-medium text-gray-500">Production Progress</h2>
-                                <span className="text-sm text-gray-500">{completedParts} of {totalParts} parts</span>
+                                <h2 className="text-base font-medium text-gray-500">Production Progress</h2>
+                                <span className="text-base text-gray-600">{completedParts} of {totalParts} parts</span>
                             </div>
                             <div className="mb-1">
                                 <Progress value={progressPercentage} className="h-2" />
                             </div>
-                            <p className="text-lg font-semibold">{progressPercentage}%</p>
+                            <p className="text-xl font-semibold">{progressPercentage}%</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className='container mx-auto px-4 py-6'>
+            <div className='container mx-auto px-8 py-6'>
                 <div className='space-y-6'>
                     {/* <div className="flex items-center justify-between">
                         <h2 className='text-xl font-semibold'>Products</h2>
@@ -160,6 +165,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                                         productId={product.id}
                                         productName={product.name}
                                         orderQuantity={order?.order_quantity || 0}
+                                        orderId={id}
+                                        onProductRemoved={handleProductRemoved}
                                     />
                                 </div>
                             ))}

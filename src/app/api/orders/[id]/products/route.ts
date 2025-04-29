@@ -23,11 +23,6 @@ export async function GET(
         .eq('id', orderId)
         .single();
 
-    // const { data, error } = await supabase
-    //     .from('products_and_orders')
-    //     .select('product_id')
-    //     .eq('order_id', orderId);
-
     if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 });
     }
@@ -38,3 +33,42 @@ export async function GET(
 
     return NextResponse.json(data, { status: 200 });
 } 
+
+// Updates the products associated with a specific order
+export async function PATCH(
+    request: Request,
+    { params }: { params: Promise<{ id: string }> }
+) {
+    const { userId } = await auth();
+    const { id: orderId } = await params;
+
+    if (!userId) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Get product IDs from request body
+    const { product_ids } = await request.json();
+
+    if (!Array.isArray(product_ids)) {
+        return NextResponse.json(
+            { error: "product_ids must be an array" },
+            { status: 400 }
+        );
+    }
+
+    const supabase = await createClerkSupabaseClientSsr();
+
+    // Update the order with new product IDs
+    const { data, error } = await supabase
+        .from('orders')
+        .update({ product_ids })
+        .eq('id', orderId)
+        .select()
+        .single();
+
+    if (error) {
+        return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ data }, { status: 200 });
+}

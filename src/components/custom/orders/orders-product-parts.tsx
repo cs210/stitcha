@@ -43,6 +43,8 @@ interface ProductPartsProps {
     productId: string;
     productName: string;
     orderQuantity: number;
+    orderId: string;
+    onProductRemoved?: () => void;
 }
 
 interface UpdatePartData {
@@ -50,6 +52,7 @@ interface UpdatePartData {
     units_completed: number;
     total_units: number;
     seamstress_id: string;
+    part_name: string;
 }
 
 // Add a helper function to determine part status
@@ -71,7 +74,7 @@ const getStatusColor = (status: string) => {
     }
 };
 
-export function ProductParts({ productId, productName, orderQuantity }: ProductPartsProps) {
+export function ProductParts({ productId, productName, orderQuantity, orderId, onProductRemoved }: ProductPartsProps) {
     const [parts, setParts] = useState<Part[]>([]);
     const [seamstresses, setSeamstresses] = useState<Seamstress[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -87,7 +90,8 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         id: '',
         units_completed: 0,
         total_units: 0,
-        seamstress_id: ''
+        seamstress_id: '',
+        part_name: '',
     });
 
     // Fetch parts and seamstresses data
@@ -175,7 +179,8 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
             id: partId,
             units_completed: part.units_completed || 0,
             total_units: part.total_units || 0,
-            seamstress_id: part.seamstress_id || ''
+            seamstress_id: part.seamstress_id || '',
+            part_name: part.part_name || '',
         });
         setIsUpdatingPart(true);
     };
@@ -190,9 +195,12 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
             const cappedCompletedUnits = Math.min(updatePart.units_completed, updatePart.total_units);
             
             // Check if any values have actually changed
-            if (part.units_completed === cappedCompletedUnits &&
+            if (
+                part.units_completed === cappedCompletedUnits &&
                 part.total_units === updatePart.total_units &&
-                part.seamstress_id === (updatePart.seamstress_id || null)) {
+                part.seamstress_id === (updatePart.seamstress_id || null) &&
+                part.part_name === updatePart.part_name
+            ) {
                 setIsUpdatingPart(false);
                 return;
             }
@@ -206,7 +214,8 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                 body: JSON.stringify({
                     units_completed: cappedCompletedUnits,
                     total_units: updatePart.total_units,
-                    seamstress_id: updatePart.seamstress_id || null
+                    seamstress_id: updatePart.seamstress_id || null,
+                    part_name: updatePart.part_name,
                 }),
             });
 
@@ -251,6 +260,42 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         }
     };
 
+    const handleRemoveProduct = async () => {
+        try {
+            // First get current product IDs
+            const response = await fetch(`/api/orders/${orderId}/products`);
+            const data = await response.json();
+            
+            if (!data.product_ids) {
+                throw new Error('No product IDs found');
+            }
+            
+            // Filter out the current product
+            const updatedProductIds = data.product_ids.filter((id: string) => id !== productId);
+            
+            // Update the order with new product IDs
+            const updateResponse = await fetch(`/api/orders/${orderId}/products`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_ids: updatedProductIds
+                }),
+            });
+
+            if (!updateResponse.ok) {
+                throw new Error('Failed to remove product');
+            }
+
+            // Notify parent component
+            onProductRemoved?.();
+        } catch (error) {
+            console.error('Error removing product:', error);
+            setError(error instanceof Error ? error.message : 'Failed to remove product');
+        }
+    };
+
     // Calculate total progress
     const totalParts = parts.reduce((sum, part) => sum + part.total_units, 0);
     const completedParts = parts.reduce((sum, part) => sum + part.units_completed, 0);
@@ -272,19 +317,33 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
         <div className="space-y-4">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold">{productName}</h3>
+                    <h3 className="text-xl font-semibold">{productName}</h3>
                     <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
                         {orderQuantity} units
                     </span>
                 </div>
-                <Button variant="outline" onClick={() => window.location.href = `/dashboard/products/${productId}`}>
-                    View Details
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button 
+                        variant="outline" 
+                        size="lg"
+                        onClick={() => window.location.href = `/dashboard/products/${productId}`}
+                    >
+                        View Details
+                    </Button>
+                    <Button 
+                        variant="ghost" 
+                        size="lg"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={handleRemoveProduct}
+                    >
+                        Remove
+                    </Button>
+                </div>
             </div>
 
             <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-gray-600">Progress</span>
+                    <span className="text-base text-gray-600">Progress</span>
                     <span className="text-sm text-gray-600">
                         {completedParts} of {totalParts} parts completed ({Math.round(progressPercentage)}%)
                     </span>
@@ -294,10 +353,10 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
 
             <div>
                 <div className="flex items-center justify-between mb-4">
-                    <h4 className="font-medium">Parts</h4>
+                    <h4 className="text-lg font-medium">Parts</h4>
                     <Dialog open={isAddingPart} onOpenChange={setIsAddingPart}>
                         <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">Add Part</Button>
+                            <Button variant="outline" size="lg">Add Part</Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
@@ -462,6 +521,14 @@ export function ProductParts({ productId, productName, orderQuantity }: ProductP
                         <DialogTitle>Update Part Progress</DialogTitle>
                     </DialogHeader>
                     <div className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                            <Label>Part Name</Label>
+                            <Input
+                                value={updatePart.part_name}
+                                onChange={(e) => setUpdatePart({ ...updatePart, part_name: e.target.value })}
+                                placeholder="Enter name of part"
+                            />
+                        </div>
                         <div className="space-y-2">
                             <Label>Total Units</Label>
                             <Input
