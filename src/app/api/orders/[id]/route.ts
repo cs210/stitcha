@@ -1,13 +1,11 @@
-import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId } = await auth();
-  const { id } = await params;
+// Retrieves a specific order by id
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+	const { userId } = await auth();
+	const { id: orderId } = await params;
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -15,11 +13,7 @@ export async function GET(
 
   const supabase = await createClerkSupabaseClientSsr();
 
-  const { data, error } = await supabase
-    .from("orders")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const { data, error } = await supabase.from('orders').select('*').eq('id', orderId).single();
 
   if (error) {
     console.error("Supabase error:", error);
