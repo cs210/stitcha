@@ -473,11 +473,14 @@ export default function ProductDetails({
                     <input
                       placeholder="Search seamstresses..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onClick={(e) => {
+                      onChange={(e) => { 
+                        setSearchQuery(e.target.value); 
                         e.stopPropagation();
-                        setIsCommandOpen(true);
-                      }}
+                        setIsCommandOpen(true);}}
+                      // onClick={(e) => {
+                      //   e.stopPropagation();
+                      //   setIsCommandOpen(true);
+                      // }}
                       className="flex-1 outline-none bg-transparent placeholder:text-gray-500"
                     />
                   </div>
