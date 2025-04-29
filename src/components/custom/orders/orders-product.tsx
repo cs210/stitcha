@@ -1,6 +1,7 @@
 import { Product } from '@/lib/schemas/global.types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { H3 } from '../text/headings';
 
 export function OrdersProduct({ product }: { product: Product }) {
 	return (
@@ -11,11 +12,9 @@ export function OrdersProduct({ product }: { product: Product }) {
 				</div>
 			)}
 			<div>
-				<h3 className='text-lg font-medium'>
-					<Link href={`/dashboard/products/${product.id}`} className='hover:underline text-blue-600'>
-						{product.name}
-					</Link>
-				</h3>
+				<Link href={`/dashboard/products/${product.id}`} className='hover:underline text-blue-600'>
+					<H3 text={product.name} />
+				</Link>
 			</div>
 		</div>
 	);

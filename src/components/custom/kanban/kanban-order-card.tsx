@@ -33,7 +33,7 @@ export function KanbanOrderCard({
 					ref={provided.innerRef}
 					{...provided.draggableProps}
 					{...provided.dragHandleProps}
-					className={`bg-white border rounded-none border-black/20 w-full cursor-pointer hover:border-black/40 transition-colors ${
+					className={`border rounded-none w-full cursor-pointer hover:border-black/20 transition-colors ${
 						snapshot.isDragging ? 'ring-2 ring-blue-500 shadow-lg' : ''
 					}`}
 					onClick={() => router.push(`/dashboard/orders/${order.id}`)}
