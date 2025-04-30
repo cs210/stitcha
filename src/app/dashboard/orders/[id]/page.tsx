@@ -35,7 +35,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             setOrder(data);
 
             // Fetch all products associated with the order
-            const productsResponse = await fetch(`/api/orders/${id}/products`);
+            const productsResponse = await fetch(`/api/orders/${id}`, { method: 'GET' });
             const productsData = await productsResponse.json();
 
             // Fetch product data for each product_id
