@@ -186,7 +186,7 @@ export default function Page() {
 		// Fetch materials from the database
 		async function fetchMaterials() {
 			try {
-				const response = await fetch('/api/raw_materials');
+				const response = await fetch('/api/raw-materials');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
@@ -220,7 +220,7 @@ export default function Page() {
 		// Fetch packaging materials from the database
 		async function fetchPackagingMaterials() {
 			try {
-				const response = await fetch('/api/packaging_materials');
+				const response = await fetch('/api/packaging-materials');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
@@ -254,7 +254,7 @@ export default function Page() {
 		// Fetch labor types from the database
 		async function fetchLabor() {
 			try {
-				const response = await fetch('/api/labor_types');
+				const response = await fetch('/api/labor');
 				const result = await response.json();
 
 				if (response.ok && result.data) {
