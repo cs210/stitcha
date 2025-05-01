@@ -77,27 +77,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         }
     }, [id]);
 
-    const handleProductRemoved = async (productId: string) => {
-        // Update the product's order_id to null
-        const patchResponse = await fetch(`/api/products/${productId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                order_id: null
-            }),
-        });
-
-        if (!patchResponse.ok) {
-            const errorData = await patchResponse.json();
-            throw new Error(errorData.error || 'Failed to update product');
-        }
-
-        // Refetch the order data to update the UI
-        fetchOrder();
-    };
-
     useEffect(() => {
         fetchOrder();
     }, [fetchOrder]);
@@ -182,7 +161,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                                         productName={product.name}
                                         orderQuantity={order?.order_quantity || 0}
                                         orderId={id}
-                                        onProductRemoved={handleProductRemoved}
                                     />
                                 </div>
                             ))}

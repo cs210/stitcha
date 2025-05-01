@@ -278,33 +278,37 @@ export function ProductParts({ productId, productName, orderQuantity, orderId, o
                 }));
             }
 
-            // Update orders to remove product_id from product_ids array
-            const response = await fetch(`/api/orders/${orderId}/products`);
-            const data = await response.json();
-            
-            if (!data.product_ids) {
-                throw new Error('No product IDs found');
-            }
-            
-            // Filter out the current product
-            const updatedProductIds = data.product_ids.filter((id: string) => id !== productId);
-            
-            // Update the order with new product IDs
-            const updateResponse = await fetch(`/api/orders/${orderId}/products`, {
+            // Update the order to remove this product
+            const updateResponse = await fetch(`/api/orders/${orderId}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    product_ids: updatedProductIds
+                    productId: productId
                 }),
             });
 
             if (!updateResponse.ok) {
-                throw new Error('Failed to remove product');
+                throw new Error('Failed to remove product from order');
             }
 
-            // Notify parent component with the productId
+            // Update the product to remove its order_id
+            const productResponse = await fetch(`/api/products/${productId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: null
+                }),
+            });
+
+            if (!productResponse.ok) {
+                throw new Error('Failed to update product');
+            }
+
+            // Notify parent component
             onProductRemoved?.(productId);
         } catch (error) {
             console.error('Error removing product:', error);
