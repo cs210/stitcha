@@ -36,79 +36,43 @@ export type Database = {
         }
         Relationships: []
       }
-      labor_types: {
+      labor: {
         Row: {
           cost_per_minute: number
+          id: string
           task: string
-          task_id: string
         }
         Insert: {
           cost_per_minute: number
+          id?: string
           task: string
-          task_id?: string
         }
         Update: {
           cost_per_minute?: number
+          id?: string
           task?: string
-          task_id?: string
-        }
-        Relationships: []
-      }
-      orders: {
-        Row: {
-          client: string
-          contact: string
-          date_created: string | null
-          due_date: string
-          id: string
-          logo_url: string | null
-          order_quantity: number
-          product_ids: string[] | null
-          progress_level: Database["public"]["Enums"]["progress_level"] | null
-        }
-        Insert: {
-          client: string
-          contact: string
-          date_created?: string | null
-          due_date: string
-          id?: string
-          logo_url?: string | null
-          order_quantity: number
-          product_ids?: string[] | null
-          progress_level?: Database["public"]["Enums"]["progress_level"] | null
-        }
-        Update: {
-          client?: string
-          contact?: string
-          date_created?: string | null
-          due_date?: string
-          id?: string
-          logo_url?: string | null
-          order_quantity?: number
-          product_ids?: string[] | null
-          progress_level?: Database["public"]["Enums"]["progress_level"] | null
         }
         Relationships: []
       }
       packaging_materials: {
         Row: {
-          packaging_id: string
-          packaging_material_code: string
-          packaging_material_name: string
+          code: string
+          id: string
+          name: string
           purchase_price: number
           units: string | null
         }
         Insert: {
-          packaging_id?: string
-          packaging_material_code: string
-          packaging_material_name: string
+          code: string
+          id?: string
+          name: string
           purchase_price?: number
           units?: string | null
         }
         Update: {
-          packaging_id?: string
-          packaging_material_code?: string
-          packaging_material_name?: string
+          code?: string
+          id?: string
+          name?: string
           purchase_price?: number
           units?: string | null
         }
@@ -164,30 +128,6 @@ export type Database = {
           },
         ]
       }
-      product_parts: {
-        Row: {
-          part_id: string
-          part_name: string | null
-          seamstress_id: string | null
-          total_units: number | null
-          units_completed: number | null
-        }
-        Insert: {
-          part_id?: string
-          part_name?: string | null
-          seamstress_id?: string | null
-          total_units?: number | null
-          units_completed?: number | null
-        }
-        Update: {
-          part_id?: string
-          part_name?: string | null
-          seamstress_id?: string | null
-          total_units?: number | null
-          units_completed?: number | null
-        }
-        Relationships: []
-      }
       product_progress: {
         Row: {
           product_id: string
@@ -218,36 +158,6 @@ export type Database = {
           },
         ]
       }
-      product_users: {
-        Row: {
-          product_id: string
-          user_id: string
-        }
-        Insert: {
-          product_id: string
-          user_id: string
-        }
-        Update: {
-          product_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_users_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_users_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       products: {
         Row: {
           barcode: string | null
@@ -257,8 +167,6 @@ export type Database = {
           image_urls: Json | null
           inmetro_cert_number: string | null
           name: string
-          order_id: string | null
-          parts: string[] | null
           percent_pieces_lost: number | null
           product_type: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
@@ -274,8 +182,6 @@ export type Database = {
           image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
-          order_id?: string | null
-          parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
@@ -291,8 +197,6 @@ export type Database = {
           image_urls?: Json | null
           inmetro_cert_number?: string | null
           name?: string
-          order_id?: string | null
-          parts?: string[] | null
           percent_pieces_lost?: number | null
           product_type?: string | null
           progress_level?: Database["public"]["Enums"]["progress_level"]
@@ -302,7 +206,7 @@ export type Database = {
         }
         Relationships: []
       }
-      products_and_labor: {
+      products_labor: {
         Row: {
           conversion: number
           id: string
@@ -342,12 +246,12 @@ export type Database = {
             foreignKeyName: "products_and_labor_task_id_fkey"
             columns: ["task_id"]
             isOneToOne: true
-            referencedRelation: "labor_types"
-            referencedColumns: ["task_id"]
+            referencedRelation: "labor"
+            referencedColumns: ["id"]
           },
         ]
       }
-      products_and_packaging_materials: {
+      products_packaging_materials: {
         Row: {
           id: string
           material_code: string | null
@@ -375,7 +279,7 @@ export type Database = {
             columns: ["material_code"]
             isOneToOne: false
             referencedRelation: "packaging_materials"
-            referencedColumns: ["packaging_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "products_and_packaging_materials_product_id_fkey"
@@ -386,7 +290,7 @@ export type Database = {
           },
         ]
       }
-      products_and_raw_materials: {
+      products_raw_materials: {
         Row: {
           id: string
           material_code: string | null
@@ -414,13 +318,43 @@ export type Database = {
             columns: ["material_code"]
             isOneToOne: false
             referencedRelation: "raw_materials"
-            referencedColumns: ["material_id"]
+            referencedColumns: ["id"]
           },
           {
             foreignKeyName: "products_and_materials_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products_users: {
+        Row: {
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_users_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_users_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -462,25 +396,25 @@ export type Database = {
       }
       raw_materials: {
         Row: {
-          material_code: string
-          material_id: string
-          material_name: string
+          code: string
+          id: string
+          name: string
           purchase_price: number
           units: string | null
           validated: boolean | null
         }
         Insert: {
-          material_code: string
-          material_id?: string
-          material_name: string
+          code: string
+          id?: string
+          name: string
           purchase_price?: number
           units?: string | null
           validated?: boolean | null
         }
         Update: {
-          material_code?: string
-          material_id?: string
-          material_name?: string
+          code?: string
+          id?: string
+          name?: string
           purchase_price?: number
           units?: string | null
           validated?: boolean | null

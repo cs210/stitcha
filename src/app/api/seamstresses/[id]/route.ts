@@ -3,7 +3,7 @@ import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Retrieves a specific seamstress by id
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
 	const { userId } = await auth();
 	const { id: seamstressId } = await params;
 
@@ -13,25 +13,29 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 	const supabase = await createClerkSupabaseClientSsr();
 
-	try {
+	try {		
 		const { data, error } = await supabase
 			.from('users')
-			.select(
-				`
-				*,
-				product_users!inner (
-					products (*)
-				)
-			`
-			)
+			.select('*')
 			.eq('id', seamstressId)
 			.single();
 
-		if (error) {
-			throw new Error(error.message);
+		const { data: progressData, error: progressError } = await supabase
+			.from('progress')
+			.select('*')
+			.eq('user_id', seamstressId);		
+
+		// Combine the seamstress data with the progress data
+		const combinedData = {
+			...data,
+			progress: progressData
+		};		
+
+		if (error || progressError) {
+			throw new Error(error?.message || progressError?.message);
 		}
 
-		return NextResponse.json({ data }, { status: 200 });
+		return NextResponse.json({ data: combinedData }, { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ error }, { status: 500 });
 	}

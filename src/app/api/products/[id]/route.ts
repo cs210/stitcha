@@ -4,97 +4,112 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Get a specific product by id
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const supabase = await createClerkSupabaseClientSsr();
-  const { id } = await params;
+	const { userId } = await auth();
+	const { id } = await params;
 
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("id", id)
-    .single();
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
-  }
+	const supabase = await createClerkSupabaseClientSsr();
 
-  return NextResponse.json(data, { status: 200 });
+	try {
+		const { data, error } = await supabase
+			.from('products')
+			.select(`
+				*,
+				products_users (
+					user_id,					
+					users!inner (
+						first_name,
+						last_name
+					)
+				),
+				product_costs (*),
+				product_progress (
+					progress_id,
+					progress (
+						id,
+						description, 
+						created_at,
+						image_urls,
+						emotion,
+						user_id,
+						users:user_id (
+							first_name,
+							last_name
+						)
+					)
+				),
+				products_labor (
+					*,
+					labor (*)
+				),
+				products_packaging_materials (
+					*,
+					packaging_materials (*)
+				),
+				products_raw_materials (
+					*,
+					raw_materials (*)
+				)
+			`)
+			.eq('id', id)
+			.single();
+
+		// Rename the users, costs, progress, labor, packaging materials, and raw materials fields in the data object
+		if (data) {
+			data.users = data.products_users;
+			data.costs = data.product_costs;
+			data.progress = data.product_progress;
+			data.labor = data.products_labor;
+			data.packaging_materials = data.products_packaging_materials;
+			data.raw_materials = data.products_raw_materials;
+			
+			delete data.products_users;
+			delete data.product_costs;
+			delete data.product_progress;
+			delete data.products_labor;
+			delete data.products_packaging_materials;
+			delete data.products_raw_materials;
+		}		
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return NextResponse.json({ data }, { status: 200 });
+	} catch (error) {
+		return NextResponse.json({ error }, { status: 500 });
+	}
 }
 
-// update the order_id of a specific product
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { userId } = await auth();
-  const { id: productId } = await params;
-
-  // Check if the user is authenticated
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const supabase = await createClerkSupabaseClientSsr();
-
-  const body = await request.json();
-
-  // Build update object based on provided fields
-  const updateData: {
-    order_id?: string | null;
-  } = {};
-
-  if (body.order_id !== undefined) {
-    updateData.order_id = body.order_id;
-  }
-
-  const { data, error } = await supabase
-    .from("products")
-    .update(updateData)
-    .eq("id", productId)
-    .select();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return NextResponse.json({ data }, { status: 200 });
-}
-
-
-// Delete a specific product
+// Delete a specific product by id
 export async function DELETE(
-  request: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  try {
-    const { userId } = await auth();
-    const { id: productId } = await params;
+	const { userId } = await auth();
+	const { id: productId } = await params;
 
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
 
-    const supabase = await createClerkSupabaseClientSsr();
+	const supabase = await createClerkSupabaseClientSsr();
 
-    // Then delete the product
-    const { error } = await supabase
-      .from("products")
-      .delete()
-      .eq("id", productId);
+	try {
+		const { data, error } = await supabase.from('products').delete().eq('id', productId);
 
-    if (error) {
-      console.error("Error in Supabase delete operation:", error);
-      throw error;
-    }
+		if (error) {
+			throw new Error(error.message);
+		}
 
-    return NextResponse.json({ success: true, deletedId: productId });
-  } catch (error) {
-    console.error("Error deleting product:", error);
-    return NextResponse.json(
-      { error: "Failed to delete product" },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json({ data }, { status: 200 });
+	} catch (error) {
+		return NextResponse.json({ error }, { status: 500 });
+	}
 }

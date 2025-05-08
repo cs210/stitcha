@@ -4,399 +4,333 @@ import { Header } from "@/components/custom/header/header";
 import { HeaderContainer } from "@/components/custom/header/header-container";
 import { Loader } from "@/components/custom/loader/loader";
 import { LoaderContainer } from "@/components/custom/loader/loader-container";
-import ProductsActivityTimelineItem from "@/components/custom/products/products-activity-timeline-item";
-import ProductsSeamstressAvatar from "@/components/custom/products/products-seamstress-avatar";
-import { Button } from "@/components/ui/button";
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandItem,
-	CommandList,
-} from "@/components/ui/command";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
-import { generateProductPDF } from "@/lib/pdf/generate";
-import { Product, Progress, User } from "@/lib/schemas/global.types";
-import {
-	Download,
-	Search,
-	Users,
-	X
-} from "lucide-react";
-import Image from "next/image";
-import { use, useEffect, useMemo, useRef, useState } from "react";
-import { toast } from "sonner";
-
-interface TimelineUpdate extends Progress {
-  status?: string;
-}
+import ProductsDetails from "@/components/custom/products/products-details";
+import { Product } from "@/lib/schemas/global.types";
+import { useUser } from "@clerk/nextjs";
+import { use, useEffect, useState } from "react";
 
 export default function ProductDetails({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const unwrappedParams = use(params);
+	const { id: productId } = use(params);
+	const { user } = useUser();
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [product, setProduct] = useState<Product | null>(null);
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-  const [tempSelectedUsers, setTempSelectedUsers] = useState<User[]>([]);
-  const [progressUpdates, setProgressUpdates] = useState<TimelineUpdate[]>([]);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isCommandOpen, setIsCommandOpen] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
-  const [zoomImageIndex, setZoomImageIndex] = useState(0);
-  const productImageRef = useRef<HTMLDivElement>(null);
-  const productDetailsRef = useRef<HTMLDivElement>(null);
-  const [isPdfGenerating, setIsPdfGenerating] = useState(false);
+
+  // const [users, setUsers] = useState<User[]>([]);
+  // const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+  // const [tempSelectedUsers, setTempSelectedUsers] = useState<User[]>([]);
+  // const [progressUpdates, setProgressUpdates] = useState<TimelineUpdate[]>([]);
+  // const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [isCommandOpen, setIsCommandOpen] = useState(false);
+  // const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  // const [isZoomModalOpen, setIsZoomModalOpen] = useState(false);
+  // const [zoomImageIndex, setZoomImageIndex] = useState(0);
+  // const productImageRef = useRef<HTMLDivElement>(null);
+  // const productDetailsRef = useRef<HTMLDivElement>(null);
+  // const [isPdfGenerating, setIsPdfGenerating] = useState(false);
 
   // Fetch initial product data
-  useEffect(() => {
-    let isMounted = true;
+	useEffect(() => {
+		if (!user) return;
 
-    async function fetchInitialData() {
-      try {
-        setLoading(true);
-        const [productResponse, usersResponse] = await Promise.all([
-          fetch(`/api/products/${unwrappedParams.id}`),
-          fetch("/api/seamstresses")
-        ]);
+		(async () => {
+			// Get product details
+			const productResponse = await fetch(`/api/products/${productId}`);
+			const { data, error } = await productResponse.json();
 
-        const [productData, { data: usersData }] = await Promise.all([
-          productResponse.json(),
-          usersResponse.json()
-        ]);
+			if (!error) {
+				setProduct(data);
+			} else {
+				console.error('Error fetching product details:', error);
+			}
 
-        if (!isMounted) return;
-
-        if (!productResponse.ok) {
-          throw new Error(productData.error);
-        }
-
-        setProduct(productData);
-        if (Array.isArray(usersData)) {
-          setUsers(usersData);
-        }
-
-        // Fetch assigned users
-        const assignedResponse = await fetch(
-          `/api/products/${unwrappedParams.id}/assigned`
-        );
-        const { data: assignedData } = await assignedResponse.json();
-
-        if (!isMounted) return;
-
-        // Find the full user objects for assigned seamstresses
-        if (Array.isArray(assignedData)) {
-          const assignedUsers = usersData.filter((user: User) =>
-            assignedData.some((assigned) => assigned.user_id === user.id)
-          );
-          setSelectedUsers(assignedUsers);
-          setTempSelectedUsers(assignedUsers);
-        }
-      } catch (error) {
-        console.error("Error fetching initial data:", error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchInitialData();
-    return () => {
-      isMounted = false;
-    };
-  }, [unwrappedParams.id]);
+			setLoading(false);
+		})();
+  }, [user, productId]);
 
   // Fetch timeline and progress updates separately with a delay
-  useEffect(() => {
-    let isMounted = true;
-    const timeoutId = setTimeout(async () => {
-      if (!product) return;
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   const timeoutId = setTimeout(async () => {
+  //     if (!product) return;
 
-      try {
-        const [timelineResponse, progressResponse] = await Promise.all([
-          fetch(`/api/products/${unwrappedParams.id}/timeline`),
-          fetch(`/api/products/${unwrappedParams.id}/progress`)
-        ]);
+  //     try {
+  //       const [timelineResponse, progressResponse] = await Promise.all([
+  //         fetch(`/api/products/${unwrappedParams.id}/timeline`),
+  //         fetch(`/api/products/${unwrappedParams.id}/progress`)
+  //       ]);
 
-        const [timelineData, progressData] = await Promise.all([
-          timelineResponse.json(),
-          progressResponse.json()
-        ]);
+  //       const [timelineData, progressData] = await Promise.all([
+  //         timelineResponse.json(),
+  //         progressResponse.json()
+  //       ]);
 
-        if (!isMounted) return;
+  //       if (!isMounted) return;
 
-        let updates: TimelineUpdate[] = [];
+  //       let updates: TimelineUpdate[] = [];
 
-        // Add timeline data
-        if (Array.isArray(timelineData.data)) {
-          updates = [...timelineData.data];
+  //       // Add timeline data
+  //       if (Array.isArray(timelineData.data)) {
+  //         updates = [...timelineData.data];
 
-          if (!updates.some((update) => update.status === "created")) {
-            updates.unshift({
-              id: "created",
-              created_at: new Date().toISOString(),
-              description: `Batch ${product.system_code} entered production phase`,
-              emotion: null,
-              user_id: "system",
-              image_urls: [],
-            });
-          }
-        }
+  //         if (!updates.some((update) => update.status === "created")) {
+  //           updates.unshift({
+  //             id: "created",
+  //             created_at: new Date().toISOString(),
+  //             description: `Batch ${product.system_code} entered production phase`,
+  //             emotion: null,
+  //             user_id: "system",
+  //             image_urls: [],
+  //           });
+  //         }
+  //       }
 
-        // Add progress data
-        if (Array.isArray(progressData.data)) {
-          updates = [
-            ...updates,
-            ...progressData.data
-          ];
-        }
+  //       // Add progress data
+  //       if (Array.isArray(progressData.data)) {
+  //         updates = [
+  //           ...updates,
+  //           ...progressData.data
+  //         ];
+  //       }
 
-        // Sort all updates by date
-        updates.sort(
-          (a, b) =>
-            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
+  //       // Sort all updates by date
+  //       updates.sort(
+  //         (a, b) =>
+  //           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  //       );
 
-        setProgressUpdates(updates);
-      } catch (error) {
-        console.error("Error fetching updates:", error);
-      }
-    }, 1000);
+  //       setProgressUpdates(updates);
+  //     } catch (error) {
+  //       console.error("Error fetching updates:", error);
+  //     }
+  //   }, 1000);
 
-    return () => {
-      isMounted = false;
-      clearTimeout(timeoutId);
-    };
-  }, [unwrappedParams.id, product]);
+  //   return () => {
+  //     isMounted = false;
+  //     clearTimeout(timeoutId);
+  //   };
+  // }, [unwrappedParams.id, product]);
 
-  // Reset temporary selection when dialog opens
-  useEffect(() => {
-    if (isDialogOpen) {
-      setTempSelectedUsers(selectedUsers);
-    } else {
-      setIsCommandOpen(false);
-    }
-  }, [isDialogOpen, selectedUsers]);
+  // // Reset temporary selection when dialog opens
+  // useEffect(() => {
+  //   if (isDialogOpen) {
+  //     setTempSelectedUsers(selectedUsers);
+  //   } else {
+  //     setIsCommandOpen(false);
+  //   }
+  // }, [isDialogOpen, selectedUsers]);
 
-  // Handle user selection
-  const handleUserSelect = (userId: string) => {
-    const user = users.find((u) => u.id === userId);
+  // // Handle user selection
+  // const handleUserSelect = (userId: string) => {
+  //   const user = users.find((u) => u.id === userId);
 
-    if (user && !tempSelectedUsers.some((u) => u.id === userId)) {
-      setTempSelectedUsers([...tempSelectedUsers, user]);
-    }
-  };
+  //   if (user && !tempSelectedUsers.some((u) => u.id === userId)) {
+  //     setTempSelectedUsers([...tempSelectedUsers, user]);
+  //   }
+  // };
 
-  // Handle user removal
-  const handleRemoveUser = (userId: string) => {
-    setTempSelectedUsers(
-      tempSelectedUsers.filter((user) => user.id !== userId)
-    );
-  };
+  // // Handle user removal
+  // const handleRemoveUser = (userId: string) => {
+  //   setTempSelectedUsers(
+  //     tempSelectedUsers.filter((user) => user.id !== userId)
+  //   );
+  // };
 
-  // Handle assignment confirmation
-  const handleConfirmAssignment = async () => {
-    try {
-      const response = await fetch(
-        `/api/products/${unwrappedParams.id}/assign`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            seamstressIds: tempSelectedUsers.map((user) => user.id),
-          }),
-        }
-      );
+  // // Handle assignment confirmation
+  // const handleConfirmAssignment = async () => {
+  //   try {
+  //     const response = await fetch(
+  //       `/api/products/${unwrappedParams.id}/assign`,
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           seamstressIds: tempSelectedUsers.map((user) => user.id),
+  //         }),
+  //       }
+  //     );
 
-      const data = await response.json();
+  //     const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to assign seamstresses");
-      }
+  //     if (!response.ok) {
+  //       throw new Error(data.error || "Failed to assign seamstresses");
+  //     }
 
-      // Find newly assigned users (for the progress update)
-      const newlyAssignedUsers = tempSelectedUsers.filter(
-        (tempUser) =>
-          !selectedUsers.some((selectedUser) => selectedUser.id === tempUser.id)
-      );
+  //     // Find newly assigned users (for the progress update)
+  //     const newlyAssignedUsers = tempSelectedUsers.filter(
+  //       (tempUser) =>
+  //         !selectedUsers.some((selectedUser) => selectedUser.id === tempUser.id)
+  //     );
 
-      // Create progress event if there are new assignments
-      if (newlyAssignedUsers.length > 0) {
-        const newEvent: TimelineUpdate = {
-          id: `assigned-${Date.now()}`,
-          created_at: new Date().toISOString(),
-          description:
-            newlyAssignedUsers.length === 1
-              ? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
-              : `Product assigned to ${newlyAssignedUsers
-                  .map((user) => `${user.first_name} ${user.last_name}`)
-                  .join(", ")}`,
-          emotion: null,
-          user_id: newlyAssignedUsers.map((user) => user.id).join(","),
-          image_urls: [],
-        };
+  //     // Create progress event if there are new assignments
+  //     if (newlyAssignedUsers.length > 0) {
+  //       const newEvent: TimelineUpdate = {
+  //         id: `assigned-${Date.now()}`,
+  //         created_at: new Date().toISOString(),
+  //         description:
+  //           newlyAssignedUsers.length === 1
+  //             ? `Product assigned to ${newlyAssignedUsers[0].first_name} ${newlyAssignedUsers[0].last_name}`
+  //             : `Product assigned to ${newlyAssignedUsers
+  //                 .map((user) => `${user.first_name} ${user.last_name}`)
+  //                 .join(", ")}`,
+  //         emotion: null,
+  //         user_id: newlyAssignedUsers.map((user) => user.id).join(","),
+  //         image_urls: [],
+  //       };
 
-        setProgressUpdates((prev) => [...(prev || []), newEvent]);
-      }
+  //       setProgressUpdates((prev) => [...(prev || []), newEvent]);
+  //     }
 
-      setSelectedUsers(tempSelectedUsers);
-      setIsDialogOpen(false);
+  //     setSelectedUsers(tempSelectedUsers);
+  //     setIsDialogOpen(false);
 
-      toast.success("Seamstresses assigned successfully");
-    } catch (error) {
-      console.error("Error in handleConfirmAssignment:", error);
+  //     toast.success("Seamstresses assigned successfully");
+  //   } catch (error) {
+  //     console.error("Error in handleConfirmAssignment:", error);
 
-      toast.error(
-        error instanceof Error ? error.message : "Failed to assign seamstresses"
-      );
-    }
-  };
+  //     toast.error(
+  //       error instanceof Error ? error.message : "Failed to assign seamstresses"
+  //     );
+  //   }
+  // };
 
-  // Handle assignment removal
-  const handleDeleteAssignment = async (userId: string) => {
-    try {
-      const response = await fetch(
-        `/api/products/${unwrappedParams.id}/assign`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            seamstressIds: [userId],
-          }),
-        }
-      );
+  // // Handle assignment removal
+  // const handleDeleteAssignment = async (userId: string) => {
+  //   try {
+  //     const response = await fetch(
+  //       `/api/products/${unwrappedParams.id}/assign`,
+  //       {
+  //         method: "DELETE",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //         body: JSON.stringify({
+  //           seamstressIds: [userId],
+  //         }),
+  //       }
+  //     );
 
-      if (!response.ok) {
-        const data = await response.json();
+  //     if (!response.ok) {
+  //       const data = await response.json();
 
-        throw new Error(data.error || "Failed to remove assignment");
-      }
+  //       throw new Error(data.error || "Failed to remove assignment");
+  //     }
 
-      setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+  //     setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
 
-      const removedUser = selectedUsers.find((user) => user.id === userId);
+  //     const removedUser = selectedUsers.find((user) => user.id === userId);
 
-      if (removedUser) {
-        const newEvent: TimelineUpdate = {
-          id: `unassigned-${Date.now()}`,
-          created_at: new Date().toISOString(),
-          description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
-          emotion: null,
-          user_id: userId,
-          image_urls: [],
-        };
+  //     if (removedUser) {
+  //       const newEvent: TimelineUpdate = {
+  //         id: `unassigned-${Date.now()}`,
+  //         created_at: new Date().toISOString(),
+  //         description: `Removed assignment from ${removedUser.first_name} ${removedUser.last_name}`,
+  //         emotion: null,
+  //         user_id: userId,
+  //         image_urls: [],
+  //       };
 
-        setProgressUpdates((prev) => [...(prev || []), newEvent]);
-      }
+  //       setProgressUpdates((prev) => [...(prev || []), newEvent]);
+  //     }
 
-      toast.success("Assignment removed successfully");
-    } catch (error) {
-      console.error("Error removing assignment:", error);
+  //     toast.success("Assignment removed successfully");
+  //   } catch (error) {
+  //     console.error("Error removing assignment:", error);
 
-      toast.error(
-        error instanceof Error ? error.message : "Failed to remove assignment"
-      );
-    }
-  };
+  //     toast.error(
+  //       error instanceof Error ? error.message : "Failed to remove assignment"
+  //     );
+  //   }
+  // };
 
-  // Function to open zoom modal
-  const openZoomModal = (index: number) => {
-    setZoomImageIndex(index);
-    setIsZoomModalOpen(true);
-  };
+  // // Function to open zoom modal
+  // const openZoomModal = (index: number) => {
+  //   setZoomImageIndex(index);
+  //   setIsZoomModalOpen(true);
+  // };
 
-  // Function to navigate to next/previous image in zoom view
-  const navigateZoomImage = (direction: "next" | "prev") => {
-    if (!safeImageUrls.length) return;
+  // // Function to navigate to next/previous image in zoom view
+  // const navigateZoomImage = (direction: "next" | "prev") => {
+  //   if (!safeImageUrls.length) return;
 
-    if (direction === "next") {
-      setZoomImageIndex((prev) => (prev + 1) % safeImageUrls.length);
-    } else {
-      setZoomImageIndex(
-        (prev) => (prev - 1 + safeImageUrls.length) % safeImageUrls.length
-      );
-    }
-  };
+  //   if (direction === "next") {
+  //     setZoomImageIndex((prev) => (prev + 1) % safeImageUrls.length);
+  //   } else {
+  //     setZoomImageIndex(
+  //       (prev) => (prev - 1 + safeImageUrls.length) % safeImageUrls.length
+  //     );
+  //   }
+  // };
 
-  const handleGeneratePDF = async () => {
-    if (!productImageRef.current || !productDetailsRef.current || !product)
-      return;
+  // const handleGeneratePDF = async () => {
+  //   if (!productImageRef.current || !productDetailsRef.current || !product)
+  //     return;
 
-    setIsPdfGenerating(true);
-    try {
-      const pdfData = await generateProductPDF(
-        productImageRef.current,
-        productDetailsRef.current,
-        product
-      );
+  //   setIsPdfGenerating(true);
+  //   try {
+  //     const pdfData = await generateProductPDF(
+  //       productImageRef.current,
+  //       productDetailsRef.current,
+  //       product
+  //     );
 
-      // Create a blob from the Uint8Array
-      const blob = new Blob([pdfData], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
+  //     // Create a blob from the Uint8Array
+  //     const blob = new Blob([pdfData], { type: "application/pdf" });
+  //     const url = URL.createObjectURL(blob);
 
-      // Create a download link
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${product.name}-details.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+  //     // Create a download link
+  //     const link = document.createElement("a");
+  //     link.href = url;
+  //     link.download = `${product.name}-details.pdf`;
+  //     document.body.appendChild(link);
+  //     link.click();
+  //     document.body.removeChild(link);
+  //     URL.revokeObjectURL(url);
 
-      toast.success("PDF generated successfully");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Failed to generate PDF");
-    } finally {
-      setIsPdfGenerating(false);
-    }
-  };
+  //     toast.success("PDF generated successfully");
+  //   } catch (error) {
+  //     console.error("Error generating PDF:", error);
+  //     toast.error("Failed to generate PDF");
+  //   } finally {
+  //     setIsPdfGenerating(false);
+  //   }
+  // };
 
-  // Filter available users
-  const filteredAvailableUsers = users.filter(
-    (user) =>
-      !tempSelectedUsers.some((selectedUser) => selectedUser.id === user.id) &&
-      (searchQuery === "" ||
-        `${user.first_name} ${user.last_name}`
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        (user.location?.toLowerCase() || "").includes(
-          searchQuery.toLowerCase()
-        ))
-  );
+  // // Filter available users
+  // const filteredAvailableUsers = users.filter(
+  //   (user) =>
+  //     !tempSelectedUsers.some((selectedUser) => selectedUser.id === user.id) &&
+  //     (searchQuery === "" ||
+  //       `${user.first_name} ${user.last_name}`
+  //         .toLowerCase()
+  //         .includes(searchQuery.toLowerCase()) ||
+  //       (user.location?.toLowerCase() || "").includes(
+  //         searchQuery.toLowerCase()
+  //       ))
+  // );
 
-  // Type guard for image URLs
-  const safeImageUrls: string[] = useMemo(() => {
-    if (!product?.image_urls) return [];
+  // // Type guard for image URLs
+  // const safeImageUrls: string[] = useMemo(() => {
+  //   if (!product?.image_urls) return [];
     
-    if (Array.isArray(product.image_urls)) {
-      return product.image_urls.filter((url): url is string => typeof url === 'string');
-    }
+  //   if (Array.isArray(product.image_urls)) {
+  //     return product.image_urls.filter((url): url is string => typeof url === 'string');
+  //   }
     
-    if (typeof product.image_urls === 'object') {
-      return Object.values(product.image_urls)
-        .filter((url): url is string => typeof url === 'string');
-    }
+  //   if (typeof product.image_urls === 'object') {
+  //     return Object.values(product.image_urls)
+  //       .filter((url): url is string => typeof url === 'string');
+  //   }
     
-    return [];
-  }, [product?.image_urls]);
+  //   return [];
+  // }, [product?.image_urls]);
 
   if (loading) {
     return (
@@ -406,21 +340,13 @@ export default function ProductDetails({
     );
   }
 
-  if (!product) {
-    return (
-      <div className="p-4 text-center">
-        <p>Product not found</p>
-      </div>
-    );
-  }
-
   return (
     <>
       <HeaderContainer>
-        <Header text={product.name} />
+        <Header text={`${product?.name}`} />
       </HeaderContainer>
 
-      <div className="flex items-center gap-4 mt-4">
+      {/* <div className="flex items-center gap-4 mt-4">
         <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500">Assigned to:</span>
           {selectedUsers.length > 0 ? (
@@ -600,13 +526,15 @@ export default function ProductDetails({
             </>
           )}
         </Button>
-      </div>
+      </div> */}
+
+      <ProductsDetails product={product} />
 
       <div className="py-4 space-y-4">
         <div className="grid grid-cols-[2fr,1fr] gap-4">
           <div className="space-y-4">
             <div className="bg-white rounded-2xl p-8 shadow-sm border">
-              <div className="mb-8">
+              {/* <div className="mb-8">
                 <div className="w-full h-96 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative group cursor-zoom-in">
                   <Image
                     src={safeImageUrls[selectedImageIndex] || "/placeholder-image.jpg"}
@@ -641,70 +569,11 @@ export default function ProductDetails({
                     ))}
                   </div>
                 )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Product Information
-                  </h2>
-                  <div className="space-y-4">
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">System Code</span>
-                      <span className="font-medium">{product.system_code}</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Cert Number</span>
-                      <span className="font-medium">
-                        {product.inmetro_cert_number}
-                      </span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Barcode</span>
-                      <span className="font-medium">{product.barcode}</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Product Type</span>
-                      <span className="font-medium">
-                        {product.product_type}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h2 className="text-2xl font-semibold mb-4">
-                    Specifications
-                  </h2>
-                  <div className="space-y-4">
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Weight</span>
-                      <span className="font-medium">{product.weight} kg</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Width</span>
-                      <span className="font-medium">{product.width} cm</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Height</span>
-                      <span className="font-medium">{product.height} cm</span>
-                    </div>
-                    <div className="flex items-baseline">
-                      <span className="text-gray-500 w-32">Lost %</span>
-                      <span className="font-medium">
-                        {product.percent_pieces_lost}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Description</h2>
-                <p className="text-gray-500">{product.description}</p>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-sm border">
+          {/* <div className="bg-white rounded-2xl p-8 shadow-sm border">
             <h2 className="text-2xl font-semibold mb-8">Activity Timeline</h2>
             <div className="relative">
               {progressUpdates && progressUpdates.length > 1 && (
@@ -730,11 +599,11 @@ export default function ProductDetails({
                 )}
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      {isZoomModalOpen && (
+      {/* {isZoomModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center">
           <Image
             src={safeImageUrls[zoomImageIndex] || "/placeholder-image.jpg"}
@@ -751,7 +620,7 @@ export default function ProductDetails({
             </div>
           )}
         </div>
-      )}
+      )} */}
     </>
   );
 }

@@ -1,7 +1,7 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { handleProductTableInsert, updatePackagingMaterialFromProduct, updateRawMaterialFromProduct } from '@/lib/supabase/utils';
 import { auth } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Retrieves all products
 export async function GET() {
@@ -20,14 +20,14 @@ export async function GET() {
 			throw new Error(error.message);
 		}
 
-		return Response.json({ data }, { status: 200 });
+		return NextResponse.json({ data }, { status: 200 });
 	} catch (error) {
-		return Response.json({ error }, { status: 500 });
+		return NextResponse.json({ error }, { status: 500 });
 	}
 }
 
 // Creates a new product
-export async function POST(request: Request) {
+export async function POST(req: NextRequest) {
 	const { userId } = await auth();
 
 	if (!userId) {
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const formData = await request.formData();
+		const formData = await req.formData();
 
 		const updatedProduct = await handleProductTableInsert(formData, supabase, userId);
 		const productId = updatedProduct.id;
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 		await updateRawMaterialFromProduct(productId, supabase, formData);
 		await updatePackagingMaterialFromProduct(productId, supabase, formData);
 
-		return NextResponse.json({ success: true, data: updatedProduct }, { status: 201 });
+		return NextResponse.json({ data: updatedProduct }, { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ error }, { status: 500 });
 	}

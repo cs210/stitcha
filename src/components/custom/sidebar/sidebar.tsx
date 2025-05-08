@@ -6,11 +6,10 @@ import { UserButton } from "@clerk/nextjs";
 import {
 	BrainIcon,
 	ChevronLeft,
-	ClipboardIcon,
 	KanbanIcon,
 	SettingsIcon,
 	ShirtIcon,
-	Users,
+	Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -21,7 +20,6 @@ const navRoutes = [
   { href: "/dashboard/assistant", icon: BrainIcon, label: "Stitcha AI" },
   { href: "/dashboard/kanban", icon: KanbanIcon, label: "Kanban" },
   { href: "/dashboard/products", icon: ShirtIcon, label: "Products" },
-  { href: "/dashboard/orders", icon: ClipboardIcon, label: "Orders" },
   { href: "/dashboard/seamstresses", icon: Users, label: "Seamstresses" },
   { href: "/dashboard/settings", icon: SettingsIcon, label: "Settings" },
 ];
@@ -45,7 +43,7 @@ export function Sidebar() {
 							<ChevronLeft className='h-4 w-4' />
 						</Button>
 					)}
-				</div>				
+				</div>
 			</div>
 
 			<div className='flex flex-col gap-4'>
@@ -75,7 +73,17 @@ export function Sidebar() {
 			</div>
 
 			<div className='mx-auto mt-auto'>
-				<UserButton />
+				<UserButton
+					appearance={{
+						elements: {
+							userButtonBox: {								
+								width: isExpanded && '100%',
+								padding: isExpanded && '8px',
+							},
+						},
+					}}
+					showName={isExpanded}
+				/>
 			</div>
 		</div>
 	);
