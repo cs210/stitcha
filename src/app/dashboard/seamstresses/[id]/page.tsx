@@ -21,15 +21,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	useEffect(() => {
 		if (!user) return;
 
-		(async () => {			
-			// Get seamstress details			
+		(async () => {
+			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
 			const { data, error } = await seamstressResponse.json();
 
 			if (!error) {
 				setSeamstress(data);
 			} else {
-				console.error("Error fetching seamstress details:", error);
+				console.error('Error fetching seamstress details:', error);
 			}
 
 			setLoading(false);
@@ -52,9 +52,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 			</HeaderContainer>
 
 			<Container>
-				<div className='flex flex-wrap gap-6'>
-					{seamstress && <SeamstressProfile seamstress={seamstress} />}
-				</div>
+				<div className='flex flex-wrap gap-6'>{seamstress && <SeamstressProfile seamstress={seamstress} />}</div>
 			</Container>
 		</>
 	);

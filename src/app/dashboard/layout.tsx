@@ -1,96 +1,52 @@
-"use client";
+'use client';
 
-import { NavigationBreadcrumb } from "@/components/custom/navigation/navigation-breadcrumb";
-import { Sidebar } from "@/components/custom/sidebar/sidebar";
-import { Toaster } from "@/components/ui/sonner";
-import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-breadcrumb';
+import { Sidebar } from '@/components/custom/sidebar/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
+import { usePathname } from 'next/navigation';
+import { useContext, useEffect, useState } from 'react';
+import { getDictionary } from '../locales';
+import { LangContext } from '../layout';
 
-export default function Layout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
-  const pathname = usePathname();
-  const segments = pathname.split("/").filter(Boolean);
+export default function Layout({ children }: { children: React.ReactNode }) {
+	const { lang } = useContext(LangContext);
+	const [dict, setDict] = useState<any>();
 
-  // const [productName, setProductName] = useState<string>("");
-  // const [orderClient, setOrderClient] = useState<string>("");
-  // const [seamstressName, setSeamstressName] = useState<string>("");
+	const pathname = usePathname();
+	const segments = pathname.split('/').filter(Boolean);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
-		// async function getDetails() {
-		// 	// Get product details based on segments
-		// 	if (segments[1] === 'products' && segments.length === 3) {
-		// 		try {
-		// 			const response = await fetch(`/api/products/${segments[2]}`);
-		// 			const data = await response.json();
+		(async () => {
+			const dict = await getDictionary(lang);
 
-		// 			if (data?.name) {
-		// 				setProductName(data.name);
-		// 			}
-		// 		} catch (error) {
-		// 			console.error('Error fetching product:', error);
-		// 		}
-		// 	}
-		// 	// Get order details based on segments
-		// 	else if (segments[1] === 'orders' && segments.length === 3) {
-		// 		try {
-		// 			const response = await fetch(`/api/orders/${segments[2]}`);
-		// 			const data = await response.json();
+			setDict(dict);
+			setLoading(false);
+		})();
+	}, [lang]);
 
-		// 			if (data?.client) {
-		// 				setOrderClient(data.client);
-		// 			}
-		// 		} catch (error) {
-		// 			console.error('Error fetching order:', error);
-		// 		}
-		// 	}
-		// 	// Get seamstress details based on segments
-		// 	else if (segments[1] === 'seamstresses' && segments.length === 3) {
-		// 		try {
-		// 			const response = await fetch(`/api/seamstresses/${segments[2]}`);
-		// 			const { data } = await response.json();
-
-		// 			if (data?.first_name && data?.last_name) {
-		// 				setSeamstressName(`${data.first_name} ${data.last_name}`);
-		// 			}
-		// 		} catch (error) {
-		// 			console.error('Error fetching seamstress:', error);
-		// 		}
-		// 	}
-		// }
-
-		// getDetails();
-	}, [segments]);
-
-  // Determine what to show in the breadcrumb
-  const isProductDetails = segments[1] === "products" && segments.length === 3;
-  const isOrderDetails = segments[1] === "orders" && segments.length === 3;
-  const isSeamstressDetails = segments[1] === "seamstresses" && segments.length === 3;
-
-  const currentPage = segments[segments.length - 1];
-  const formattedPage = currentPage.charAt(0).toUpperCase() + currentPage.slice(1);
+	if (loading) {
+		return;
+	}
 
 	return (
-		<div className='flex h-screen'>
-			<Sidebar />
+		<SidebarProvider>
+			<div className='flex w-full h-screen'>
+				<Sidebar dict={dict} />
 
-			<main className='flex-1 overflow-x-hidden overflow-y-auto p-8'>
-				<header>
-					<NavigationBreadcrumb
-						isProductDetails={isProductDetails}
-						isOrderDetails={isOrderDetails}
-						isSeamstressDetails={isSeamstressDetails}
-						segments={segments}
-						formattedPage={formattedPage}
-					/>
-				</header>
+				<main className='flex-1 overflow-x-hidden overflow-y-auto p-8'>
+					<header className='flex items-center gap-4'>
+						<SidebarTrigger />
 
-				<div className='flex-1 flex-col h-full pt-8'>{children}</div>
-			</main>
+						<NavigationBreadcrumb segments={segments} formattedPage={segments[segments.length - 1]} />
+					</header>
 
-			<Toaster />
-		</div>
+					<div className='flex-1 flex-col h-full pt-8'>{children}</div>
+				</main>
+
+				<Toaster />
+			</div>
+		</SidebarProvider>
 	);
 }

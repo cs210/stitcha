@@ -1,0 +1,64 @@
+{
+  "settings": {
+    "title": "Configurações",
+    "description": "Gerenciar as configurações e preferências da sua conta",
+    "form": {
+      "fullName": "Nome Completo",
+      "email": "Email",
+      "language": {
+        "title": "Idioma",
+        "options": {
+          "en": "Inglês",
+          "pt": "Português"
+        },
+        "placeholder": "Selecionar idioma"
+      },
+      "save": "Salvar"
+    }
+  },
+  "kanban": {
+    "title": "Kanban",
+    "description": "Gerenciar e acompanhar o progresso dos pedidos",
+    "columns": {
+      "notStarted": "Não Iniciado",
+      "inProgress": "Em Andamento",
+      "done": "Concluído"
+    }
+  },
+  "products": {
+    "title": "Produtos",
+    "description": "Visualizar e gerenciar todos os produtos",
+    "search": "Pesquisar produtos por nome, tipo ou código do sistema...",
+    "table": {
+      "image": "Imagem",
+      "name": "Nome",
+      "type": "Tipo",
+      "systemCode": "Código do Sistema",
+      "noResults": "Nenhum resultado encontrado",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "seamstresses": {
+    "title": "Costureiras",
+    "description": "Visualizar e gerenciar todas as costureiras"
+  },
+  "table": {
+    "new": "Novo",
+    "noResults": "Nenhum resultado.",
+    "rowsSelected": "{{count}} de {{total}} linha(s) selecionada(s).",
+    "rowsPerPage": "Linhas por página",
+    "pageCount": "Página {{count}} de {{total}}",
+    "goToFirstPage": "Ir para a primeira página",
+    "goToPreviousPage": "Ir para a página anterior",
+    "goToNextPage": "Ir para a próxima página",
+    "goToLastPage": "Ir para a última página"
+  },
+  "sidebar": {
+    "stitchaAi": "Stitcha AI",
+    "kanban": "Kanban",
+    "products": "Produtos",
+    "seamstresses": "Costureiras",
+    "settings": "Configurações"
+  }
+}

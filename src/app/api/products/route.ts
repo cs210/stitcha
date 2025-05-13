@@ -1,5 +1,11 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
-import { handleProductTableInsert, updatePackagingMaterialFromProduct, updateRawMaterialFromProduct } from '@/lib/supabase/utils';
+import {
+	handleProductTableInsert,
+	updateLaborFromProduct,
+	updatePackagingMaterialFromProduct,	
+	updateRawMaterialFromProduct,
+	updateTechnicalSheetFromProduct,
+} from '@/lib/supabase/utils';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -44,6 +50,8 @@ export async function POST(req: NextRequest) {
 
 		await updateRawMaterialFromProduct(productId, supabase, formData);
 		await updatePackagingMaterialFromProduct(productId, supabase, formData);
+		await updateTechnicalSheetFromProduct(productId, supabase, formData);
+		await updateLaborFromProduct(productId, supabase, formData);
 
 		return NextResponse.json({ data: updatedProduct }, { status: 200 });
 	} catch (error) {

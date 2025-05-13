@@ -22,6 +22,14 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "src/lib/utils/client.tsc", "src/app/api/products/[id]", "src/components/custom/container"],
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		".next/types/**/*.ts",
+		"src/lib/utils/client.tsc",
+		"src/app/[lang]/api/products/[id]",
+		"src/components/custom/container"
+	],
 	"exclude": ["node_modules"]
 }

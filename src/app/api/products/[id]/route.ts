@@ -1,12 +1,9 @@
-import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { auth } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Get a specific product by id
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
 	const { userId } = await auth();
 	const { id } = await params;
 
@@ -19,7 +16,8 @@ export async function GET(
 	try {
 		const { data, error } = await supabase
 			.from('products')
-			.select(`
+			.select(
+				`
 				*,
 				products_users (
 					user_id,					
@@ -56,7 +54,8 @@ export async function GET(
 					*,
 					raw_materials (*)
 				)
-			`)
+			`
+			)
 			.eq('id', id)
 			.single();
 
@@ -68,14 +67,16 @@ export async function GET(
 			data.labor = data.products_labor;
 			data.packaging_materials = data.products_packaging_materials;
 			data.raw_materials = data.products_raw_materials;
-			
+
 			delete data.products_users;
 			delete data.product_costs;
 			delete data.product_progress;
 			delete data.products_labor;
 			delete data.products_packaging_materials;
 			delete data.products_raw_materials;
-		}		
+		}
+
+		console.log(data);
 
 		if (error) {
 			throw new Error(error.message);
@@ -88,10 +89,7 @@ export async function GET(
 }
 
 // Delete a specific product by id
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const { userId } = await auth();
 	const { id: productId } = await params;
 
@@ -102,10 +100,26 @@ export async function DELETE(
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
+		// First delete the product from the database
 		const { data, error } = await supabase.from('products').delete().eq('id', productId);
 
 		if (error) {
 			throw new Error(error.message);
+		}
+
+		// Only proceed with storage deletion if database deletion was successful
+		// Delete the product images from storage
+		const { error: productsStorageError } = await supabase.storage.from('products').remove([`${productId}`]);
+
+		if (productsStorageError) {
+			throw new Error(`Failed to delete product images: ${productsStorageError.message}`);
+		}
+
+		// Delete the technical sheets from storage
+		const { error: technicalSheetsStorageError } = await supabase.storage.from('technical-sheets').remove([`${productId}`]);
+
+		if (technicalSheetsStorageError) {
+			throw new Error(`Failed to delete technical sheets: ${technicalSheetsStorageError.message}`);
 		}
 
 		return NextResponse.json({ data }, { status: 200 });

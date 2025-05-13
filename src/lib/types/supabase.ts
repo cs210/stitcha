@@ -333,14 +333,17 @@ export type Database = {
         Row: {
           product_id: string
           user_id: string
+          validated: boolean
         }
         Insert: {
           product_id: string
           user_id: string
+          validated?: boolean
         }
         Update: {
           product_id?: string
           user_id?: string
+          validated?: boolean
         }
         Relationships: [
           {
@@ -401,7 +404,6 @@ export type Database = {
           name: string
           purchase_price: number
           units: string | null
-          validated: boolean | null
         }
         Insert: {
           code: string
@@ -409,7 +411,6 @@ export type Database = {
           name: string
           purchase_price?: number
           units?: string | null
-          validated?: boolean | null
         }
         Update: {
           code?: string
@@ -417,7 +418,6 @@ export type Database = {
           name?: string
           purchase_price?: number
           units?: string | null
-          validated?: boolean | null
         }
         Relationships: []
       }

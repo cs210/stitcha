@@ -1,7 +1,7 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
-import { auth } from "@clerk/nextjs/server";
+import { auth } from '@clerk/nextjs/server';
 import fs from 'fs';
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import path from 'path';
 
@@ -14,10 +14,8 @@ export async function POST(req: NextRequest) {
 	}
 
 	const supabase = await createClerkSupabaseClientSsr();
-	
-	const { data: productData, error: productError } = await supabase
-		.from('products')
-		.select('*');
+
+	const { data: productData, error: productError } = await supabase.from('products').select('*');
 
 	if (productError) {
 		return NextResponse.json({ error: productError }, { status: 400 });
@@ -25,13 +23,13 @@ export async function POST(req: NextRequest) {
 
 	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-	// Convert data to CSV strings	
-	const productCsv = productData?.map(product => Object.values(product).join(',')).join('\n') || '';
+	// Convert data to CSV strings
+	const productCsv = productData?.map((product) => Object.values(product).join(',')).join('\n') || '';
 
 	// Upload CSV strings directly to OpenAI
-	try {				
+	try {
 		const productPath = path.join('/tmp', 'products.csv');
-		
+
 		fs.writeFileSync(productPath, productCsv);
 
 		const productFile = await openai.files.create({
@@ -41,17 +39,17 @@ export async function POST(req: NextRequest) {
 
 		// Upload files to vector store
 		// const productVectorStore = await openai.vectorStores.files.create(
-		// 	"products", 
+		// 	"products",
 		// 	{
 		// 		file_id: productFile.id
 		// 	}
 		// );
 
-		// Clean up temporary files		
+		// Clean up temporary files
 		fs.unlinkSync(productPath);
 
 		return NextResponse.json({ data: productData }, { status: 200 });
-	} catch (error) {		
+	} catch (error) {
 		return NextResponse.json({ error }, { status: 500 });
 	}
 }

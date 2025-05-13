@@ -1,0 +1,43 @@
+version: 1
+files:
+  src/locales/en.json:
+    kanban.title: 39b32dd45982038aa5704ca2728334ee
+    kanban.description: 6f872d8a15db658aa590e47bbef47d92
+    kanban.columns.notStarted: 10db56f8b10dc989c43fbe33202e5339
+    kanban.columns.inProgress: c9413dd7682a45da9ecc9efa8cea47d7
+    kanban.columns.done: f92965e2c8a7afb3c1b9a5c09a263636
+    products.title: 068f80c7519d0528fb08e82137a72131
+    products.description: 0cb39c5bd95b0da88ae4ee23ca8f82c5
+    products.search: 7eee3887b2ec835fe69a27802be1d44f
+    products.table.image: be53a0541a6d36f6ecb879fa2c584b08
+    products.table.name: 49ee3087348e8d44e1feda1917443987
+    products.table.type: a1fa27779242b4902f7ae3bdd5c6d508
+    products.table.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    products.table.noResults: e576c23d915755d83e2d1f47bd9f6c22
+    products.table.edit: 7dce122004969d56ae2e0245cb754d35
+    products.table.delete: f2a6c498fb90ee345d997f888fce3b18
+    seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
+    seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
+    settings.title: f4f70727dc34561dfde1a3c529b6205c
+    settings.description: 5a398c73304f6e071c91a65c1f0bffb5
+    settings.form.fullName: 630058029627ce58e7571e7a5b6ec591
+    settings.form.email: ce8ae9da5b7cd6c3df2929543a9af92d
+    settings.form.language.title: 4994a8ffeba4ac3140beb89e8d41f174
+    settings.form.language.placeholder: 653777801f96237326d65205bc9129e3
+    settings.form.language.options.en: 78463a384a5aa4fad5fa73e2f506ecfc
+    settings.form.language.options.pt: 30e32c7c4cf434e9c75e60c14c442541
+    settings.form.save: c9cc8cce247e49bae79f15173ce97354
+    sidebar.stitchaAi: 7f7ce1b6270deca4deee7f8497d754d5
+    sidebar.kanban: 39b32dd45982038aa5704ca2728334ee
+    sidebar.products: 068f80c7519d0528fb08e82137a72131
+    sidebar.seamstresses: 9e91116c7f0918c4c3e50e73f6dba966
+    sidebar.settings: f4f70727dc34561dfde1a3c529b6205c
+    table.new: 03c2e7e41ffc181a4e84080b4710e81e
+    table.noResults: 3b8769d187c6c3306c50729bc43a9903
+    table.rowsSelected: 4155ae997447db2f8fe3af8d9adbfc6a
+    table.rowsPerPage: 3995e76cfbc85dea7472c8a1aa627244
+    table.pageCount: cafffb04cf38c1e77883885eea0cf7f2
+    table.goToFirstPage: e987e3128b4e18b03c5a22b0b0e9167a
+    table.goToPreviousPage: bbaeea4b59d37bd6e0927044f9a00047
+    table.goToNextPage: 406b6936d95a8acd48be844ec706e22c
+    table.goToLastPage: 261e818736ac3798b888949dd433e318

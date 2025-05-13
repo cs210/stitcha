@@ -9,10 +9,14 @@ import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressCard } from '@/components/custom/seamstress/seamstress-card';
 import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { getDictionary } from '../../locales';
+import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { user } = useUser();
+	const { lang } = useContext(LangContext);
+	const [dict, setDict] = useState<any>();
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
@@ -20,7 +24,11 @@ export default function Page() {
 	useEffect(() => {
 		if (!user) return;
 
-		(async () => {			
+		(async () => {
+			const dict = await getDictionary(lang);
+
+			setDict(dict);
+
 			const response = await fetch('/api/seamstresses');
 			const { data, error } = await response.json();
 
@@ -30,7 +38,7 @@ export default function Page() {
 
 			setLoading(false);
 		})();
-	}, [user]);
+	}, [user, lang]);
 
 	if (loading) {
 		return (
@@ -43,8 +51,8 @@ export default function Page() {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text='Seamstresses' />
-				<Description text='View and manage all seamstresses' />
+				<Header text={dict.seamstresses.title} />
+				<Description text={dict.seamstresses.description} />
 			</HeaderContainer>
 
 			<Container>

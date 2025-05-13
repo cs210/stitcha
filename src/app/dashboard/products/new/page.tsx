@@ -13,7 +13,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { LaborType, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
+import { Labor, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
@@ -41,23 +41,23 @@ export type ProductFormData = {
 	status: ProgressLevel;
 	// TODO: Update this to use types from supabase.types.ts
 	materials?: {
-		material_code: string;
-		material_name: string;
+		code: string;
+		name: string;
 		purchase_price: number;
 		unit_consumption: number;
 		units?: string;
 		total_cost: number;
 	}[];
 	packaging_materials?: {
-		material_code: string;
-		material_name: string;
+		code: string;
+		name: string;
 		purchase_price: number;
 		unit_consumption: number;
 		units?: string;
 		total_cost: number;
 	}[];
 	labor?: {
-		labor_name: string;
+		task: string;
 		time_per_unit: number;
 		conversion: number;
 		rework: number;
@@ -85,52 +85,71 @@ const formSchema = z.object({
 		.min(0, { message: 'Percent pieces lost must be 0 or greater' })
 		.max(100, { message: 'Percent pieces lost must be 100 or less' })
 		.optional(),
-	image_urls: z.array(z.instanceof(File))
-		.min(1, { message: 'At least one product image is required' })
-		.nullable(),
+	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }).nullable(),
 	status: progressLevelSchema,
-	materials: z.array(z.object({
-		material_code: z.string().min(1, { message: "Material code is required" }),
-		material_name: z.string().min(1, { message: "Material name is required" }),
-		purchase_price: z.number()
-			.positive({ message: "Purchase price must be greater than 0" })
-			.min(0.01, { message: "Purchase price must be at least 0.01" })
-			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
-		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
-		units: z.string().optional(),
-		total_cost: z.number(),
-	})).optional(),
-	packaging_materials: z.array(z.object({
-		material_code: z.string().min(1, { message: "Material code is required" }),
-		material_name: z.string().min(1, { message: "Material name is required" }),
-		purchase_price: z.number()
-			.positive({ message: "Purchase price must be greater than 0" })
-			.min(0.01, { message: "Purchase price must be at least 0.01" })
-			.refine(val => Number(val.toFixed(2)) === val, { message: "Purchase price can only have up to 2 decimal places" }),
-		unit_consumption: z.number().positive({ message: "Unit consumption must be greater than 0" }),
-		units: z.string().optional(),
-		total_cost: z.number(),
-	})).optional(),
-	labor: z.array(z.object({
-		labor_name: z.string().min(1, { message: "Task name is required" }),
-		time_per_unit: z.number().min(0, { message: "Time per unit must be 0 or greater" }),
-		conversion: z.number().min(0, { message: "Conversion must be 0 or greater" }),
-		rework: z.number()
-			.min(0, { message: "Rework percentage must be between 0 and 100" })
-			.max(100, { message: "Rework percentage must be between 0 and 100" }),
-		cost_per_minute: z.number()
-			.min(0, { message: "Cost per minute must be 0 or greater" })
-			.refine(val => Number(val.toFixed(2)) === val, { message: "Cost per minute can only have up to 2 decimal places" }),
-		total_cost: z.number(),
-	})).optional(),
-	general_expenses: z.number()
-		.min(0, { message: "General expenses must be 0 or greater" })
-		.refine(val => Number(val.toFixed(2)) === val, { message: "General expenses can only have up to 2 decimal places" }),
-	royalties: z.number().min(0, { message: "Royalties percentage must be 0 or greater" }).max(100, { message: "Royalties percentage must be between 0 and 100" }),
-	selling_price: z.number()
-		.positive({ message: "Selling price must be greater than 0" })
-		.min(0.01, { message: "Selling price must be at least 0.01" })
-		.refine(val => Number(val.toFixed(2)) === val, { message: "Selling price can only have up to 2 decimal places" }),
+	materials: z
+		.array(
+			z.object({
+				code: z.string().min(1, { message: 'Material code is required' }),
+				name: z.string().min(1, { message: 'Material name is required' }),
+				purchase_price: z
+					.number()
+					.positive({ message: 'Purchase price must be greater than 0' })
+					.min(0.01, { message: 'Purchase price must be at least 0.01' })
+					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
+				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
+				units: z.string().optional(),
+				total_cost: z.number(),
+			})
+		)
+		.optional(),
+	packaging_materials: z
+		.array(
+			z.object({
+				code: z.string().min(1, { message: 'Material code is required' }),
+				name: z.string().min(1, { message: 'Material name is required' }),
+				purchase_price: z
+					.number()
+					.positive({ message: 'Purchase price must be greater than 0' })
+					.min(0.01, { message: 'Purchase price must be at least 0.01' })
+					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
+				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
+				units: z.string().optional(),
+				total_cost: z.number(),
+			})
+		)
+		.optional(),
+	labor: z
+		.array(
+			z.object({
+				task: z.string().min(1, { message: 'Task name is required' }),
+				time_per_unit: z.number().min(0, { message: 'Time per unit must be 0 or greater' }),
+				conversion: z.number().min(0, { message: 'Conversion must be 0 or greater' }),
+				rework: z
+					.number()
+					.min(0, { message: 'Rework percentage must be between 0 and 100' })
+					.max(100, { message: 'Rework percentage must be between 0 and 100' }),
+				cost_per_minute: z
+					.number()
+					.min(0, { message: 'Cost per minute must be 0 or greater' })
+					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Cost per minute can only have up to 2 decimal places' }),
+				total_cost: z.number(),
+			})
+		)
+		.optional(),
+	general_expenses: z
+		.number()
+		.min(0, { message: 'General expenses must be 0 or greater' })
+		.refine((val) => Number(val.toFixed(2)) === val, { message: 'General expenses can only have up to 2 decimal places' }),
+	royalties: z
+		.number()
+		.min(0, { message: 'Royalties percentage must be 0 or greater' })
+		.max(100, { message: 'Royalties percentage must be between 0 and 100' }),
+	selling_price: z
+		.number()
+		.positive({ message: 'Selling price must be greater than 0' })
+		.min(0.01, { message: 'Selling price must be at least 0.01' })
+		.refine((val) => Number(val.toFixed(2)) === val, { message: 'Selling price can only have up to 2 decimal places' }),
 	technical_sheet: z.instanceof(File).nullable().optional(),
 });
 
@@ -142,7 +161,7 @@ export default function Page() {
 	const [isPending, setIsPending] = useState<boolean>(false);
 	const [materials, setMaterials] = useState<RawMaterial[]>([]);
 	const [packagingMaterials, setPackagingMaterials] = useState<PackagingMaterial[]>([]);
-	const [labor, setLabor] = useState<LaborType[]>([]);
+	const [labor, setLabor] = useState<Labor[]>([]);
 	const [materialOptions, setMaterialOptions] = useState({
 		codes: [] as { value: string; label: string }[],
 		names: [] as { value: string; label: string }[],
@@ -194,13 +213,13 @@ export default function Page() {
 
 					// Transform raw materials into options for dropdowns
 					const codes = result.data.map((material: RawMaterial) => ({
-						value: material.material_code,
-						label: material.material_code,
+						value: material.code,
+						label: material.code,
 					})) as { value: string; label: string }[];
 
 					const names = result.data.map((material: RawMaterial) => ({
-						value: material.material_name,
-						label: material.material_name,
+						value: material.name,
+						label: material.name,
 					})) as { value: string; label: string }[];
 
 					setMaterialOptions({
@@ -228,13 +247,13 @@ export default function Page() {
 
 					// Transform packaging materials into options for dropdowns
 					const codes = result.data.map((material: PackagingMaterial) => ({
-						value: material.packaging_material_code,
-						label: material.packaging_material_code,
+						value: material.code,
+						label: material.code,
 					})) as { value: string; label: string }[];
 
 					const names = result.data.map((material: PackagingMaterial) => ({
-						value: material.packaging_material_name,
-						label: material.packaging_material_name,
+						value: material.name,
+						label: material.name,
 					})) as { value: string; label: string }[];
 
 					setPackagingMaterialOptions({
@@ -261,7 +280,7 @@ export default function Page() {
 					setLabor(result.data);
 
 					// Transform labor into options for dropdowns
-					const names = result.data.map((labor: LaborType) => ({
+					const names = result.data.map((labor: Labor) => ({
 						value: labor.task,
 						label: labor.task,
 					})) as { value: string; label: string }[];
@@ -286,10 +305,10 @@ export default function Page() {
 
 	// Auto-fill related fields when a material code is selected
 	const handleMaterialCodeChange = (index: number, value: string) => {
-		const selectedMaterial = materials.find((m) => m.material_code === value);
+		const selectedMaterial = materials.find((m) => m.code === value);
 
 		if (selectedMaterial) {
-			form.setValue(`materials.${index}.material_name`, selectedMaterial.material_name || '');
+			form.setValue(`materials.${index}.name`, selectedMaterial.name || '');
 
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
@@ -299,15 +318,15 @@ export default function Page() {
 			}
 		}
 
-		form.setValue(`materials.${index}.material_code`, value);
+		form.setValue(`materials.${index}.code`, value);
 	};
 
 	// Auto-fill related fields when a material name is selected
 	const handleMaterialNameChange = (index: number, value: string) => {
-		const selectedMaterial = materials.find((m) => m.material_name === value);
+		const selectedMaterial = materials.find((m) => m.name === value);
 
 		if (selectedMaterial) {
-			form.setValue(`materials.${index}.material_code`, selectedMaterial.material_code || '');
+			form.setValue(`materials.${index}.code`, selectedMaterial.code || '');
 
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
@@ -317,15 +336,15 @@ export default function Page() {
 			}
 		}
 
-		form.setValue(`materials.${index}.material_name`, value);
+		form.setValue(`materials.${index}.name`, value);
 	};
 
 	// Auto-fill related fields when a packaging material name is selected
 	const handlePackagingMaterialNameChange = (index: number, value: string) => {
-		const selectedMaterial = packagingMaterials.find((m) => m.packaging_material_name === value);
+		const selectedMaterial = packagingMaterials.find((m) => m.name === value);
 
 		if (selectedMaterial) {
-			form.setValue(`packaging_materials.${index}.material_code`, selectedMaterial.packaging_material_code || '');
+			form.setValue(`packaging_materials.${index}.code`, selectedMaterial.code || '');
 
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
@@ -335,15 +354,15 @@ export default function Page() {
 			}
 		}
 
-		form.setValue(`packaging_materials.${index}.material_name`, value);
+		form.setValue(`packaging_materials.${index}.name`, value);
 	};
 
 	// Auto-fill related fields when a packaging material code is selected
 	const handlePackagingMaterialCodeChange = (index: number, value: string) => {
-		const selectedMaterial = packagingMaterials.find((m) => m.packaging_material_code === value);
+		const selectedMaterial = packagingMaterials.find((m) => m.code === value);
 
 		if (selectedMaterial) {
-			form.setValue(`packaging_materials.${index}.material_name`, selectedMaterial.packaging_material_name || '');
+			form.setValue(`packaging_materials.${index}.name`, selectedMaterial.name || '');
 
 			if (selectedMaterial.purchase_price) {
 				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
@@ -353,7 +372,7 @@ export default function Page() {
 			}
 		}
 
-		form.setValue(`packaging_materials.${index}.material_code`, value);
+		form.setValue(`packaging_materials.${index}.code`, value);
 	};
 
 	// Auto-fill related fields when a labor name is selected
@@ -364,7 +383,7 @@ export default function Page() {
 			form.setValue(`labor.${index}.cost_per_minute`, selectedLabor.cost_per_minute);
 		}
 
-		form.setValue(`labor.${index}.labor_name`, value);
+		form.setValue(`labor.${index}.task`, value);
 	};
 
 	// Calculate total cost for labor
@@ -602,8 +621,8 @@ export default function Page() {
 										form.setValue('materials', [
 											...(form.getValues('materials') || []),
 											{
-												material_code: '',
-												material_name: '',
+												code: '',
+												name: '',
 												purchase_price: 0,
 												unit_consumption: 0,
 												units: '',
@@ -636,11 +655,11 @@ export default function Page() {
 											<div className='grid grid-cols-3 gap-4'>
 												<div>
 													<FormLabel className='text-sm'>Material Code</FormLabel>
-													<p className='mt-1'>{material.material_code || '-'}</p>
+													<p className='mt-1'>{material.code || '-'}</p>
 												</div>
 												<div>
 													<FormLabel className='text-sm'>Material Name</FormLabel>
-													<p className='mt-1'>{material.material_name || '-'}</p>
+													<p className='mt-1'>{material.name || '-'}</p>
 												</div>
 												<div>
 													<FormLabel className='text-sm'>Unit Consumption</FormLabel>
@@ -652,7 +671,7 @@ export default function Page() {
 												<div className='grid gap-4 md:grid-cols-3'>
 													<FormField
 														control={form.control}
-														name={`materials.${index}.material_code`}
+														name={`materials.${index}.code`}
 														render={({ field }) => (
 															<FormItem>
 																<FormLabel>Material Code</FormLabel>
@@ -670,7 +689,7 @@ export default function Page() {
 
 													<FormField
 														control={form.control}
-														name={`materials.${index}.material_name`}
+														name={`materials.${index}.name`}
 														render={({ field }) => (
 															<FormItem>
 																<FormLabel>Material Name</FormLabel>
@@ -812,8 +831,8 @@ export default function Page() {
 
 															// Validate just this material's fields
 															const isValid = await form.trigger([
-																`materials.${index}.material_code`,
-																`materials.${index}.material_name`,
+																`materials.${index}.code`,
+																`materials.${index}.name`,
 																`materials.${index}.purchase_price`,
 																`materials.${index}.unit_consumption`,
 															]);
@@ -895,8 +914,8 @@ export default function Page() {
 										form.setValue('packaging_materials', [
 											...(form.getValues('packaging_materials') || []),
 											{
-												material_code: '',
-												material_name: '',
+												code: '',
+												name: '',
 												purchase_price: 0,
 												unit_consumption: 0,
 												units: '',
@@ -929,11 +948,11 @@ export default function Page() {
 											<div className='grid grid-cols-3 gap-4'>
 												<div>
 													<FormLabel className='text-sm'>Material Code</FormLabel>
-													<p className='mt-1'>{material.material_code || '-'}</p>
+													<p className='mt-1'>{material.code || '-'}</p>
 												</div>
 												<div>
 													<FormLabel className='text-sm'>Material Name</FormLabel>
-													<p className='mt-1'>{material.material_name || '-'}</p>
+													<p className='mt-1'>{material.name || '-'}</p>
 												</div>
 												<div>
 													<FormLabel className='text-sm'>Unit Consumption</FormLabel>
@@ -945,7 +964,7 @@ export default function Page() {
 												<div className='grid gap-4 md:grid-cols-3'>
 													<FormField
 														control={form.control}
-														name={`packaging_materials.${index}.material_code`}
+														name={`packaging_materials.${index}.code`}
 														render={({ field }) => (
 															<FormItem>
 																<FormLabel>Material Code</FormLabel>
@@ -963,7 +982,7 @@ export default function Page() {
 
 													<FormField
 														control={form.control}
-														name={`packaging_materials.${index}.material_name`}
+														name={`packaging_materials.${index}.name`}
 														render={({ field }) => (
 															<FormItem>
 																<FormLabel>Material Name</FormLabel>
@@ -1105,8 +1124,8 @@ export default function Page() {
 
 															// Validate just this packaging material's fields
 															const isValid = await form.trigger([
-																`packaging_materials.${index}.material_code`,
-																`packaging_materials.${index}.material_name`,
+																`packaging_materials.${index}.code`,
+																`packaging_materials.${index}.name`,
 																`packaging_materials.${index}.purchase_price`,
 																`packaging_materials.${index}.unit_consumption`,
 															]);
@@ -1186,7 +1205,7 @@ export default function Page() {
 										form.setValue('labor', [
 											...(form.getValues('labor') || []),
 											{
-												labor_name: '',
+												task: '',
 												time_per_unit: 0,
 												conversion: 1,
 												rework: 0,
@@ -1220,7 +1239,7 @@ export default function Page() {
 											<div className='grid grid-cols-3 gap-4'>
 												<div>
 													<FormLabel className='text-sm'>Task Name</FormLabel>
-													<p className='mt-1'>{labor.labor_name || '-'}</p>
+													<p className='mt-1'>{labor.task || '-'}</p>
 												</div>
 												<div>
 													<FormLabel className='text-sm'>Time per Unit</FormLabel>
@@ -1236,7 +1255,7 @@ export default function Page() {
 												<div className='grid gap-4 md:grid-cols-2'>
 													<FormField
 														control={form.control}
-														name={`labor.${index}.labor_name`}
+														name={`labor.${index}.task`}
 														render={({ field }) => (
 															<FormItem>
 																<FormLabel>Task Name</FormLabel>
@@ -1419,7 +1438,7 @@ export default function Page() {
 
 															// Validate just this labor's fields
 															const isValid = await form.trigger([
-																`labor.${index}.labor_name`,
+																`labor.${index}.task`,
 																`labor.${index}.time_per_unit`,
 																`labor.${index}.cost_per_minute`,
 																`labor.${index}.conversion`,

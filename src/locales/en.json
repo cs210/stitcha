@@ -1,0 +1,64 @@
+{
+	"kanban": {
+		"title": "Kanban",
+		"description": "Manage and track order progress",
+		"columns": {
+			"notStarted": "Not Started",
+			"inProgress": "In Progress",
+			"done": "Done"
+		}
+	},
+	"products": {
+		"title": "Products",
+		"description": "View and manage all products",
+		"search": "Search products by name, type, or system code...",
+		"table": {
+			"image": "Image",
+			"name": "Name",
+			"type": "Type",
+			"systemCode": "System Code",
+			"noResults": "No results found",
+			"edit": "Edit",
+			"delete": "Delete"
+		}
+	},
+	"seamstresses": {
+		"title": "Seamstresses",
+		"description": "View and manage all seamstresses"
+	},
+	"settings": {
+		"title": "Settings",
+		"description": "Manage your account settings and preferences",
+		"form": {
+			"fullName": "Full Name",
+			"email": "Email",
+			"language": {
+				"title": "Language",
+				"placeholder": "Select language",
+				"options": {
+					"en": "English",
+					"pt": "Portuguese"
+				}
+			},
+			"save": "Save"
+		}
+	},
+	"sidebar": {
+		"stitchaAi": "Stitcha AI",
+		"kanban": "Kanban",
+		"products": "Products",
+		"seamstresses": "Seamstresses",
+		"settings": "Settings"
+	},
+	"table": {
+		"new": "New",
+		"noResults": "No results.",
+		"rowsSelected": "{{count}} of {{total}} row(s) selected.",
+		"rowsPerPage": "Rows per page",
+		"pageCount": "Page {{count}} of {{total}}",
+		"goToFirstPage": "Go to first page",
+		"goToPreviousPage": "Go to previous page",
+		"goToNextPage": "Go to next page",
+		"goToLastPage": "Go to last page"
+	}
+}

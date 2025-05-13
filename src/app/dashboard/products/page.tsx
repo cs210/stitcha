@@ -17,7 +17,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { getDictionary } from '../../locales';
+import { LangContext } from '@/app/layout';
 
 const handleDeleteProduct = async (productId: string) => {
 	try {
@@ -54,7 +56,7 @@ const columns: ColumnDef<Product>[] = [
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Image' />,
 		cell: ({ row }) => (
 			<Image
-				src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/placeholder-image.jpg'}
+				src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/images/placeholder-image.jpg'}
 				alt={row.original.name}
 				className='w-32 h-32 object-contain'
 				width={128}
@@ -111,12 +113,18 @@ const columns: ColumnDef<Product>[] = [
 ];
 
 export default function Page() {
+	const { lang } = useContext(LangContext);
+	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState(true);
 	const [products, setProducts] = useState<Product[]>([]);
 
 	useEffect(() => {
 		(async () => {
 			try {
+				const dict = await getDictionary(lang);
+
+				setDict(dict);
+
 				const response = await fetch('/api/products');
 				const result = await response.json();
 
@@ -130,7 +138,7 @@ export default function Page() {
 				console.error('Error fetching products:', error);
 			}
 		})();
-	}, []);
+	}, [lang]);
 
 	if (loading) {
 		return (
@@ -143,12 +151,12 @@ export default function Page() {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text='Products' />
-				<Description text='View and manage all products' />
+				<Header text={dict.products.title} />
+				<Description text={dict.products.description} />
 			</HeaderContainer>
 
 			<Container>
-				<DataTable columns={columns} searchPlaceholder='Search products by name, type, or system code...' path='products' data={products} />
+				<DataTable dict={dict} columns={columns} searchPlaceholder={dict.products.search} path='products' data={products} />
 			</Container>
 		</>
 	);

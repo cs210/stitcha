@@ -8,10 +8,10 @@ import { useEffect } from 'react';
 export default function Page() {
 	useEffect(() => {
 		fetch('/api/openai', {
-			method: 'POST'
+			method: 'POST',
 		})
-			.then(res => res.json())
-			.then(data => console.log(data));
+			.then((res) => res.json())
+			.then((data) => console.log(data));
 	}, []);
 
 	return (

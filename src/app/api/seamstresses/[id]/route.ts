@@ -13,23 +13,34 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 	const supabase = await createClerkSupabaseClientSsr();
 
-	try {		
+	try {
 		const { data, error } = await supabase
 			.from('users')
-			.select('*')
+			.select(
+				`
+				*,
+				products_users (
+					products (*)
+				)
+			`
+			)
 			.eq('id', seamstressId)
 			.single();
 
-		const { data: progressData, error: progressError } = await supabase
-			.from('progress')
-			.select('*')
-			.eq('user_id', seamstressId);		
+		// Rename the products_users field in the data object
+		if (data) {
+			data.products = data.products_users.map((product) => product.products);
+
+			delete data.products_users;
+		}
+
+		const { data: progressData, error: progressError } = await supabase.from('progress').select('*').eq('user_id', seamstressId);
 
 		// Combine the seamstress data with the progress data
 		const combinedData = {
 			...data,
-			progress: progressData
-		};		
+			progress: progressData,
+		};
 
 		if (error || progressError) {
 			throw new Error(error?.message || progressError?.message);

@@ -27,7 +27,7 @@ export async function POST(req: Request) {
 					throw new Error('ASSISTANT_ID is not set');
 				})(),
 		});
-		
+
 		let runResult: Run = await forwardStream(runStream);
 
 		while (runResult?.status === 'requires_action' && runResult.required_action?.type === 'submit_tool_outputs') {

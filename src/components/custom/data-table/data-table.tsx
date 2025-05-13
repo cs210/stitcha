@@ -20,13 +20,14 @@ import { useState } from 'react';
 import { DataTablePagination } from './data-table-pagination';
 
 interface DataTableProps<TData, TValue> {
+	dict: any;
 	columns: ColumnDef<TData, TValue>[];
 	data: TData[];
 	searchPlaceholder: string;
 	path: string;
 }
 
-export function DataTable<TData, TValue>({ columns, data, searchPlaceholder, path }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholder, path }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [rowSelection, setRowSelection] = useState({});
@@ -58,7 +59,7 @@ export function DataTable<TData, TValue>({ columns, data, searchPlaceholder, pat
 				<Button asChild>
 					<Link href={`/dashboard/${path}/new`}>
 						<Plus size={16} />
-						New
+						{dict.table.new}
 					</Link>
 				</Button>
 			</div>
@@ -85,7 +86,7 @@ export function DataTable<TData, TValue>({ columns, data, searchPlaceholder, pat
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className='h-24 text-center'>
-									No results.
+									{dict.table.noResults}
 								</TableCell>
 							</TableRow>
 						)}
@@ -93,7 +94,7 @@ export function DataTable<TData, TValue>({ columns, data, searchPlaceholder, pat
 				</Table>
 			</div>
 			<div className='py-4'>
-				<DataTablePagination table={table} />
+				<DataTablePagination dict={dict} table={table} />
 			</div>
 		</div>
 	);
