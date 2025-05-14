@@ -12,10 +12,16 @@ const inter = Inter({
 	preload: true,
 });
 
-export const LangContext = createContext<'en' | 'pt-br'>('en');
+export const LangContext = createContext<{
+	lang: 'en' | 'pt-br';
+	setLang: React.Dispatch<React.SetStateAction<'en' | 'pt-br'>>;
+}>({
+	lang: 'en',
+	setLang: () => {},
+});
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-	const [lang, setLang] = useState<'en' | 'pt-br'>('pt-br');
+	const [lang, setLang] = useState<'en' | 'pt-br'>('en');
 
 	return (
 		<MyRuntimeProvider>
