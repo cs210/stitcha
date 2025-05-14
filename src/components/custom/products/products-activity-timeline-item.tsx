@@ -2,7 +2,7 @@ import { Product } from '@/lib/schemas/global.types';
 import Image from 'next/image';
 import Link from 'next/link';
 
-export default function ProductsActivityTimelineItem({ update }: { update: Product }) {
+export function ProductsActivityTimelineItem({ update }: { update: Product }) {
 	return (
 		<div key={update.id} className='relative pl-8'>
 			<div className={`absolute left-0 top-[6px] w-4 h-4 rounded-full ${update.status === 'progress' ? 'bg-blue-500' : 'bg-black'}`} />

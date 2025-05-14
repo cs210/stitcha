@@ -1,19 +1,26 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
+import { getDictionary } from '@/app/locales';
 import { Container } from '@/components/custom/container/container';
-import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
-import { User } from '@/lib/schemas/global.types';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
+import { Progress } from '@/components/ui/progress';
+import { Product, User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
-import { use, useEffect, useState } from 'react';
+import { use, useContext, useEffect, useState } from 'react';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: seamstressId } = use(params);
 	const { user } = useUser();
+	const { lang } = useContext(LangContext);
+	const [dict, setDict] = useState<any>();
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const [seamstress, setSeamstress] = useState<User | null>(null);
@@ -22,9 +29,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 		if (!user) return;
 
 		(async () => {
+			const dict = await getDictionary(lang);
+
+			setDict(dict);
+			
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
-			const { data, error } = await seamstressResponse.json();
+			const { data, error } = await seamstressResponse.json();					
 
 			if (!error) {
 				setSeamstress(data);
@@ -47,12 +58,26 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={`${seamstress?.first_name} ${seamstress?.last_name}`} />
-				<Description text={`${seamstress?.location}`} />
+				<Header text={`${seamstress?.first_name} ${seamstress?.last_name}`} />				
 			</HeaderContainer>
 
 			<Container>
-				<div className='flex flex-wrap gap-6'>{seamstress && <SeamstressProfile seamstress={seamstress} />}</div>
+				<div className='flex flex-col gap-4'>
+					<div className='flex flex-wrap gap-6'>{seamstress && <SeamstressProfile seamstress={seamstress} />}</div>
+
+					<H2 text={dict.seamstresses.products} />
+
+					<div className='flex flex-row items-center gap-2'>
+						<Progress value={seamstress?.total_units_completed} className='w-[60%]' />
+						<P text={`${seamstress?.total_units_completed} / unknown`} />
+					</div>
+
+					<div className='flex flex-wrap gap-6'>
+						{seamstress?.products.map((product: Product) => (
+							<SeamstressProductCard key={product.id} product={product} />
+						))}
+					</div>
+				</div>
 			</Container>
 		</>
 	);

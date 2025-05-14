@@ -1,7 +1,7 @@
 {
 	"kanban": {
 		"title": "Kanban",
-		"description": "Manage and track order progress",
+		"description": "Manage and track product progress",
 		"columns": {
 			"notStarted": "Not Started",
 			"inProgress": "In Progress",
@@ -24,7 +24,8 @@
 	},
 	"seamstresses": {
 		"title": "Seamstresses",
-		"description": "View and manage all seamstresses"
+		"description": "View and manage all seamstresses",
+		"products": "Products"
 	},
 	"settings": {
 		"title": "Settings",

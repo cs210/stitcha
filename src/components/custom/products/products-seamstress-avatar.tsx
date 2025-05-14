@@ -2,7 +2,7 @@ import { User } from '@/lib/schemas/global.types';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 
-export default function ProductsSeamstressAvatar({ user, handleDeleteAssignment }: { user: User; handleDeleteAssignment: (id: string) => void }) {
+export function ProductsSeamstressAvatar({ user, handleDeleteAssignment }: { user: User; handleDeleteAssignment: (id: string) => void }) {
 	return (
 		<div key={user.id} className='group relative'>
 			<div className='relative w-8 h-8 rounded-full overflow-hidden border-2 border-white'>

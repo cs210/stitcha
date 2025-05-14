@@ -4,7 +4,8 @@ import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
-import ProductsDetails from '@/components/custom/products/products-details';
+import { ProductsDetails } from '@/components/custom/products/products-details';
+import { ProductsImages } from '@/components/custom/products/products-images';
 import { Product } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { use, useEffect, useState } from 'react';
@@ -524,80 +525,14 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         </Button>
       </div> */}
 
-			<ProductsDetails product={product} />
-
-			<div className='py-4 space-y-4'>
-				<div className='grid grid-cols-[2fr,1fr] gap-4'>
-					<div className='space-y-4'>
-						<div className='bg-white rounded-2xl p-8 shadow-sm border'>
-							{/* <div className="mb-8">
-                <div className="w-full h-96 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center relative group cursor-zoom-in">
-                  <Image
-                    src={safeImageUrls[selectedImageIndex] || "/images/placeholder-image.jpg"}
-                    alt={product.name}
-                    className="w-full h-full object-contain"
-                    width={800}
-                    height={600}
-                    priority
-                  />
-                </div>
-
-                {safeImageUrls.length > 1 && (
-                  <div className="flex gap-2 overflow-x-auto pb-2">
-                    {safeImageUrls.map((imageUrl, index) => (
-                      <div
-                        key={index}
-                        className={`w-20 h-20 flex-shrink-0 rounded-md overflow-hidden cursor-pointer transition-all ${
-                          selectedImageIndex === index
-                            ? "border-2 border-blue-500 shadow-md"
-                            : "border border-gray-200 hover:border-gray-300"
-                        }`}
-                        onClick={() => setSelectedImageIndex(index)}
-                      >
-                        <Image
-                          src={imageUrl}
-                          alt={`${product.name} - image ${index + 1}`}
-                          className="w-full h-full object-cover"
-                          width={80}
-                          height={80}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div> */}
-						</div>
-					</div>
-
-					{/* <div className="bg-white rounded-2xl p-8 shadow-sm border">
-            <h2 className="text-2xl font-semibold mb-8">Activity Timeline</h2>
-            <div className="relative">
-              {progressUpdates && progressUpdates.length > 1 && (
-                <div className="absolute left-[7px] top-[24px] bottom-[64px] w-[2px] bg-gray-200" />
-              )}
-
-              <div className="space-y-12">
-                {progressUpdates && progressUpdates.length > 0 ? (
-                  [...progressUpdates]
-                    .sort(
-                      (a, b) =>
-                        new Date(b.created_at).getTime() -
-                        new Date(a.created_at).getTime()
-                    )
-                    .map((update, index) => (
-                      <ProductsActivityTimelineItem
-                        key={index}
-                        update={update}
-                      />
-                    ))
-                ) : (
-                  <p className="text-gray-500">No activity recorded yet.</p>
-                )}
-              </div>
-            </div>
-          </div> */}
+			<div className='flex flex-col justify-center items-center gap-4'>
+				<div className='w-[80%]'>
+					<ProductsImages product={product} />
 				</div>
-			</div>
+				<div className='w-full'>
+					<ProductsDetails product={product} />
+				</div>
+			</div>			
 
 			{/* {isZoomModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center">

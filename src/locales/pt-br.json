@@ -18,7 +18,7 @@
   },
   "kanban": {
     "title": "Kanban",
-    "description": "Gerenciar e acompanhar o progresso dos pedidos",
+    "description": "Gerenciar e acompanhar o progresso dos produtos",
     "columns": {
       "notStarted": "Não Iniciado",
       "inProgress": "Em Andamento",

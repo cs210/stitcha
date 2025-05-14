@@ -78,7 +78,55 @@ export type Database = {
         }
         Relationships: []
       }
-      product_costs: {
+      products: {
+        Row: {
+          barcode: string | null
+          description: string | null
+          height: number
+          id: string
+          image_urls: Json | null
+          inmetro_cert_number: string | null
+          name: string
+          percent_pieces_lost: number | null
+          product_type: string | null
+          progress_level: Database["public"]["Enums"]["progress_level"]
+          system_code: string
+          weight: number
+          width: number
+        }
+        Insert: {
+          barcode?: string | null
+          description?: string | null
+          height?: number
+          id?: string
+          image_urls?: Json | null
+          inmetro_cert_number?: string | null
+          name?: string
+          percent_pieces_lost?: number | null
+          product_type?: string | null
+          progress_level: Database["public"]["Enums"]["progress_level"]
+          system_code?: string
+          weight?: number
+          width?: number
+        }
+        Update: {
+          barcode?: string | null
+          description?: string | null
+          height?: number
+          id?: string
+          image_urls?: Json | null
+          inmetro_cert_number?: string | null
+          name?: string
+          percent_pieces_lost?: number | null
+          product_type?: string | null
+          progress_level?: Database["public"]["Enums"]["progress_level"]
+          system_code?: string
+          weight?: number
+          width?: number
+        }
+        Relationships: []
+      }
+      products_costs: {
         Row: {
           general_expenses: number
           id: string
@@ -127,84 +175,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      product_progress: {
-        Row: {
-          product_id: string
-          progress_id: string
-        }
-        Insert: {
-          product_id: string
-          progress_id: string
-        }
-        Update: {
-          product_id?: string
-          progress_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_progress_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_progress_progress_id_fkey"
-            columns: ["progress_id"]
-            isOneToOne: false
-            referencedRelation: "progress"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      products: {
-        Row: {
-          barcode: string | null
-          description: string | null
-          height: number
-          id: string
-          image_urls: Json | null
-          inmetro_cert_number: string | null
-          name: string
-          percent_pieces_lost: number | null
-          product_type: string | null
-          progress_level: Database["public"]["Enums"]["progress_level"]
-          system_code: string
-          weight: number
-          width: number
-        }
-        Insert: {
-          barcode?: string | null
-          description?: string | null
-          height?: number
-          id?: string
-          image_urls?: Json | null
-          inmetro_cert_number?: string | null
-          name?: string
-          percent_pieces_lost?: number | null
-          product_type?: string | null
-          progress_level: Database["public"]["Enums"]["progress_level"]
-          system_code?: string
-          weight?: number
-          width?: number
-        }
-        Update: {
-          barcode?: string | null
-          description?: string | null
-          height?: number
-          id?: string
-          image_urls?: Json | null
-          inmetro_cert_number?: string | null
-          name?: string
-          percent_pieces_lost?: number | null
-          product_type?: string | null
-          progress_level?: Database["public"]["Enums"]["progress_level"]
-          system_code?: string
-          weight?: number
-          width?: number
-        }
-        Relationships: []
       }
       products_labor: {
         Row: {
@@ -332,16 +302,19 @@ export type Database = {
       products_users: {
         Row: {
           product_id: string
+          units_completed: number
           user_id: string
           validated: boolean
         }
         Insert: {
           product_id: string
+          units_completed?: number
           user_id: string
           validated?: boolean
         }
         Update: {
           product_id?: string
+          units_completed?: number
           user_id?: string
           validated?: boolean
         }
@@ -369,6 +342,7 @@ export type Database = {
           emotion: string | null
           id: string
           image_urls: Json | null
+          product_id: string
           user_id: string
         }
         Insert: {
@@ -377,6 +351,7 @@ export type Database = {
           emotion?: string | null
           id?: string
           image_urls?: Json | null
+          product_id: string
           user_id: string
         }
         Update: {
@@ -385,9 +360,17 @@ export type Database = {
           emotion?: string | null
           id?: string
           image_urls?: Json | null
+          product_id?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "progress_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "progress_user_id_fkey"
             columns: ["user_id"]
