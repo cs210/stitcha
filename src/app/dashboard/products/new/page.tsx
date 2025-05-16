@@ -37,9 +37,8 @@ export type ProductFormData = {
 	height: number;
 	percent_pieces_lost?: number;
 	image_urls: File[] | null;
-	product_type?: string;
+	product_type: string;
 	status: ProgressLevel;
-	// TODO: Update this to use types from supabase.types.ts
 	materials?: {
 		code: string;
 		name: string;
@@ -386,17 +385,6 @@ export default function Page() {
 		form.setValue(`labor.${index}.task`, value);
 	};
 
-	// Calculate total cost for labor
-	const calculateLaborTotalCost = (labor: any) => {
-		if (!labor) return 0;
-
-		const timePerUnit = Number(labor.time_per_unit) || 0;
-		const costPerMinute = Number(labor.cost_per_minute) || 0;
-		const rework = Number(labor.rework) || 0;
-		const conversion = Number(labor.conversion) || 1; // Default to 1 to avoid division by zero
-
-		return timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion));
-	};
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
@@ -484,7 +472,20 @@ export default function Page() {
 
 			<div className='py-4'>
 				<Form {...form}>
-					<FormContainer onSubmit={form.handleSubmit(onSubmit)}>
+					<FormContainer onSubmit={form.handleSubmit(onSubmit, (errors) => {
+						// Get the first error field
+						const firstError = Object.keys(errors)[0];
+						if (firstError) {
+							// Find the input element for the first error
+							const errorInput = document.querySelector(`[name="${firstError}"]`) as HTMLElement;
+							if (errorInput) {
+								// Scroll the error into view
+								errorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+								// Focus the input
+								errorInput.focus();
+							}
+						}
+					})}>
 						<FormField
 							control={form.control}
 							name='name'
@@ -504,19 +505,47 @@ export default function Page() {
 							name='image_urls'
 							render={({ field: { value, onChange, ...fieldProps } }) => (
 								<FormItem>
-									<FormLabel>Product Images</FormLabel>
+									<FormLabel>Product Images *</FormLabel>
 									<FormControl>
 										<div>
-											<Input
-												{...fieldProps}
-												type='file'
-												accept='image/*'
-												multiple
-												onChange={(e) => {
-													const newFiles = Array.from(e.target.files || []);
-													onChange([...(value || []), ...newFiles]);
-												}}
-											/>
+											<div className="relative">
+												<div className="flex items-center gap-2">
+													<Button
+														type="button"
+														variant="outline"
+														onClick={() => {
+															const fileInput = document.createElement('input');
+															fileInput.type = 'file';
+															fileInput.accept = 'image/*';
+															fileInput.multiple = true;
+															fileInput.onchange = (e) => {
+																const newFiles = Array.from((e.target as HTMLInputElement).files || []);
+																onChange([...(value || []), ...newFiles]);
+															};
+															fileInput.click();
+														}}
+													>
+														Choose Files
+													</Button>
+													<span className="text-sm text-muted-foreground">
+														{value && value.length > 0
+															? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected`
+															: 'No file chosen'}
+													</span>
+												</div>
+												<input
+													{...fieldProps}
+													type='file'
+													accept='image/*'
+													multiple
+													key={value?.length}
+													onChange={(e) => {
+														const newFiles = Array.from(e.target.files || []);
+														onChange([...(value || []), ...newFiles]);
+													}}
+													className="hidden"
+												/>
+											</div>
 
 											{/* Display selected files */}
 											<div className='mt-2 space-y-2'>
@@ -530,6 +559,11 @@ export default function Page() {
 															onClick={() => {
 																const newFiles = value.filter((_, i) => i !== index);
 																onChange(newFiles);
+																// Reset the file input
+																const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+																if (fileInput) {
+																	fileInput.value = '';
+																}
 															}}
 														>
 															Remove
@@ -781,8 +815,8 @@ export default function Page() {
 
 															// Calculate and update total cost whenever dependencies change
 															React.useEffect(() => {
-																const totalCost = purchasePrice * unitConsumption;
-																form.setValue(`materials.${index}.total_cost`, totalCost);
+																const totalCost = Number((purchasePrice * unitConsumption).toFixed(2));
+																field.onChange(totalCost);
 															}, [purchasePrice, unitConsumption, index, form]);
 
 															return (
@@ -1074,8 +1108,8 @@ export default function Page() {
 
 															// Calculate and update total cost whenever dependencies change
 															React.useEffect(() => {
-																const totalCost = purchasePrice * unitConsumption;
-																form.setValue(`packaging_materials.${index}.total_cost`, totalCost);
+																const totalCost = Number((purchasePrice * unitConsumption).toFixed(2));
+																field.onChange(totalCost);
 															}, [purchasePrice, unitConsumption, index, form]);
 
 															return (
@@ -1388,7 +1422,7 @@ export default function Page() {
 
 															// Calculate and update total cost whenever dependencies change
 															React.useEffect(() => {
-																const totalCost = timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion));
+																const totalCost = Number((timePerUnit * costPerMinute * (1 + rework / 100) * (1 / Math.max(0.0001, conversion))).toFixed(2));
 																field.onChange(totalCost);
 															}, [timePerUnit, costPerMinute, rework, conversion, index, form]);
 

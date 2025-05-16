@@ -72,7 +72,7 @@ export async function handleProductCostsInsert(productId: string, supabase: Supa
 	};
 	// Insert the product costs into the product_costs table
 	const { data: productCostsData, error: productCostsError } = await supabase
-		.from('product_costs')
+		.from('costs')
 		.insert({
 			raw_material_cost: productCosts.raw_material_cost,
 			packaging_cost: productCosts.packaging_material_cost,
@@ -94,6 +94,7 @@ export async function handleProductCostsInsert(productId: string, supabase: Supa
 
 	return productCostsData.id;
 }
+
 export async function handleProductTableInsert(formData: FormData, supabase: SupabaseClient, userId: string) {
 	// Parse the product data fields from the form
 	const productData: ProductFormData = {
@@ -111,6 +112,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 	};
 
 	const image_urls: string[] = [];
+	let technical_sheet: string = '';
 
 	// Create the product object with empty string handling
 	const product = {
@@ -121,6 +123,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 		description: emptyToNull(productData.description),
 		product_type: emptyToNull(productData.product_type),
 		image_urls,
+		technical_sheet,
 	};
 
 	// Insert the product
@@ -173,11 +176,48 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 	// Update the product with the image URLs
 	const { data: updatedProduct, error: updateError } = await supabase.from('products').update({ image_urls }).eq('id', productId).select().single();
 
+	const technical_sheet_url = formData.get('technical_sheet') as File;
+
+	// Update the technical sheet
+	if (technical_sheet_url) {
+		const fileExt = technical_sheet_url.name.split('.').pop();
+		const fileName = `${productId}_${Date.now()}.${fileExt}`;
+		const filePath = `${productId}/${fileName}`;
+
+		// Upload the file to Supabase Storage
+		const { error: uploadError } = await supabase.storage.from('technical-sheets').upload(filePath, technical_sheet_url, {
+			cacheControl: '3600',
+			upsert: true,
+		});
+
+		if (uploadError) {
+			throw new Error(`Failed to upload technical sheet: ${uploadError.message}`);
+		}
+
+		// Get the public URL for the uploaded file
+		const { data: urlData } = await supabase.storage.from('technical-sheets').createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days expiration
+
+		// Check if the URL was successfully generated
+		if (!urlData || !urlData.signedUrl) {
+			throw new Error('Failed to generate public URL for technical sheet');
+		}
+
+		technical_sheet = urlData.signedUrl;
+	}
+
+	// Update the technical_sheets table with the new technical sheet
+	const { data: productWithTechnicalSheet, error: insertErrorTechnicalSheet } = await supabase.from('products').update({ technical_sheet }).eq('id', productId).select().single();
+
+	if (insertErrorTechnicalSheet) {
+		throw new Error(`Failed to insert technical sheet record: ${insertErrorTechnicalSheet.message}`);
+	}
+
+	// if image update fails
 	if (updateError) {
 		throw new Error(`Failed to update product: ${updateError.message}`);
 	}
 
-	return updatedProduct;
+	return productWithTechnicalSheet;
 }
 
 export async function updateLaborFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
