@@ -12,6 +12,7 @@ interface ProductFormData {
 	percent_pieces_lost: number;
 	product_type?: string;
 	progress_level: number;
+	total_units: number;
 }
 
 interface RawMaterialProduct {
@@ -109,6 +110,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 		percent_pieces_lost: JSON.parse(formData.get('percent_pieces_lost') as string),
 		product_type: JSON.parse((formData.get('product_type') as string)?.trim() || 'null'),
 		progress_level: JSON.parse(formData.get('status') as string),
+		total_units: JSON.parse(formData.get('total_units') as string),
 	};
 
 	const image_urls: string[] = [];

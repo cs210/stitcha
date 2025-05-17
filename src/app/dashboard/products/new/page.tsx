@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
+import { handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange, handleLaborChange } from '@/lib/utils/form-utils';
 
 const progressLevelValues = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
 const progressLevelSchema = z.enum(progressLevelValues);
@@ -35,6 +36,7 @@ export type ProductFormData = {
 	weight: number;
 	width: number;
 	height: number;
+	total_units: number;
 	percent_pieces_lost?: number;
 	image_urls: File[] | null;
 	product_type: string;
@@ -79,6 +81,7 @@ const formSchema = z.object({
 	weight: z.number().positive({ message: 'Weight must be positive' }),
 	width: z.number().positive({ message: 'Width must be positive' }),
 	height: z.number().positive({ message: 'Height must be positive' }),
+	total_units: z.number().positive({ message: 'Total units must be positive' }),
 	percent_pieces_lost: z
 		.number()
 		.min(0, { message: 'Percent pieces lost must be 0 or greater' })
@@ -160,7 +163,7 @@ export default function Page() {
 	const [isPending, setIsPending] = useState<boolean>(false);
 	const [materials, setMaterials] = useState<RawMaterial[]>([]);
 	const [packagingMaterials, setPackagingMaterials] = useState<PackagingMaterial[]>([]);
-	const [labor, setLabor] = useState<Labor[]>([]);
+	const [labors, setLabors] = useState<Labor[]>([]);
 	const [materialOptions, setMaterialOptions] = useState({
 		codes: [] as { value: string; label: string }[],
 		names: [] as { value: string; label: string }[],
@@ -187,6 +190,7 @@ export default function Page() {
 			weight: 0,
 			width: 0,
 			height: 0,
+			total_units: 1,
 			percent_pieces_lost: 0,
 			image_urls: null,
 			status: 'Not Started',
@@ -276,7 +280,7 @@ export default function Page() {
 				const result = await response.json();
 
 				if (response.ok && result.data) {
-					setLabor(result.data);
+					setLabors(result.data);
 
 					// Transform labor into options for dropdowns
 					const names = result.data.map((labor: Labor) => ({
@@ -299,92 +303,6 @@ export default function Page() {
 		fetchPackagingMaterials();
 		fetchLabor();
 	}, []);
-
-	// TODO: Can we make streamline the below functions or put them into a different component?
-
-	// Auto-fill related fields when a material code is selected
-	const handleMaterialCodeChange = (index: number, value: string) => {
-		const selectedMaterial = materials.find((m) => m.code === value);
-
-		if (selectedMaterial) {
-			form.setValue(`materials.${index}.name`, selectedMaterial.name || '');
-
-			if (selectedMaterial.purchase_price) {
-				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
-			}
-			if (selectedMaterial.units) {
-				form.setValue(`materials.${index}.units`, selectedMaterial.units);
-			}
-		}
-
-		form.setValue(`materials.${index}.code`, value);
-	};
-
-	// Auto-fill related fields when a material name is selected
-	const handleMaterialNameChange = (index: number, value: string) => {
-		const selectedMaterial = materials.find((m) => m.name === value);
-
-		if (selectedMaterial) {
-			form.setValue(`materials.${index}.code`, selectedMaterial.code || '');
-
-			if (selectedMaterial.purchase_price) {
-				form.setValue(`materials.${index}.purchase_price`, selectedMaterial.purchase_price);
-			}
-			if (selectedMaterial.units) {
-				form.setValue(`materials.${index}.units`, selectedMaterial.units);
-			}
-		}
-
-		form.setValue(`materials.${index}.name`, value);
-	};
-
-	// Auto-fill related fields when a packaging material name is selected
-	const handlePackagingMaterialNameChange = (index: number, value: string) => {
-		const selectedMaterial = packagingMaterials.find((m) => m.name === value);
-
-		if (selectedMaterial) {
-			form.setValue(`packaging_materials.${index}.code`, selectedMaterial.code || '');
-
-			if (selectedMaterial.purchase_price) {
-				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
-			}
-			if (selectedMaterial.units) {
-				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
-			}
-		}
-
-		form.setValue(`packaging_materials.${index}.name`, value);
-	};
-
-	// Auto-fill related fields when a packaging material code is selected
-	const handlePackagingMaterialCodeChange = (index: number, value: string) => {
-		const selectedMaterial = packagingMaterials.find((m) => m.code === value);
-
-		if (selectedMaterial) {
-			form.setValue(`packaging_materials.${index}.name`, selectedMaterial.name || '');
-
-			if (selectedMaterial.purchase_price) {
-				form.setValue(`packaging_materials.${index}.purchase_price`, selectedMaterial.purchase_price);
-			}
-			if (selectedMaterial.units) {
-				form.setValue(`packaging_materials.${index}.units`, selectedMaterial.units);
-			}
-		}
-
-		form.setValue(`packaging_materials.${index}.code`, value);
-	};
-
-	// Auto-fill related fields when a labor name is selected
-	const handleLaborChange = (index: number, value: string) => {
-		const selectedLabor = labor.find((l) => l.task === value);
-
-		if (selectedLabor) {
-			form.setValue(`labor.${index}.cost_per_minute`, selectedLabor.cost_per_minute);
-		}
-
-		form.setValue(`labor.${index}.task`, value);
-	};
-
 
 	async function onSubmit(values: z.infer<typeof formSchema>) {
 		setIsPending(true);
@@ -713,7 +631,7 @@ export default function Page() {
 																	<ComboboxFormField
 																		options={materialOptions.codes}
 																		value={field.value}
-																		onChange={(value) => handleMaterialCodeChange(index, value)}
+																		onChange={(value) => handleMaterialCodeChange(form, materials, index, value)}
 																	/>
 																</FormControl>
 																<FormMessage />
@@ -731,7 +649,7 @@ export default function Page() {
 																	<ComboboxFormField
 																		options={materialOptions.names}
 																		value={field.value}
-																		onChange={(value) => handleMaterialNameChange(index, value)}
+																		onChange={(value) => handleMaterialNameChange(form, materials, index, value)}
 																	/>
 																</FormControl>
 																<FormMessage />
@@ -1006,7 +924,7 @@ export default function Page() {
 																	<ComboboxFormField
 																		options={packagingMaterialOptions.codes}
 																		value={field.value}
-																		onChange={(value) => handlePackagingMaterialCodeChange(index, value)}
+																		onChange={(value) => handlePackagingMaterialCodeChange(form, packagingMaterials, index, value)}
 																	/>
 																</FormControl>
 																<FormMessage />
@@ -1024,7 +942,7 @@ export default function Page() {
 																	<ComboboxFormField
 																		options={packagingMaterialOptions.names}
 																		value={field.value}
-																		onChange={(value) => handlePackagingMaterialNameChange(index, value)}
+																		onChange={(value) => handlePackagingMaterialNameChange(form, packagingMaterials, index, value)}
 																	/>
 																</FormControl>
 																<FormMessage />
@@ -1299,7 +1217,7 @@ export default function Page() {
 																		value={field.value}
 																		onChange={(value: string) => {
 																			field.onChange(value);
-																			handleLaborChange(index, value);
+																			handleLaborChange(form, labors, index, value);
 																		}}
 																	/>
 																</FormControl>
@@ -1772,6 +1690,30 @@ export default function Page() {
 												onChange={(e) => field.onChange(e.target.value === '' ? '' : Number.parseFloat(e.target.value))}
 												onBlur={(e) => {
 													const value = e.target.value === '' ? 0 : Number.parseFloat(e.target.value) || 0;
+													field.onChange(value);
+													field.onBlur();
+												}}
+											/>
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name='total_units'
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Total Units *</FormLabel>
+										<FormControl>
+											<Input
+												type='number'
+												min='1'
+												step='1'
+												{...field}
+												onChange={(e) => field.onChange(e.target.value === '' ? '' : Number.parseInt(e.target.value))}
+												onBlur={(e) => {
+													const value = e.target.value === '' ? 1 : Number.parseInt(e.target.value) || 1;
 													field.onChange(value);
 													field.onBlur();
 												}}
