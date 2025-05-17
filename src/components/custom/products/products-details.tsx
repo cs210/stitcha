@@ -34,6 +34,14 @@ export function ProductsDetails({ product }: { product: Product }) {
 					</div>
 				</AccordionContent>
 			</AccordionItem>
+			<AccordionItem value='item-4'>
+				<AccordionTrigger>Technical Sheet</AccordionTrigger>
+				<AccordionContent>
+					<div className="flex justify-center">
+						<iframe src={product.technical_sheet || ''} width='80%' height='400px' />
+					</div>
+				</AccordionContent>
+			</AccordionItem>
 		</Accordion>
 	);
 }

@@ -9,7 +9,7 @@ import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
-import { H2 } from '@/components/custom/text/headings';
+import { H3 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Progress } from '@/components/ui/progress';
 import { Product, User } from '@/lib/schemas/global.types';
@@ -58,25 +58,31 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={`${seamstress?.first_name} ${seamstress?.last_name}`} />				
+				<Header text={`${seamstress?.first_name} ${seamstress?.last_name}`} />
 			</HeaderContainer>
 
 			<Container>
 				<div className='flex flex-col gap-4'>
 					<div className='flex flex-wrap gap-6'>{seamstress && <SeamstressProfile seamstress={seamstress} />}</div>
 
-					<H2 text={dict.seamstresses.products} />
+					{seamstress?.products.length > 0 && (
+						<>
+							<H3 text="Overall Progress" />
 
-					<div className='flex flex-row items-center gap-2'>
-						<Progress value={seamstress?.total_units_completed} className='w-[60%]' />
-						<P text={`${seamstress?.total_units_completed} / unknown`} />
-					</div>
+							<div className='flex flex-row items-center gap-2'>
+								<Progress value={seamstress?.total_units_completed} className='w-[60%]' />
+								<P text={`${seamstress?.total_units_completed} / unknown`} />
+							</div>
 
-					<div className='flex flex-wrap gap-6'>
-						{seamstress?.products.map((product: Product) => (
-							<SeamstressProductCard key={product.id} product={product} />
-						))}
-					</div>
+							<H3 text='Assigned Products' />
+
+							<div className='flex flex-wrap gap-6'>
+								{seamstress?.products.map((product: Product) => (
+									<SeamstressProductCard key={product.id} product={product} />
+								))}
+							</div>
+						</>
+					)}
 				</div>
 			</Container>
 		</>

@@ -9,6 +9,56 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      costs: {
+        Row: {
+          general_expenses: number
+          id: string
+          margin: number
+          packaging_cost: number
+          product_id: string
+          raw_material_cost: number
+          royalties: number
+          selling_price: number
+          total_cost: number
+          total_labor_cost: number
+          total_material_cost: number
+        }
+        Insert: {
+          general_expenses?: number
+          id?: string
+          margin?: number
+          packaging_cost?: number
+          product_id: string
+          raw_material_cost?: number
+          royalties?: number
+          selling_price?: number
+          total_cost?: number
+          total_labor_cost?: number
+          total_material_cost?: number
+        }
+        Update: {
+          general_expenses?: number
+          id?: string
+          margin?: number
+          packaging_cost?: number
+          product_id?: string
+          raw_material_cost?: number
+          royalties?: number
+          selling_price?: number
+          total_cost?: number
+          total_labor_cost?: number
+          total_material_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_costs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       education: {
         Row: {
           description: string
@@ -91,6 +141,8 @@ export type Database = {
           product_type: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
           system_code: string
+          technical_sheet: string | null
+          total_units: number
           weight: number
           width: number
         }
@@ -106,6 +158,8 @@ export type Database = {
           product_type?: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
           system_code?: string
+          technical_sheet?: string | null
+          total_units?: number
           weight?: number
           width?: number
         }
@@ -121,60 +175,12 @@ export type Database = {
           product_type?: string | null
           progress_level?: Database["public"]["Enums"]["progress_level"]
           system_code?: string
+          technical_sheet?: string | null
+          total_units?: number
           weight?: number
           width?: number
         }
         Relationships: []
-      }
-      products_costs: {
-        Row: {
-          general_expenses: number
-          id: string
-          margin: number
-          packaging_cost: number
-          product_id: string
-          raw_material_cost: number
-          royalties: number
-          selling_price: number
-          total_cost: number
-          total_labor_cost: number
-          total_material_cost: number
-        }
-        Insert: {
-          general_expenses?: number
-          id?: string
-          margin?: number
-          packaging_cost?: number
-          product_id: string
-          raw_material_cost?: number
-          royalties?: number
-          selling_price?: number
-          total_cost?: number
-          total_labor_cost?: number
-          total_material_cost?: number
-        }
-        Update: {
-          general_expenses?: number
-          id?: string
-          margin?: number
-          packaging_cost?: number
-          product_id?: string
-          raw_material_cost?: number
-          royalties?: number
-          selling_price?: number
-          total_cost?: number
-          total_labor_cost?: number
-          total_material_cost?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_costs_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: true
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       products_labor: {
         Row: {
@@ -301,19 +307,25 @@ export type Database = {
       }
       products_users: {
         Row: {
+          description: string | null
           product_id: string
+          units_assigned: number
           units_completed: number
           user_id: string
           validated: boolean
         }
         Insert: {
+          description?: string | null
           product_id: string
+          units_assigned?: number
           units_completed?: number
           user_id: string
           validated?: boolean
         }
         Update: {
+          description?: string | null
           product_id?: string
+          units_assigned?: number
           units_completed?: number
           user_id?: string
           validated?: boolean
@@ -343,6 +355,7 @@ export type Database = {
           id: string
           image_urls: Json | null
           product_id: string
+          units_completed: number
           user_id: string
         }
         Insert: {
@@ -352,6 +365,7 @@ export type Database = {
           id?: string
           image_urls?: Json | null
           product_id: string
+          units_completed?: number
           user_id: string
         }
         Update: {
@@ -361,6 +375,7 @@ export type Database = {
           id?: string
           image_urls?: Json | null
           product_id?: string
+          units_completed?: number
           user_id?: string
         }
         Relationships: [
@@ -403,32 +418,6 @@ export type Database = {
           units?: string | null
         }
         Relationships: []
-      }
-      technical_sheets: {
-        Row: {
-          id: number
-          product_id: string
-          technical_sheet: string | null
-        }
-        Insert: {
-          id?: number
-          product_id: string
-          technical_sheet?: string | null
-        }
-        Update: {
-          id?: number
-          product_id?: string
-          technical_sheet?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "technical_sheets_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: true
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       users: {
         Row: {

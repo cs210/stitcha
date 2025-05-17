@@ -1,5 +1,6 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
 import { Container } from '@/components/custom/container/container';
 import { Description } from '@/components/custom/header/description';
 import { Header } from '@/components/custom/header/header';
@@ -11,7 +12,6 @@ import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { user } = useUser();

@@ -1,5 +1,6 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
 import { getDictionary } from '@/app/locales';
 import { Container } from '@/components/custom/container/container';
 import { Description } from '@/components/custom/header/description';
@@ -13,14 +14,13 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { user } = useUser();
 	const { lang, setLang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
-	const [selectedLanguage, setSelectedLanguage] = useState<string>(lang);
+	const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'pt-br'>(lang as 'en' | 'pt-br');
 
 	useEffect(() => {
 		if (!user) return;
@@ -69,7 +69,7 @@ export default function Page() {
 						</div>
 						<div className='space-y-2'>
 							<Label>{dict.settings.form.language.title}</Label>
-							<Select defaultValue={lang} onValueChange={(value) => setSelectedLanguage(value)}>
+							<Select defaultValue={lang} onValueChange={(value) => setSelectedLanguage(value as 'en' | 'pt-br')}>
 								<SelectTrigger>
 									<SelectValue placeholder={dict.settings.form.language.placeholder} />
 								</SelectTrigger>

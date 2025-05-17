@@ -18,7 +18,7 @@ export function SeamstressProductCard({ product }: { product: Product }) {
 						<H4 text={product.name} />
 					</Link>
 					<P text={`${product.system_code}`} />
-					<P text={`${product.validated ? 'Validated' : 'Not Validated'}`} />
+					<P text={`Validated: ${product.validated ? 'Yes' : 'No'}`} />
 					<P text={`Units Completed: ${product.units_completed}`} />
 				</div>
 			</div>
