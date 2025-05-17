@@ -18,9 +18,9 @@ export function SeamstressCard({ seamstress }: { seamstress: User }) {
 					</Avatar>
 				</Link>
 				<Link href={`/dashboard/seamstresses/${seamstress.id}`} className='mb-1'>
-					<H4 text={`${seamstress.first_name} ${seamstress.last_name}`} />
+					<H4>{seamstress.first_name} {seamstress.last_name}</H4>
 				</Link>
-				<P color='dark-gray' text={`${seamstress.location}`} />
+				<P color='dark-gray'>{seamstress.location}</P>
 			</div>
 		</div>
 	);

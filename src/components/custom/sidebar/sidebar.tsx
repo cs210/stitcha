@@ -55,7 +55,7 @@ export function Sidebar({ dict }: { dict: any }) {
 				<SidebarHeader className='flex flex-row items-center p-4'>
 					<Image src='/images/orientavida.jpeg' alt='Stitcha Logo' width={30} height={30} />
 
-					<H4 text='Stitcha' />
+					<H4>Stitcha</H4>
 				</SidebarHeader>
 			</Link>
 			<SidebarContent>

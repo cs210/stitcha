@@ -1,4 +1,4 @@
-import { Product } from '@/lib/schemas/global.types';
+import { Product, Progress } from '@/lib/schemas/global.types';
 import { P } from '../text/text';
 
 export function ProductsProgress({ product }: { product: Product }) {
@@ -6,16 +6,16 @@ export function ProductsProgress({ product }: { product: Product }) {
 		<div>			
 			{product.progress && product.progress.length > 0 ? (
 				<div className='flex flex-row gap-4'>
-					{product.progress.map((progressItem, index) => (
+					{product.progress.map((progress: Progress, index: number) => (
 						<div key={index}>
-							<P text={`${new Date(progressItem.created_at).toLocaleDateString()}`} />
-							<P text={`${progressItem.description}`} />
-							<P text={`${progressItem.emotion}`} />
+							<P>{new Date(progress.created_at).toLocaleDateString()}</P>
+							<P>{progress.description}</P>
+							<P>{progress.emotion}</P>
 						</div>
 					))}
 				</div>
 			) : (
-				<P text='No progress updates yet' />
+				<P>No progress updates yet</P>
 			)}
 		</div>
 	);

@@ -54,10 +54,7 @@ export function ProductsSeamstresses({ product }: { product: Product }) {
 			method: 'POST',
 			body: formData,
 		});
-
 		const { data, error } = await response.json();
-
-		console.log(data, error);
 
 		if (error) {
 			console.error('Error assigning seamstress:', error);
@@ -141,32 +138,28 @@ export function ProductsSeamstresses({ product }: { product: Product }) {
 				</PopoverContent>
 			</Popover>
 
-			<H4 text='Assigned Seamstresses' />
-			<div>
-				{product.users && product.users.length > 0 ? (
-					<div className='flex flex-col gap-4'>
-						<div className='flex flex-wrap gap-4'>
-							{product.users.map((user) => (
-								<div key={user.id} className='flex items-center gap-2 p-2'>
-									<Avatar>
-										<AvatarImage src={user.image_url} />
-										<AvatarFallback>
-											{user.first_name.charAt(0)} {user.last_name.charAt(0)}
-										</AvatarFallback>
-									</Avatar>
-									<div className='flex flex-row gap-2'>
-										<P text={`${user.first_name} ${user.last_name}`} />
-										<P text={`${user.validated ? 'Validated' : 'Not Validated'}`} />
-										<P text={`${user.units_completed} units completed`} />
-									</div>
-								</div>
-							))}
+			<H4>Assigned Seamstresses</H4>			
+			{product.users && product.users.length > 0 ? (
+				<div className='flex flex-col gap-4'>
+					{product.users.map((user: User) => (
+						<div key={user.id} className='flex items-center gap-2 p-2'>
+							<Avatar>
+								<AvatarImage src={user.image_url ?? ''} />
+								<AvatarFallback>
+									{user.first_name.charAt(0)} {user.last_name.charAt(0)}
+								</AvatarFallback>
+							</Avatar>
+							<div className='flex flex-row gap-2'>
+								<P>{user.first_name} {user.last_name}</P>
+								<P>{user.validated ? 'Validated' : 'Not Validated'}</P>
+								<P>{user.units_completed} units completed</P>
+							</div>
 						</div>
-					</div>
-				) : (
-					<p className='text-gray-500'>No seamstresses assigned to this product</p>
-				)}
-			</div>
+					))}
+				</div>					
+			) : (
+				<P>No seamstresses assigned to this product</P>
+			)}			
 		</div>
 	);
 }

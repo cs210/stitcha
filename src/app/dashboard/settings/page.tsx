@@ -33,10 +33,8 @@ export default function Page() {
 		})();
 	}, [user, lang]);
 
-	const handleSubmit = () => {				
+	const handleLanguageChange = () => {				
 		if (setLang && selectedLanguage) {
-			console.log('selectedLanguage', selectedLanguage);
-
 			setLang(selectedLanguage);
 		}
 	};
@@ -58,7 +56,7 @@ export default function Page() {
 
 			<Container>
 				<div className='space-y-8 w-full'>
-					<div className='grid grid-cols-2 gap-6'>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 						<div className='space-y-2'>
 							<Label>{dict.settings.form.fullName}</Label>
 							<Input value={user?.fullName || ''} disabled />
@@ -81,7 +79,7 @@ export default function Page() {
 						</div>
 					</div>
 
-					<Button onClick={handleSubmit}>{dict.settings.form.save}</Button>
+					<Button onClick={handleLanguageChange}>{dict.settings.form.save}</Button>
 				</div>
 			</Container>
 		</>

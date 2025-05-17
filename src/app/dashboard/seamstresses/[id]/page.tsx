@@ -67,14 +67,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 					{seamstress?.products.length > 0 && (
 						<>
-							<H3 text="Overall Progress" />
+							<H3>Overall Progress</H3>
 
 							<div className='flex flex-row items-center gap-2'>
 								<Progress value={seamstress?.total_units_completed} className='w-[60%]' />
-								<P text={`${seamstress?.total_units_completed} / unknown`} />
+								<P>{`${seamstress?.total_units_completed} / unknown`}</P>
 							</div>
 
-							<H3 text='Assigned Products' />
+							<H3>Assigned Products</H3>
 
 							<div className='flex flex-wrap gap-6'>
 								{seamstress?.products.map((product: Product) => (

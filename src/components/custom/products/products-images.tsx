@@ -8,7 +8,7 @@ export function ProductsImages({ product }: { product: Product }) {
 		<Carousel>
 			<CarouselContent>
 				{product.image_urls && product.image_urls.length > 0 ? (
-					product.image_urls.map((imageUrl, index) => (
+					product.image_urls.map((imageUrl: string, index: number) => (
 						<CarouselItem key={index}>
 							<div className="w-full h-full flex items-center justify-center">
 								<Image src={imageUrl} alt={`Product image ${index + 1}`} className="w-96 h-96 object-contain" width={96} height={96} />
@@ -17,7 +17,7 @@ export function ProductsImages({ product }: { product: Product }) {
 					))
 				) : (
 					<CarouselItem>
-						<P text='No images available' />
+						<P>No images available</P>
 					</CarouselItem>
 				)}
 			</CarouselContent>
