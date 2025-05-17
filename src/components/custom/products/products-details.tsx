@@ -7,7 +7,7 @@ import {
 import { Product } from "@/lib/schemas/global.types";
 import { P } from "../text/text";
 
-export function ProductsDetails({ product }: { product: Product }) {
+export function ProductsDetails({ dict, product }: { dict: any, product: Product }) {
 	return (
 		<Accordion type='single' collapsible>
 			<AccordionItem value='item-1'>
@@ -34,14 +34,16 @@ export function ProductsDetails({ product }: { product: Product }) {
 					</div>
 				</AccordionContent>
 			</AccordionItem>
-			<AccordionItem value='item-4'>
-				<AccordionTrigger>Technical Sheet</AccordionTrigger>
-				<AccordionContent>
-					<div className="flex justify-center">
-						<iframe src={product.technical_sheet || ''} width='80%' height='400px' />
-					</div>
-				</AccordionContent>
-			</AccordionItem>
+			{product.technical_sheet && (
+				<AccordionItem value='item-4'>
+					<AccordionTrigger>Technical Sheet</AccordionTrigger>
+					<AccordionContent>
+						<div className="flex justify-center">
+							<iframe src={product.technical_sheet} width='80%' height='400px' />
+						</div>
+					</AccordionContent>
+				</AccordionItem>
+			)}
 		</Accordion>
 	);
 }

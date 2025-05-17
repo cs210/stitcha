@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User } from '@/lib/schemas/global.types';
 import Link from 'next/link';
-import { H4 } from '../text/headings';
+import { H3 } from '../text/headings';
 import { P } from '../text/text';
 
 export function SeamstressCard({ seamstress }: { seamstress: User }) {
@@ -18,7 +18,7 @@ export function SeamstressCard({ seamstress }: { seamstress: User }) {
 					</Avatar>
 				</Link>
 				<Link href={`/dashboard/seamstresses/${seamstress.id}`} className='mb-1'>
-					<H4>{seamstress.first_name} {seamstress.last_name}</H4>
+					<H3>{seamstress.first_name} {seamstress.last_name}</H3>
 				</Link>
 				<P color='dark-gray'>{seamstress.location}</P>
 			</div>

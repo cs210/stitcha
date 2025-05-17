@@ -1,15 +1,15 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
 import { Container } from '@/components/custom/container/container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { KanbanBoard } from '@/components/custom/kanban/kanban';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { lang } = useContext(LangContext);
@@ -36,8 +36,8 @@ export default function Page() {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={dict.kanban.title} />
-				<Description text={dict.kanban.description} />
+				<H2>{dict.kanban.title}</H2>
+				<P className='mt-2'>{dict.kanban.description}</P>
 			</HeaderContainer>
 
 			<Container>

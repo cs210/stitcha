@@ -11,8 +11,6 @@ import { P } from '../text/text';
 export function KanbanProductCard({ product, index, onDelete }: { product: Product; index: number; onDelete: (productId: string) => void }) {
 	const router = useRouter();
 
-	console.log();
-
 	return (
 		<Draggable draggableId={product.id} index={index}>
 			{(provided, snapshot) => (
@@ -27,12 +25,12 @@ export function KanbanProductCard({ product, index, onDelete }: { product: Produ
 				>
 					<div className='flex flex-row gap-4 p-4 relative'>
 						{product?.image_urls?.length > 0 && (
-							<Image src={`${product.image_urls[0]}`} alt={product.name} className='w-24 h-24' width={24} height={24} />
+							<Image src={`${product?.image_urls[0]}`} alt={product.name} className='w-24 h-24' width={24} height={24} />
 						)}
 
 						<div className='flex flex-col gap-2'>
-							<H4 text={product.name} />
-							<P text={`${product.system_code}`} />
+							<H4>{product.name}</H4>
+							<P>{product.system_code}</P>
 						</div>
 
 						<Button

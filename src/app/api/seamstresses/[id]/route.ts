@@ -40,7 +40,8 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			data.products = data.products_users.map((product) => ({
 				...product.products,
 				validated: product.validated,
-				units_completed: product.units_completed || 0
+				units_completed: product.units_completed || 0,
+				units_assigned: product.units_assigned || 0
 			}));
 
 			// Update each product with respective progress data
@@ -60,7 +61,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			// Calculate total units completed across all products
 			data.total_units_completed = data.products_users.reduce((total, product) => {
 				return total + (product.units_completed || 0);
-			}, 0);			
+			}, 0);
+
+			// Calculate total units assigned across all products
+			data.total_units_assigned = data.products_users.reduce((total, product) => {
+				return total + (product.units_assigned || 0);
+			}, 0);
 
 			delete data.products_users;
 		}

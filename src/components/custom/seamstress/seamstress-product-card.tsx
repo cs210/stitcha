@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { H4 } from '../text/headings';
 import { P } from '../text/text';
 
-export function SeamstressProductCard({ product }: { product: Product }) {
+export function SeamstressProductCard({ dict, product }: { dict: any, product: Product }) {
 	return (
 		<Card className='flex flex-col gap-4 p-4'>
 			<div className='flex flex-row gap-2'>
@@ -15,14 +15,15 @@ export function SeamstressProductCard({ product }: { product: Product }) {
 					<Link href={`/dashboard/products/${product.id}`}>
 						<H4>{product.name}</H4>
 					</Link>
-					<P><strong>System Code:</strong> {product.system_code}</P>
-					<P><strong>Validated:</strong> {product.validated ? 'Yes' : 'No'}</P>
-					<P><strong>Units Completed:</strong> {product.units_completed}</P>
+					<P><strong>{dict.product.systemCode}:</strong> {product.system_code}</P>
+					<P><strong>{dict.product.validated}:</strong> {product.validated ? 'Yes' : 'No'}</P>
+					<P><strong>{dict.product.unitsAssigned}:</strong> {product.units_assigned}</P>
+					<P><strong>{dict.product.unitsCompleted}:</strong> {product.units_completed}</P>
 				</div>
 			</div>
 
 			<div className='flex flex-col gap-2'>
-				<H4>Progress Updates</H4>
+				<H4>{dict.seamstress.productCard.progressUpdates}</H4>
 				
 				{product.progress && product.progress.length > 0 ? (
 					<div className='flex flex-row gap-4'>
@@ -35,7 +36,7 @@ export function SeamstressProductCard({ product }: { product: Product }) {
 						))}
 					</div>
 				) : (
-					<P>No progress updates yet</P>
+					<P>{dict.seamstress.productCard.noProgressUpdates}</P>
 				)}
 			</div>
 		</Card>

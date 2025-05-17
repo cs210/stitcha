@@ -14,11 +14,17 @@
         "placeholder": "Selecionar idioma"
       },
       "save": "Salvar"
+    },
+    "notifications": {
+      "languageChanged": {
+        "title": "Idioma alterado.",
+        "description": "Idioma alterado com sucesso para {{language}}!"
+      }
     }
   },
   "kanban": {
     "title": "Kanban",
-    "description": "Gerenciar e acompanhar o progresso dos produtos",
+    "description": "Gerenciar e acompanhar o progresso do produto",
     "columns": {
       "notStarted": "Não Iniciado",
       "inProgress": "Em Andamento",
@@ -41,7 +47,8 @@
   },
   "seamstresses": {
     "title": "Costureiras",
-    "description": "Visualizar e gerenciar todas as costureiras"
+    "description": "Visualizar e gerenciar todas as costureiras",
+    "products": "Produtos"
   },
   "table": {
     "new": "Novo",
@@ -60,5 +67,8 @@
     "products": "Produtos",
     "seamstresses": "Costureiras",
     "settings": "Configurações"
+  },
+  "navigation": {
+    "dashboard": "Painel de Controle"
   }
 }

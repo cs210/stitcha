@@ -1,11 +1,11 @@
 'use client';
 
 import { FormContainer } from '@/components/custom/form/form-container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ComboboxFormField } from '@/components/ui/combobox-form-field';
@@ -478,8 +478,8 @@ export default function Page() {
 	return (
 		<div className='flex flex-col min-h-0'>
 			<HeaderContainer>
-				<Header text='Products' />
-				<Description text='Manage and track customer products.' />
+				<H2>New Product</H2>
+				<P className='mt-2'>Create a new product.</P>
 			</HeaderContainer>
 
 			<div className='py-4'>

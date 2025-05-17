@@ -3,7 +3,7 @@ import { Product } from '@/lib/schemas/global.types';
 import Image from 'next/image';
 import { P } from '../text/text';
 
-export function ProductsImages({ product }: { product: Product }) {
+export function ProductsImages({ dict, product }: { dict: any, product: Product }) {
 	return (		
 		<Carousel>
 			<CarouselContent>

@@ -1,13 +1,14 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
 import { Container } from '@/components/custom/container/container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -19,7 +20,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
-import { LangContext } from '@/app/layout';
 
 const handleDeleteProduct = async (productId: string) => {
 	try {
@@ -76,7 +76,12 @@ const columns: ColumnDef<Product>[] = [
 	{
 		accessorKey: 'type',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
-		cell: ({ row }) => <Badge variant='outline'>{row.original.product_type}</Badge>,
+		cell: ({ row }) => <Badge variant='outline' className='text-sm'>{row.original.product_type}</Badge>,
+	},
+	{
+		accessorKey: 'progress_level',
+		header: ({ column }) => <DataTableColumnHeader column={column} title='Progress Level' />,
+		cell: ({ row }) => <Badge className={row.original.progress_level === 'Not Started' ? `bg-red-500` : row.original.progress_level === 'In Progress' ? `bg-yellow-400` : `bg-green-500`}>{row.original.progress_level}</Badge>,
 	},
 	{
 		accessorKey: 'system_code',
@@ -151,8 +156,8 @@ export default function Page() {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={dict.products.title} />
-				<Description text={dict.products.description} />
+				<H2>{dict.products.title}</H2>
+				<P className='mt-2'>{dict.products.description}</P>
 			</HeaderContainer>
 
 			<Container>

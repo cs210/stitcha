@@ -2,7 +2,7 @@ version: 1
 files:
   src/locales/en.json:
     kanban.title: 39b32dd45982038aa5704ca2728334ee
-    kanban.description: 6f872d8a15db658aa590e47bbef47d92
+    kanban.description: 92df4b070cf883722638f7de7ba34038
     kanban.columns.notStarted: 10db56f8b10dc989c43fbe33202e5339
     kanban.columns.inProgress: c9413dd7682a45da9ecc9efa8cea47d7
     kanban.columns.done: f92965e2c8a7afb3c1b9a5c09a263636
@@ -18,6 +18,7 @@ files:
     products.table.delete: f2a6c498fb90ee345d997f888fce3b18
     seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
+    seamstresses.products: 068f80c7519d0528fb08e82137a72131
     settings.title: f4f70727dc34561dfde1a3c529b6205c
     settings.description: 5a398c73304f6e071c91a65c1f0bffb5
     settings.form.fullName: 630058029627ce58e7571e7a5b6ec591
@@ -27,6 +28,9 @@ files:
     settings.form.language.options.en: 78463a384a5aa4fad5fa73e2f506ecfc
     settings.form.language.options.pt: 30e32c7c4cf434e9c75e60c14c442541
     settings.form.save: c9cc8cce247e49bae79f15173ce97354
+    settings.notifications.languageChanged.title: 3d37179cdc5057a3e15be8b161522ff1
+    settings.notifications.languageChanged.description: 43a632ec13856c958b2444716c6f8a4c
+    navigation.dashboard: 2938c7f7e560ed972f8a4f68e80ff834
     sidebar.stitchaAi: 7f7ce1b6270deca4deee7f8497d754d5
     sidebar.kanban: 39b32dd45982038aa5704ca2728334ee
     sidebar.products: 068f80c7519d0528fb08e82137a72131

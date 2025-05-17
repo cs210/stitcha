@@ -1,5 +1,6 @@
 'use client';
 
+import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/lib/schemas/global.types';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext } from '@hello-pangea/dnd';
@@ -19,6 +20,8 @@ const REVERSE_STATUS_MAPPING = {
 } as const;
 
 export function KanbanBoard({ dict }: { dict: any }) {
+	const { toast } = useToast();
+
 	const [products, setProducts] = useState<Record<string, Product[]>>({
 		notStarted: [],
 		inProgress: [],
@@ -106,10 +109,18 @@ export function KanbanBoard({ dict }: { dict: any }) {
 				if (!response.ok) {
 					throw new Error('Failed to update product status');
 				}
-			} catch (error) {
-				console.error('Error updating product status:', error);
 
+				toast({
+					title: 'Product status updated.',
+					description: 'Product status updated successfully.',
+				});
+			} catch (error) {
 				setProducts(newProducts);
+				
+				toast({
+					title: 'Error updating product status.',
+					description: 'Failed to update product status.',
+				});
 			}
 		}
 	};
@@ -131,8 +142,16 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			});
 
 			setProducts(newProducts);
+
+			toast({
+				title: 'Product deleted.',
+				description: 'Product deleted successfully.',
+			});
 		} catch (error) {
-			console.error('Error deleting product:', error);
+			toast({
+				title: 'Error deleting product.',
+				description: 'Failed to delete product.',
+			});
 		}
 	};
 
@@ -141,9 +160,21 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-4 h-full'>
-						<KanbanColumn title={dict.kanban.columns.notStarted} id='notStarted' products={products.notStarted} onDelete={onDelete} />
-						<KanbanColumn title={dict.kanban.columns.inProgress} id='inProgress' products={products.inProgress} onDelete={onDelete} />
-						<KanbanColumn title={dict.kanban.columns.done} id='done' products={products.done} onDelete={onDelete} />
+						<KanbanColumn id='notStarted' title={dict.kanban.columns.notStarted} badgeColor='bg-red-500' products={products.notStarted} onDelete={onDelete} />
+						<KanbanColumn
+							id='inProgress'
+							title={dict.kanban.columns.inProgress}
+							badgeColor='bg-yellow-400'
+							products={products.inProgress}
+							onDelete={onDelete}
+						/>
+						<KanbanColumn
+							id='done'
+							title={dict.kanban.columns.done}
+							badgeColor='bg-green-500'
+							products={products.done}
+							onDelete={onDelete}
+						/>
 					</div>
 				</div>
 			</DragDropContext>

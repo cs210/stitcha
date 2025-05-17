@@ -3,11 +3,11 @@
 import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-breadcrumb';
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/toaster';
 import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../locales';
 import { LangContext } from '../layout';
+import { getDictionary } from '../locales';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const { lang } = useContext(LangContext);
@@ -39,7 +39,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 					<header className='flex items-center gap-4'>
 						<SidebarTrigger />
 
-						<NavigationBreadcrumb segments={segments} formattedPage={segments[segments.length - 1]} />
+						<NavigationBreadcrumb dict={dict} segments={segments} />
 					</header>
 
 					<div className='flex-1 flex-col h-full pt-8'>{children}</div>
