@@ -1,17 +1,17 @@
 'use client';
 
+import { LangContext } from '@/app/layout';
 import { Container } from '@/components/custom/container/container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressCard } from '@/components/custom/seamstress/seamstress-card';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { User } from '@/lib/schemas/global.types';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { user } = useUser();
@@ -51,8 +51,8 @@ export default function Page() {
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={dict.seamstresses.title} />
-				<Description text={dict.seamstresses.description} />
+				<H2>{dict.seamstresses.title}</H2>
+				<P className='mt-2'>{dict.seamstresses.description}</P>
 			</HeaderContainer>
 
 			<Container>

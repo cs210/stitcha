@@ -1,7 +1,7 @@
 {
 	"kanban": {
 		"title": "Kanban",
-		"description": "Manage and track order progress",
+		"description": "Manage and track product progress",
 		"columns": {
 			"notStarted": "Not Started",
 			"inProgress": "In Progress",
@@ -22,9 +22,27 @@
 			"delete": "Delete"
 		}
 	},
+	"product": {
+		"assignedSeamstresses": "Assigned Seamstresses",
+		"productDetails": "Product Details",
+		"progressUpdates": "Progress Updates",
+		"systemCode": "System Code",
+		"validated": "Validated",
+		"unitsAssigned": "Units Assigned",
+		"unitsCompleted": "Units Completed"
+	},
 	"seamstresses": {
 		"title": "Seamstresses",
-		"description": "View and manage all seamstresses"
+		"description": "View and manage all seamstresses",
+		"products": "Products"
+	},
+	"seamstress": {
+		"overallProgress": "Overall Progress",
+		"assignedProducts": "Assigned Products",
+		"productCard": {
+			"progressUpdates": "Progress Updates",
+			"noProgressUpdates": "No progress updates yet"
+		}
 	},
 	"settings": {
 		"title": "Settings",
@@ -41,7 +59,16 @@
 				}
 			},
 			"save": "Save"
+		},
+		"notifications": {
+			"languageChanged": {
+				"title": "Language changed.",
+				"description": "Successfully changed language to {{language}}!"
+			}
 		}
+	},
+	"navigation": {
+		"dashboard": "Dashboard"
 	},
 	"sidebar": {
 		"stitchaAi": "Stitcha AI",
