@@ -57,6 +57,7 @@
 		"shadcn-ui": "^0.9.5",
 		"sonner": "^2.0.1",
 		"supabase": "^2.15.8",
+		"svix": "^1.65.0",
 		"tabs": "^0.2.0",
 		"tailwind-merge": "^3.0.1",
 		"tailwindcss-animate": "^1.0.7",
