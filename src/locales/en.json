@@ -63,7 +63,7 @@
 		"notifications": {
 			"languageChanged": {
 				"title": "Language changed.",
-				"description": "Successfully changed language to {{language}}!"
+				"description": "Successfully changed language to {{language}}."
 			}
 		}
 	},

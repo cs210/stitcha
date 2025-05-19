@@ -12,6 +12,8 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Product, User } from '@/lib/schemas/global.types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { X } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -72,6 +74,22 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		});
 	}
 
+	const handleRemoveSeamstress = async (seamstressId: string) => {
+		const response = await fetch(`/api/products/${product.id}/seamstresses/${seamstressId}`, {
+			method: 'DELETE',
+		});
+		const { data, error } = await response.json();
+
+		if (error) {
+			console.error('Error removing seamstress:', error);
+		}
+
+		toast({
+			title: 'Seamstress removed.',
+			description: 'Seamstress removed from product successfully.',
+		});
+	}
+
 	return (
 		<>
 			<div className='flex flex-row gap-2'>
@@ -98,13 +116,15 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 													{seamstresses.map((seamstress: User) => (
 														<SelectItem key={seamstress.id} value={seamstress.id}>
 															<div className='flex items-center gap-2'>
-																<Avatar className="h-8 w-8">
+																<Avatar className='h-8 w-8'>
 																	<AvatarImage src={seamstress.image_url ?? ''} />
 																	<AvatarFallback>
 																		{seamstress.first_name.charAt(0)} {seamstress.last_name.charAt(0)}
 																	</AvatarFallback>
 																</Avatar>
-																<P>{seamstress.first_name} {seamstress.last_name}</P>
+																<P>
+																	{seamstress.first_name} {seamstress.last_name}
+																</P>
 															</div>
 														</SelectItem>
 													))}
@@ -153,16 +173,21 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 					<div className='p-2'>
 						{product.users.map((user: User, index: number) => (
 							<div key={user.id}>
-								<div className='flex items-center gap-2 p-1'>
-									<Avatar>
-										<AvatarImage src={user.image_url ?? ''} />
-										<AvatarFallback>
-											{user.first_name.charAt(0)} {user.last_name.charAt(0)}
-										</AvatarFallback>
-									</Avatar>
-									<P>
-										{user.first_name} {user.last_name}
-									</P>
+								<div className='flex items-center justify-between p-1'>
+									<Link href={`/dashboard/seamstresses/${user.id}`} className='flex items-center gap-2'>
+										<Avatar>
+											<AvatarImage src={user.image_url ?? ''} />
+												<AvatarFallback>
+													{user.first_name.charAt(0)} {user.last_name.charAt(0)}
+												</AvatarFallback>
+											</Avatar>
+											<P>
+												{user.first_name} {user.last_name}
+											</P>
+									</Link>
+									<Button size='icon' onClick={() => handleRemoveSeamstress(user.id)}>
+										<X className='w-4 h-4 cursor-pointer' />
+									</Button>
 								</div>
 								{index !== product.users.length - 1 && <Separator className='my-2' />}
 							</div>

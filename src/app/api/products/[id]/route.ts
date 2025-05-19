@@ -71,6 +71,33 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 	}
 }
 
+// Update a specific product by id
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+	const { userId } = await auth();
+	const { id: productId } = await params;
+
+	if (!userId) {
+		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+	}
+
+	const supabase = await createClerkSupabaseClientSsr();
+
+	try {
+		const body = await req.json();	
+
+		const { data, error } = await supabase.from('products').update(body).eq('id', productId);
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return NextResponse.json({ data }, { status: 200 });
+	} catch (error) {
+		return NextResponse.json({ error }, { status: 500 });
+	}
+}
+
+
 // Delete a specific product by id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const { userId } = await auth();

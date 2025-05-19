@@ -64,7 +64,7 @@ export function Sidebar({ dict }: { dict: any }) {
 						<SidebarMenu>
 							{navRoutes.map((navRoute) => (
 								<SidebarMenuItem key={navRoute.title}>
-									<SidebarMenuButton asChild>
+									<SidebarMenuButton asChild isActive={pathname.startsWith(navRoute.url)}>
 										<Link href={navRoute.url} className='flex items-center gap-3'>
 											<navRoute.icon />
 											<span>{navRoute.title}</span>
@@ -76,12 +76,11 @@ export function Sidebar({ dict }: { dict: any }) {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter className='p-4'>
+			<SidebarFooter className='justify-center items-center p-4'>
 				<UserButton
 					appearance={{
 						elements: {
 							userButtonBox: {
-								width: '100%',
 								padding: '8px',
 							},
 						},

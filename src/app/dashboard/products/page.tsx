@@ -58,9 +58,9 @@ const columns: ColumnDef<Product>[] = [
 			<Image
 				src={row.original.image_urls && row.original.image_urls.length > 0 ? row.original.image_urls[0] : '/images/placeholder-image.jpg'}
 				alt={row.original.name}
-				className='w-32 h-32 object-contain'
-				width={128}
-				height={128}
+				className='w-32 h-auto object-contain'
+				width={32}
+				height={32}
 			/>
 		),
 	},
