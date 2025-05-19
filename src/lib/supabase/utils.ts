@@ -176,7 +176,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 	}
 
 	// Update the product with the image URLs
-	const { data: updatedProduct, error: updateError } = await supabase.from('products').update({ image_urls }).eq('id', productId).select().single();
+	const { error: updateError } = await supabase.from('products').update({ image_urls }).eq('id', productId).select().single();
 
 	const technical_sheet_url = formData.get('technical_sheet') as File;
 
@@ -403,7 +403,7 @@ export async function updateTechnicalSheetFromProduct(productId: string, supabas
 	const filePath = `${productId}/${fileName}`;
 
 	// Upload the file to Supabase Storage
-	const { data: uploadData, error: uploadError } = await supabase.storage.from('technical-sheets').upload(filePath, technical_sheet, {
+	const { error: uploadError } = await supabase.storage.from('technical-sheets').upload(filePath, technical_sheet, {
 		cacheControl: '3600',
 		upsert: true,
 	});

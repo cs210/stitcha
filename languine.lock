@@ -31,6 +31,32 @@ files:
     product.validated: 5364259abab90e94890f2ed2481b9824
     product.unitsAssigned: 00c256c88a101bc01e9676d149c605a5
     product.unitsCompleted: 6568b4e6a853aa2683789a272f4e948a
+    product.details.description: b5a7adde1af5c87d7fd797b6245c2a39
+    product.details.importantInformation: e89802a186e0e9ab926718844e2495a8
+    product.details.dimensions: f4843c1c797abf1a256c8802b6cd9f51
+    product.details.technicalSheet: 1fd598f44c8f21357f24b6b93c9000ef
+    product.details.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    product.details.inmetroCertNumber: 70c1f7d0995d297fbcb6ccca42d5a520
+    product.details.barcode: b93eaef026c32ad9b73e53ba24a5875e
+    product.details.width: 32954654ac8fe66a1d09be19001de2d4
+    product.details.height: eec6c4bdbd339edf8cbea68becb85244
+    product.details.weight: 8c489d0946f66d17d73f26366a4bf620
+    product.images.productImage: 3c38027cd61ce6345509574bc269f54c
+    product.images.noImagesAvailable: 0db5b7f91d78cab06983ce9f5446baba
+    product.progress.noProgressUpdatesYet: d92986bc3aa97a52c8f36566e4e4268a
+    product.seamstresses.assignSeamstressForm.title: 097e0c8fe6e69553b90c6101139a09c8
+    product.seamstresses.assignSeamstressForm.seamstress.label: eff328e6d76c7741ea2a4d3fe183b1e7
+    product.seamstresses.assignSeamstressForm.seamstress.placeholder: 6d51f7902743be8c34aa68e8d2bc4aa6
+    product.seamstresses.assignSeamstressForm.units.label: e5771a362d88a71a657bfcd21ca54b3f
+    product.seamstresses.assignSeamstressForm.description.label: b5a7adde1af5c87d7fd797b6245c2a39
+    product.seamstresses.assignSeamstressForm.description.placeholder: c95b359ee1aeee5b8f3b7a912a1175f7
+    product.seamstresses.assignSeamstressForm.submit: a4d3b161ce1309df1c4e25df28694b7b
+    product.seamstresses.sendWhatsappMessage: 88c0352defd5a0598f3fdd650d8a309f
+    product.seamstresses.noSeamstressesAssigned: 798fd554cecaa96aa4c3ff3ea37354d1
+    product.seamstresses.notificiation.seamstressAssigned.success.title: a8f20e707b39a21e92e6136b2bafd03b
+    product.seamstresses.notificiation.seamstressAssigned.success.description: 3e0a019571d9fd97d63bb518bd1f2e85
+    product.seamstresses.notificiation.seamstressAssigned.error.title: c03eb38a483bbf1d7417549c1326dc2e
+    product.seamstresses.notificiation.seamstressAssigned.error.description: 4b1b2506eba06ad0f660b1a7cd33a15d
     seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
     seamstresses.products: 068f80c7519d0528fb08e82137a72131

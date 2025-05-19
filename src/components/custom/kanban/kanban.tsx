@@ -114,7 +114,9 @@ export function KanbanBoard({ dict }: { dict: any }) {
 					title: dict.kanban.notifications.productStatusUpdated.success.title,
 					description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
 				});
-			} catch (error) {				
+			} catch (error) {
+				console.error('Error updating product status:', error);
+
 				toast({
 					title: dict.kanban.notifications.productStatusUpdated.error.title,
 					description: dict.kanban.notifications.productStatusUpdated.error.description
@@ -146,6 +148,8 @@ export function KanbanBoard({ dict }: { dict: any }) {
 				description: dict.kanban.notifications.productDeleted.success.description,
 			});
 		} catch (error) {
+			console.error('Error deleting product:', error);
+			
 			toast({
 				title: dict.kanban.notifications.productDeleted.error.title,
 				description: dict.kanban.notifications.productDeleted.error.description,

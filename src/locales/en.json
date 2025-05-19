@@ -51,7 +51,57 @@
 		"systemCode": "System Code",
 		"validated": "Validated",
 		"unitsAssigned": "Units Assigned",
-		"unitsCompleted": "Units Completed"
+		"unitsCompleted": "Units Completed",
+		"details": {
+			"description": "Description",
+			"importantInformation": "Important Information",
+			"dimensions": "Dimensions",
+			"technicalSheet": "Technical Sheet",
+			"systemCode": "System Code",
+			"inmetroCertNumber": "Inmetro Cert Number",
+			"barcode": "Barcode",
+			"width": "Width",
+			"height": "Height",
+			"weight": "Weight"
+		},
+		"images": {
+			"productImage": "Product Image",
+			"noImagesAvailable": "No images available"
+		},
+		"progress": {
+			"noProgressUpdatesYet": "No progress updates yet"
+		},
+		"seamstresses": {
+			"assignSeamstressForm": {
+				"title": "Assign Seamstress",
+				"seamstress": {
+					"label": "Seamstress",
+					"placeholder": "Select a seamstress"
+				},
+				"units": {
+					"label": "Units"
+				},
+				"description": {
+					"label": "Description",
+					"placeholder": "Enter the description"
+				},
+				"submit": "Submit"
+			},
+			"sendWhatsappMessage": "Send WhatsApp Message",
+			"noSeamstressesAssigned": "No seamstresses assigned",
+			"notificiation": {
+				"seamstressAssigned": {
+					"success": {
+						"title": "Seamstress assigned",
+						"description": "Seamstress assigned to product successfully."
+					},
+					"error": {
+						"title": "Error assigning seamstress",
+						"description": "Failed to assign seamstress to product."
+					}
+				}
+			}
+		}
 	},
 	"seamstresses": {
 		"title": "Seamstresses",

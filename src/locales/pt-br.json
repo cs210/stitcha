@@ -108,7 +108,57 @@
     "systemCode": "Código do Sistema",
     "validated": "Validado",
     "unitsAssigned": "Unidades Designadas",
-    "unitsCompleted": "Unidades Concluídas"
+    "unitsCompleted": "Unidades Concluídas",
+    "details": {
+      "description": "Descrição",
+      "importantInformation": "Informações Importantes",
+      "dimensions": "Dimensões",
+      "technicalSheet": "Ficha Técnica",
+      "systemCode": "Código do Sistema",
+      "inmetroCertNumber": "Número de Certificação Inmetro",
+      "barcode": "Código de Barras",
+      "width": "Largura",
+      "height": "Altura",
+      "weight": "Peso"
+    },
+    "images": {
+      "productImage": "Imagem do Produto",
+      "noImagesAvailable": "Nenhuma imagem disponível"
+    },
+    "progress": {
+      "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda"
+    },
+    "seamstresses": {
+      "assignSeamstressForm": {
+        "title": "Atribuir Costureira",
+        "seamstress": {
+          "label": "Costureira",
+          "placeholder": "Selecione uma costureira"
+        },
+        "units": {
+          "label": "Unidades"
+        },
+        "description": {
+          "label": "Descrição",
+          "placeholder": "Insira a descrição"
+        },
+        "submit": "Enviar"
+      },
+      "sendWhatsappMessage": "Enviar Mensagem pelo WhatsApp",
+      "noSeamstressesAssigned": "Nenhuma costureira atribuída",
+      "notificiation": {
+        "seamstressAssigned": {
+          "success": {
+            "title": "Costureira atribuída",
+            "description": "Costureira atribuída ao produto com sucesso."
+          },
+          "error": {
+            "title": "Erro ao atribuir costureira",
+            "description": "Falha ao atribuir costureira ao produto."
+          }
+        }
+      }
+    }
   },
   "seamstress": {
     "overallProgress": "Progresso Geral",

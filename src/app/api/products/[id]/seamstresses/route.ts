@@ -14,9 +14,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const formData = await req.formData();
-
-		console.log(formData);
+		const formData = await req.formData();		
 
 		const { data, error } = await supabase.from('products_users').insert({
 			product_id: productId,

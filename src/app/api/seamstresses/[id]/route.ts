@@ -28,10 +28,18 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 			.eq('id', seamstressId)
 			.single();
 
+		if (seamstressError) {
+			throw new Error(seamstressError.message);
+		}
+
 		const { data: progressData, error: progressError } = await supabase
 			.from('progress')
 			.select('*')
 			.eq('user_id', seamstressId)
+
+		if (progressError) {
+			throw new Error(progressError.message);
+		}
 
 		const data = { ...seamstressData };
 				
