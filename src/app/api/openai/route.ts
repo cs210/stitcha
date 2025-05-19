@@ -1,12 +1,11 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import fs from 'fs';
-import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { NextResponse } from 'next/server';
 import path from 'path';
 
 // Pushes all of our information to OpenAI
-export async function POST(req: NextRequest) {
+export async function POST() {
 	const { userId } = await auth();
 
 	if (!userId) {
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ error: productError }, { status: 400 });
 	}
 
-	const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+	// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 	// Convert data to CSV strings
 	const productCsv = productData?.map((product) => Object.values(product).join(',')).join('\n') || '';
@@ -32,10 +31,10 @@ export async function POST(req: NextRequest) {
 
 		fs.writeFileSync(productPath, productCsv);
 
-		const productFile = await openai.files.create({
-			file: fs.createReadStream(productPath),
-			purpose: 'assistants',
-		});
+		// const productFile = await openai.files.create({
+		// 	file: fs.createReadStream(productPath),
+		// 	purpose: 'assistants',
+		// });
 
 		// Upload files to vector store
 		// const productVectorStore = await openai.vectorStores.files.create(

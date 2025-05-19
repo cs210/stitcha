@@ -65,17 +65,20 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 
 		if (error) {
 			console.error('Error assigning seamstress:', error);
+
+			toast({
+				title: dict.product.seamstresses.seamstressAssigned.error.title,
+				description: dict.product.seamstresses.seamstressAssigned.error.description,
+			});
 		}
 		
 		form.reset();
 
-		console.log(data);
-
 		setAssignedSeamstresses(data);
 
 		toast({
-			title: 'Seamstress assigned.',
-			description: 'Seamstress assigned to product successfully.',
+			title: dict.product.seamstresses.seamstressAssigned,
+			description: dict.product.seamstresses.seamstressAssignedDescription,
 		});
 	}
 
@@ -92,8 +95,8 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		setAssignedSeamstresses(data);
 
 		toast({
-			title: 'Seamstress removed.',
-			description: 'Seamstress removed from product successfully.',
+			title: dict.product.seamstresses.seamstressRemoved,
+			description: dict.product.seamstresses.seamstressRemovedDescription,
 		});
 	}
 
@@ -126,7 +129,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 			<div className='flex flex-row gap-2'>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button className='mb-4'>Assign Seamstress</Button>
+						<Button className='mb-4'>{dict.product.seamstresses.assignSeamstressForm.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<Form {...form}>
@@ -136,11 +139,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Seamstress</FormLabel>
+											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.seamstress.label}</FormLabel>
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder='Assign a seamstress' />
+														<SelectValue placeholder={dict.product.seamstresses.assignSeamstressForm.seamstress.placeholder} />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -170,7 +173,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='units'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Units</FormLabel>
+											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
 											<FormControl>
 												<Input type='number' {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 											</FormControl>
@@ -183,20 +186,20 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='description'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>Description</FormLabel>
+											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.description.label}</FormLabel>
 											<FormControl>
-												<Input {...field} />
+												<Input {...field} placeholder={dict.product.seamstresses.assignSeamstressForm.description.placeholder} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type='submit'>Submit</Button>
+								<Button type='submit'>{dict.product.seamstresses.assignSeamstressForm.submit}</Button>
 							</form>
 						</Form>
 					</PopoverContent>
 				</Popover>
-				<Button variant='outline' onClick={handleSendWhatsapp}>Send Whatsapp Message</Button>
+				<Button variant='outline' onClick={handleSendWhatsapp}>{dict.product.seamstresses.sendWhatsappMessage}</Button>
 			</div>
 
 			{assignedSeamstresses && assignedSeamstresses.length > 0 ? (
@@ -226,7 +229,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 					</div>
 				</ScrollArea>
 			) : (
-				<P>No seamstresses assigned to this product</P>
+				<P>{dict.product.seamstresses.noSeamstressesAssigned}</P>
 			)}
 		</>
 	);

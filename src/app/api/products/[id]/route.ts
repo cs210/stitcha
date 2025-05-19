@@ -43,6 +43,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 
 		const { data: progressData, error: progressError } = await supabase.from('progress').select('*').eq('product_id', id);		
 
+		if (progressError) {
+			throw new Error(progressError.message);
+		}
+
 		// Rename the users, costs, progress, labor, packaging materials, and raw materials fields in the data object
 		if (data) {
 			data.users = data.products_users.map((product_user) => ({

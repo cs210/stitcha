@@ -15,7 +15,7 @@ export function ProductsProgress({ dict, product }: { dict: any, product: Produc
 					))}
 				</div>
 			) : (
-				<P>No progress updates yet</P>
+				<P>{dict.product.progress.noProgressUpdatesYet}</P>
 			)}
 		</div>
 	);

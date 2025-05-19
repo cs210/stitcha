@@ -232,7 +232,7 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
  * @param product - The product data to generate the technical sheet from
  * @returns Promise<Buffer> - The generated PDF as a buffer
  */
-export async function generateTechnicalSheetPDF(product: Product): Promise<Buffer> {
+export async function generateTechnicalSheetPDF(): Promise<Buffer> {
 	// TODO: Implement technical sheet generation logic
 	throw new Error('Not implemented');
 }
@@ -242,7 +242,7 @@ export async function generateTechnicalSheetPDF(product: Product): Promise<Buffe
  * @param product - The product data to generate the cost breakdown from
  * @returns Promise<Buffer> - The generated PDF as a buffer
  */
-export async function generateCostBreakdownPDF(product: Product): Promise<Buffer> {
+export async function generateCostBreakdownPDF(): Promise<Buffer> {
 	// TODO: Implement cost breakdown generation logic
 	throw new Error('Not implemented');
 }
