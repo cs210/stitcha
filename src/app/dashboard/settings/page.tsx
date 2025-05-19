@@ -41,8 +41,13 @@ export default function Page() {
 			setLang(selectedLanguage);
 
 			toast({
-				title: dict.settings.notifications.languageChanged.title,
-				description: dict.settings.notifications.languageChanged.description.replace('{{language}}', selectedLanguage === 'en' ? 'English' : 'Portuguese'),
+				title: dict.settings.notifications.languageChanged.success.title,
+				description: dict.settings.notifications.languageChanged.success.description.replace('{{language}}', selectedLanguage === 'en' ? 'English' : 'Portuguese'),
+			});
+		} else {
+			toast({
+				title: dict.settings.notifications.languageChanged.error.title,
+				description: dict.settings.notifications.languageChanged.error.description,
 			});
 		}
 	};

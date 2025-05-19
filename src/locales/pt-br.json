@@ -18,7 +18,15 @@
     "notifications": {
       "languageChanged": {
         "title": "Idioma alterado.",
-        "description": "Idioma alterado com sucesso para {{language}}!"
+        "description": "Idioma alterado com sucesso para {{language}}.",
+        "success": {
+          "title": "Idioma alterado.",
+          "description": "Idioma alterado com sucesso para {{language}}."
+        },
+        "error": {
+          "title": "Erro ao alterar o idioma.",
+          "description": "Falha ao alterar o idioma."
+        }
       }
     }
   },
@@ -29,6 +37,28 @@
       "notStarted": "Não Iniciado",
       "inProgress": "Em Andamento",
       "done": "Concluído"
+    },
+    "notifications": {
+      "productStatusUpdated": {
+        "success": {
+          "title": "Status do produto atualizado.",
+          "description": "Status do produto atualizado com sucesso para {{status}}."
+        },
+        "error": {
+          "title": "Erro ao atualizar o status do produto.",
+          "description": "Falha ao atualizar o status do produto."
+        }
+      },
+      "productDeleted": {
+        "success": {
+          "title": "Produto excluído.",
+          "description": "Produto excluído com sucesso."
+        },
+        "error": {
+          "title": "Erro ao excluir o produto.",
+          "description": "Falha ao excluir o produto."
+        }
+      }
     }
   },
   "products": {
@@ -70,5 +100,22 @@
   },
   "navigation": {
     "dashboard": "Painel de Controle"
+  },
+  "product": {
+    "assignedSeamstresses": "Costureiras Designadas",
+    "productDetails": "Detalhes do Produto",
+    "progressUpdates": "Atualizações de Progresso",
+    "systemCode": "Código do Sistema",
+    "validated": "Validado",
+    "unitsAssigned": "Unidades Designadas",
+    "unitsCompleted": "Unidades Concluídas"
+  },
+  "seamstress": {
+    "overallProgress": "Progresso Geral",
+    "assignedProducts": "Produtos Designados",
+    "productCard": {
+      "progressUpdates": "Atualizações de Progresso",
+      "noProgressUpdates": "Ainda não há atualizações de progresso"
+    }
   }
 }

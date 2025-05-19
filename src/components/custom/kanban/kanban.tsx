@@ -111,15 +111,13 @@ export function KanbanBoard({ dict }: { dict: any }) {
 				}
 
 				toast({
-					title: 'Product status updated.',
-					description: 'Product status updated successfully.',
+					title: dict.kanban.notifications.productStatusUpdated.success.title,
+					description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
 				});
-			} catch (error) {
-				setProducts(newProducts);
-				
+			} catch (error) {				
 				toast({
-					title: 'Error updating product status.',
-					description: 'Failed to update product status.',
+					title: dict.kanban.notifications.productStatusUpdated.error.title,
+					description: dict.kanban.notifications.productStatusUpdated.error.description
 				});
 			}
 		}
@@ -144,13 +142,13 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			setProducts(newProducts);
 
 			toast({
-				title: 'Product deleted.',
-				description: 'Product deleted successfully.',
+				title: dict.kanban.notifications.productDeleted.success.title,
+				description: dict.kanban.notifications.productDeleted.success.description,
 			});
 		} catch (error) {
 			toast({
-				title: 'Error deleting product.',
-				description: 'Failed to delete product.',
+				title: dict.kanban.notifications.productDeleted.error.title,
+				description: dict.kanban.notifications.productDeleted.error.description,
 			});
 		}
 	};

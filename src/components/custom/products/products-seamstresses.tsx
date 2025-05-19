@@ -28,6 +28,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 	const { toast } = useToast();
 		
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
+	const [assignedSeamstresses, setAssignedSeamstresses] = useState<User[]>([]);
 
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
@@ -68,6 +69,10 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		
 		form.reset();
 
+		console.log(data);
+
+		setAssignedSeamstresses(data);
+
 		toast({
 			title: 'Seamstress assigned.',
 			description: 'Seamstress assigned to product successfully.',
@@ -83,6 +88,8 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		if (error) {
 			console.error('Error removing seamstress:', error);
 		}
+
+		setAssignedSeamstresses(data);
 
 		toast({
 			title: 'Seamstress removed.',
@@ -168,28 +175,28 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 				<Button variant='outline'>Send Whatsapp Message</Button>
 			</div>
 
-			{product.users && product.users.length > 0 ? (
+			{assignedSeamstresses && assignedSeamstresses.length > 0 ? (
 				<ScrollArea className='h-24 w-full rounded-md border'>
 					<div className='p-2'>
-						{product.users.map((user: User, index: number) => (
-							<div key={user.id}>
+						{assignedSeamstresses.map((seamstress: User, index: number) => (
+							<div key={seamstress.id}>
 								<div className='flex items-center justify-between p-1'>
-									<Link href={`/dashboard/seamstresses/${user.id}`} className='flex items-center gap-2'>
+									<Link href={`/dashboard/seamstresses/${seamstress.id}`} className='flex items-center gap-2'>
 										<Avatar>
-											<AvatarImage src={user.image_url ?? ''} />
+											<AvatarImage src={seamstress.image_url ?? ''} />
 												<AvatarFallback>
-													{user.first_name.charAt(0)} {user.last_name.charAt(0)}
+													{seamstress.first_name.charAt(0)} {seamstress.last_name.charAt(0)}
 												</AvatarFallback>
 											</Avatar>
 											<P>
-												{user.first_name} {user.last_name}
+												{seamstress.first_name} {seamstress.last_name}
 											</P>
 									</Link>
-									<Button size='icon' onClick={() => handleRemoveSeamstress(user.id)}>
+									<Button size='icon' onClick={() => handleRemoveSeamstress(seamstress.id)}>
 										<X className='w-4 h-4 cursor-pointer' />
 									</Button>
 								</div>
-								{index !== product.users.length - 1 && <Separator className='my-2' />}
+								{index !== seamstresses.length - 1 && <Separator className='my-2' />}
 							</div>
 						))}
 					</div>

@@ -6,6 +6,28 @@
 			"notStarted": "Not Started",
 			"inProgress": "In Progress",
 			"done": "Done"
+		},
+		"notifications": {
+			"productStatusUpdated": {
+				"success": {
+					"title": "Product status updated.",
+					"description": "Successfully updated product status to {{status}}."
+				},
+				"error": {
+					"title": "Error updating product status.",
+					"description": "Failed to update product status."
+				}
+			},
+			"productDeleted": {
+				"success": {
+					"title": "Product deleted.",
+					"description": "Successfully deleted product."
+				},
+				"error": {
+					"title": "Error deleting product.",
+					"description": "Failed to delete product."
+				}
+			}
 		}
 	},
 	"products": {
@@ -62,8 +84,14 @@
 		},
 		"notifications": {
 			"languageChanged": {
-				"title": "Language changed.",
-				"description": "Successfully changed language to {{language}}."
+				"success": {
+					"title": "Language changed.",
+					"description": "Successfully changed language to {{language}}."
+				},
+				"error": {
+					"title": "Error changing language.",
+					"description": "Failed to change language."
+				}
 			}
 		}
 	},

@@ -76,7 +76,7 @@ const columns: ColumnDef<Product>[] = [
 	{
 		accessorKey: 'type',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Type' />,
-		cell: ({ row }) => <Badge variant='outline' className='text-sm'>{row.original.product_type}</Badge>,
+		cell: ({ row }) => <Badge variant='outline' className='text-sm text-center'>{row.original.product_type}</Badge>,
 	},
 	{
 		accessorKey: 'progress_level',

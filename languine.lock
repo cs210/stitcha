@@ -6,6 +6,14 @@ files:
     kanban.columns.notStarted: 10db56f8b10dc989c43fbe33202e5339
     kanban.columns.inProgress: c9413dd7682a45da9ecc9efa8cea47d7
     kanban.columns.done: f92965e2c8a7afb3c1b9a5c09a263636
+    kanban.notifications.productStatusUpdated.success.title: 05501ec7a6b1efced6b9f4371d0c023e
+    kanban.notifications.productStatusUpdated.success.description: 5a18957c38d158bfea3ad163f7354720
+    kanban.notifications.productStatusUpdated.error.title: a803b0003dbd984e00bb5a5561b2bce8
+    kanban.notifications.productStatusUpdated.error.description: 58dc6ffbea2aed2d93d7576f6201f7bc
+    kanban.notifications.productDeleted.success.title: 40420d6a44fe1b80ad6cb673c73323eb
+    kanban.notifications.productDeleted.success.description: 1c82c8a8b0a0e20ab50c66db1f83fb18
+    kanban.notifications.productDeleted.error.title: d49b49db1898cd5881a5da49c62244db
+    kanban.notifications.productDeleted.error.description: 5dfe9e6b4cd28e5adcca1425e4772946
     products.title: 068f80c7519d0528fb08e82137a72131
     products.description: 0cb39c5bd95b0da88ae4ee23ca8f82c5
     products.search: 7eee3887b2ec835fe69a27802be1d44f
@@ -16,9 +24,20 @@ files:
     products.table.noResults: e576c23d915755d83e2d1f47bd9f6c22
     products.table.edit: 7dce122004969d56ae2e0245cb754d35
     products.table.delete: f2a6c498fb90ee345d997f888fce3b18
+    product.assignedSeamstresses: 2937bcfbabdcfd36154ae59ba924c0ce
+    product.productDetails: b8900d8adf598b6653bb8c071bc49a1d
+    product.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
+    product.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    product.validated: 5364259abab90e94890f2ed2481b9824
+    product.unitsAssigned: 00c256c88a101bc01e9676d149c605a5
+    product.unitsCompleted: 6568b4e6a853aa2683789a272f4e948a
     seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
     seamstresses.products: 068f80c7519d0528fb08e82137a72131
+    seamstress.overallProgress: e9d52e029c46fd088e81503b4d0cc142
+    seamstress.assignedProducts: bdcd42605de0e27f3328921e68afb228
+    seamstress.productCard.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
+    seamstress.productCard.noProgressUpdates: d92986bc3aa97a52c8f36566e4e4268a
     settings.title: f4f70727dc34561dfde1a3c529b6205c
     settings.description: 5a398c73304f6e071c91a65c1f0bffb5
     settings.form.fullName: 630058029627ce58e7571e7a5b6ec591
@@ -28,8 +47,10 @@ files:
     settings.form.language.options.en: 78463a384a5aa4fad5fa73e2f506ecfc
     settings.form.language.options.pt: 30e32c7c4cf434e9c75e60c14c442541
     settings.form.save: c9cc8cce247e49bae79f15173ce97354
-    settings.notifications.languageChanged.title: 3d37179cdc5057a3e15be8b161522ff1
-    settings.notifications.languageChanged.description: 43a632ec13856c958b2444716c6f8a4c
+    settings.notifications.languageChanged.success.title: 3d37179cdc5057a3e15be8b161522ff1
+    settings.notifications.languageChanged.success.description: 4a73fe6e717e2534861eb70af646f419
+    settings.notifications.languageChanged.error.title: a782d5415f0d23cfea14f499eb570a47
+    settings.notifications.languageChanged.error.description: 0d44ba592d4e82ef56871ad75fa46c4b
     navigation.dashboard: 2938c7f7e560ed972f8a4f68e80ff834
     sidebar.stitchaAi: 7f7ce1b6270deca4deee7f8497d754d5
     sidebar.kanban: 39b32dd45982038aa5704ca2728334ee
