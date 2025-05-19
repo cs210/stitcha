@@ -9,12 +9,10 @@ import { SeamstressCard } from '@/components/custom/seamstress/seamstress-card';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { User } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
 
 export default function Page() {
-	const { user } = useUser();
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 
@@ -22,8 +20,6 @@ export default function Page() {
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
 	useEffect(() => {
-		if (!user) return;
-
 		(async () => {
 			const dict = await getDictionary(lang);
 
@@ -38,7 +34,7 @@ export default function Page() {
 
 			setLoading(false);
 		})();
-	}, [user, lang]);
+	}, [lang]);
 
 	if (loading) {
 		return (

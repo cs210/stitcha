@@ -10,22 +10,18 @@ import { ProductsProgress } from '@/components/custom/products/products-progress
 import { ProductsSeamstresses } from '@/components/custom/products/products-seamstresses';
 import { H2, H4 } from '@/components/custom/text/headings';
 import { Product } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
 import { use, useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../../locales';
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
 	const { id: productId } = use(params);
-	const { user } = useUser();
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 
 	const [loading, setLoading] = useState<boolean>(true);
 	const [product, setProduct] = useState<Product | null>(null);
 
-	useEffect(() => {
-		if (!user) return;
-
+	useEffect(() => {	
 		(async () => {
 			const dict = await getDictionary(lang);
 
@@ -42,7 +38,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
 			setLoading(false);
 		})();
-	}, [user, productId, lang]);
+	}, [productId, lang]);
 
 	if (loading) {
 		return (

@@ -1,5 +1,7 @@
 'use client';
 
+import { Loader } from '@/components/custom/loader/loader';
+import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-breadcrumb';
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -27,7 +29,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	}, [lang]);
 
 	if (loading) {
-		return;
+		return (
+			<LoaderContainer>
+				<Loader />
+			</LoaderContainer>
+		);
 	}
 
 	return (

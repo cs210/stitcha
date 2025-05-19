@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Labor, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
+import { handleLaborChange, handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange } from '@/lib/utils/form-utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
@@ -22,7 +22,6 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange, handleLaborChange } from '@/lib/utils/form-utils';
 
 const progressLevelValues = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
 const progressLevelSchema = z.enum(progressLevelValues);
@@ -155,8 +154,7 @@ const formSchema = z.object({
 	technical_sheet: z.instanceof(File).nullable().optional(),
 });
 
-export default function Page() {
-	const { user } = useUser();
+export default function Page() {	
 	const router = useRouter();
 
 	const [loading, setLoading] = useState<boolean>(true);

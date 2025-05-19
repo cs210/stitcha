@@ -12,12 +12,10 @@ import { H2, H3 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Progress } from '@/components/ui/progress';
 import { Product, User } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
 import { use, useContext, useEffect, useState } from 'react';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: seamstressId } = use(params);
-	const { user } = useUser();
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 
@@ -25,8 +23,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const [seamstress, setSeamstress] = useState<User | null>(null);
 
 	useEffect(() => {
-		if (!user) return;
-
 		(async () => {
 			const dict = await getDictionary(lang);
 
@@ -44,7 +40,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 			setLoading(false);
 		})();
-	}, [user, seamstressId]);
+	}, [seamstressId, lang]);
 
 	if (loading) {
 		return (

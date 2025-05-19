@@ -3,16 +3,15 @@
 import { Thread } from '@/components/assistant-ui/thread';
 import { ThreadList } from '@/components/assistant-ui/thread-list';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { useEffect } from 'react';
 
 export default function Page() {
-	useEffect(() => {
-		fetch('/api/openai', {
-			method: 'POST',
-		})
-			.then((res) => res.json())
-			.then((data) => console.log(data));
-	}, []);
+	// useEffect(() => {
+	// 	fetch('/api/openai', {
+	// 		method: 'POST',
+	// 	})
+	// 		.then((res) => res.json())
+	// 		.then((data) => console.log(data));
+	// }, []);
 
 	return (
 		<div className='h-full'>
