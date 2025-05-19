@@ -97,6 +97,30 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		});
 	}
 
+	const handleSendWhatsapp = async () => {
+		try {
+			const response = await fetch('/api/whatsapp', {
+				method: 'POST'
+			});
+			const data = await response.json();
+			
+			if (data.success) {
+				toast({
+					title: 'WhatsApp message sent',
+					description: 'Message was sent successfully'
+				});
+			} else {
+				throw new Error(data.error);
+			}
+		} catch (error) {
+			toast({
+				title: 'Error',
+				description: 'Failed to send WhatsApp message',
+				variant: 'destructive'
+			});
+		}
+	};
+
 	return (
 		<>
 			<div className='flex flex-row gap-2'>
@@ -172,7 +196,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 						</Form>
 					</PopoverContent>
 				</Popover>
-				<Button variant='outline'>Send Whatsapp Message</Button>
+				<Button variant='outline' onClick={handleSendWhatsapp}>Send Whatsapp Message</Button>
 			</div>
 
 			{assignedSeamstresses && assignedSeamstresses.length > 0 ? (
