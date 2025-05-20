@@ -119,7 +119,8 @@ export function KanbanBoard({ dict }: { dict: any }) {
 
 				toast({
 					title: dict.kanban.notifications.productStatusUpdated.error.title,
-					description: dict.kanban.notifications.productStatusUpdated.error.description
+					description: dict.kanban.notifications.productStatusUpdated.error.description,
+					variant: 'destructive',
 				});
 			}
 		}
@@ -153,6 +154,7 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			toast({
 				title: dict.kanban.notifications.productDeleted.error.title,
 				description: dict.kanban.notifications.productDeleted.error.description,
+				variant: 'destructive',
 			});
 		}
 	};

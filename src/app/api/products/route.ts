@@ -1,16 +1,16 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import {
+	handleProductCostsInsert,
 	handleProductTableInsert,
 	updateLaborFromProduct,
 	updatePackagingMaterialFromProduct,
 	updateRawMaterialFromProduct,
 	updateTechnicalSheetFromProduct,
-	handleProductCostsInsert,
-} from '@/lib/supabase/utils';
+} from '@/lib/utils/product';
 import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Retrieves all products
+// Get all products
 export async function GET() {
 	const { userId } = await auth();
 
@@ -33,10 +33,10 @@ export async function GET() {
 	}
 }
 
-// Creates a new product
+// Create a new product
 export async function POST(req: NextRequest) {
-	console.log('Creating new product');
 	const { userId } = await auth();
+	
 	if (!userId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 	}
@@ -55,10 +55,8 @@ export async function POST(req: NextRequest) {
 		await updateLaborFromProduct(productId, supabase, formData);
 		await handleProductCostsInsert(productId, supabase, formData);
 
-
 		return NextResponse.json({ data: updatedProduct }, { status: 200 });
 	} catch (error) {
-		console.log('Error creating product', error);
 		return NextResponse.json({ error }, { status: 500 });
 	}
 }

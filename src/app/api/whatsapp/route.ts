@@ -1,24 +1,22 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import twilio from 'twilio';
 
-const accountSid = 'AC9875879205e879d47b2f3bb1643b9969';
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const client = twilio(accountSid, authToken);
-
-export async function POST() {
+// Send a WhatsApp message to a seamstress
+export async function POST(req: NextRequest) {	
+	const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+	
   try {
-    const message = await client.messages.create({
-      from: 'whatsapp:+14155238886',
-      contentSid: 'HXb5b62575e6e4ff6129ad7c8efe1f983e',
-      contentVariables: '{"1":"12/1","2":"3pm"}',
-      to: 'whatsapp:+16507096642'
-    });
+		const { seamstress: seamstressPhoneNumber, message: whatsappMessage } = await req.json();
 
-    console.log(message.sid);
+		const message = await client.messages.create({
+			from: 'whatsapp:+14155238886',
+			contentSid: whatsappMessage,
+			contentVariables: '{"1":"12/1","2":"3pm"}',
+			to: `whatsapp:${seamstressPhoneNumber}`
+    });	
 
-    return NextResponse.json({ success: true, messageSid: message.sid });
+    return NextResponse.json({ data: message }, { status: 200 });
   } catch (error) {
-    console.error('Error sending WhatsApp message:', error);
-    return NextResponse.json({ success: false, error: 'Failed to send WhatsApp message' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 } 

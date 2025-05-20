@@ -1,6 +1,5 @@
 'use client';
 
-import { LangContext } from '@/app/layout';
 import { Container } from '@/components/custom/container/container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
@@ -13,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useToast } from '@/hooks/use-toast';
+import { LangContext } from '@/lib/lang/LangContext';
 import { Product } from '@/lib/schemas/global.types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
@@ -20,7 +21,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../locales';
-
 const handleDeleteProduct = async (productId: string) => {
 	try {
 		const response = await fetch(`/api/products/${productId}`, {
@@ -81,7 +81,7 @@ const columns: ColumnDef<Product>[] = [
 	{
 		accessorKey: 'progress_level',
 		header: ({ column }) => <DataTableColumnHeader column={column} title='Progress Level' />,
-		cell: ({ row }) => <Badge className={row.original.progress_level === 'Not Started' ? `bg-red-500` : row.original.progress_level === 'In Progress' ? `bg-yellow-400` : `bg-green-500`}>{row.original.progress_level}</Badge>,
+		cell: ({ row }) => <Badge className={`${row.original.progress_level === 'Not Started' ? `bg-red-500 hover:bg-red-500` : row.original.progress_level === 'In Progress' ? `bg-yellow-400 hover:bg-yellow-400` : `bg-green-500 hover:bg-green-500`}`}>{row.original.progress_level}</Badge>,
 	},
 	{
 		accessorKey: 'system_code',
@@ -121,6 +121,8 @@ export default function Page() {
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState(true);
+	const { toast } = useToast();
+
 	const [products, setProducts] = useState<Product[]>([]);
 
 	useEffect(() => {
@@ -140,7 +142,11 @@ export default function Page() {
 				setProducts(result.data);
 				setLoading(false);
 			} catch (error) {
-				console.error('Error fetching products:', error);
+				toast({
+					title: dict.products.notifcations.error,
+					description: dict.products.notifcations.errorDescription,
+					variant: 'destructive',
+				});
 			}
 		})();
 	}, [lang]);

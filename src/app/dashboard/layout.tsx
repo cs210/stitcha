@@ -6,18 +6,18 @@ import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
+import { LangContext } from '@/lib/lang/LangContext';
 import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { LangContext } from '../layout';
 import { getDictionary } from '../locales';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
+	const [loading, setLoading] = useState(true);
 
 	const pathname = usePathname();
 	const segments = pathname.split('/').filter(Boolean);
-	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		(async () => {

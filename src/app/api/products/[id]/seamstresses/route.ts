@@ -3,9 +3,9 @@ import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // Assigns a seamstress to a product
-export async function POST(req: NextRequest, { params }: { params: { id: string }}) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	const { userId } = await auth();
-	const { id: productId } = await params;
+	const { id } = await params;
 
 	if (!userId) {
 		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 		const formData = await req.formData();		
 
 		const { data, error } = await supabase.from('products_users').insert({
-			product_id: productId,
+			product_id: id,
 			user_id: formData.get('seamstress'),
 			units_assigned: formData.get('units'),
 			description: formData.get('description'),

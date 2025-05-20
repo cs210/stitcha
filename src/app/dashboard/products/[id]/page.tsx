@@ -1,6 +1,5 @@
 'use client';
 
-import { LangContext } from '@/app/layout';
 import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { LoaderContainer } from '@/components/custom/loader/loader-container';
@@ -9,16 +8,19 @@ import { ProductsImages } from '@/components/custom/products/products-images';
 import { ProductsProgress } from '@/components/custom/products/products-progress';
 import { ProductsSeamstresses } from '@/components/custom/products/products-seamstresses';
 import { H2, H4 } from '@/components/custom/text/headings';
+import { useToast } from '@/hooks/use-toast';
+import { LangContext } from '@/lib/lang/LangContext';
 import { Product } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../../locales';
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
-	const { id: productId } = use(params);
+	const { id: productId } = use(params);	
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
-
 	const [loading, setLoading] = useState<boolean>(true);
+	const { toast } = useToast();
+
 	const [product, setProduct] = useState<Product | null>(null);
 
 	useEffect(() => {	
@@ -33,7 +35,11 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 			if (!error) {
 				setProduct(data);
 			} else {
-				console.error('Error fetching product details:', error);
+				toast({
+					title: dict.product.seamstresses.seamstressRemoved,
+					description: dict.product.seamstresses.seamstressRemovedDescription,
+					variant: 'destructive',
+				});	
 			}
 
 			setLoading(false);

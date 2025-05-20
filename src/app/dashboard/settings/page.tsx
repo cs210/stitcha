@@ -1,6 +1,5 @@
 'use client';
 
-import { LangContext } from '@/app/layout';
 import { getDictionary } from '@/app/locales';
 import { Container } from '@/components/custom/container/container';
 import { HeaderContainer } from '@/components/custom/header/header-container';
@@ -13,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { LangContext } from '@/lib/lang/LangContext';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
 
@@ -20,9 +20,9 @@ export default function Page() {
 	const { user } = useUser();
 	const { lang, setLang } = useContext(LangContext);	
 	const [dict, setDict] = useState<any>();
+	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
 
-	const [loading, setLoading] = useState<boolean>(true);
 	const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'pt-br'>(lang as 'en' | 'pt-br');
 
 	useEffect(() => {
@@ -36,6 +36,7 @@ export default function Page() {
 		})();
 	}, [user, lang]);
 
+	// Handle language change
 	const handleLanguageChange = () => {
 		if (setLang && selectedLanguage) {
 			setLang(selectedLanguage);
@@ -48,6 +49,7 @@ export default function Page() {
 			toast({
 				title: dict.settings.notifications.languageChanged.error.title,
 				description: dict.settings.notifications.languageChanged.error.description,
+				variant: 'destructive',
 			});
 		}
 	};

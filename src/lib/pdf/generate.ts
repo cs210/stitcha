@@ -2,6 +2,7 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Product } from '../schemas/global.types';
 
+// Capture an element and return the data URL and canvas
 async function captureElement(element: HTMLElement): Promise<{ dataUrl: string; canvas: HTMLCanvasElement }> {
 	// Force the element to be fully expanded before measuring
 	const originalStyles = {
@@ -90,13 +91,7 @@ async function captureElement(element: HTMLElement): Promise<{ dataUrl: string; 
 	};
 }
 
-/**
- * Generates a PDF document for a product
- * @param productImageRef - Ref to the main product image container
- * @param productDetailsRef - Ref to the product details grid
- * @param product - The product data
- * @returns Promise<Uint8Array> - The generated PDF as a Uint8Array
- */
+// Generate a PDF for a product
 export async function generateProductPDF(productImageRef: HTMLElement, productDetailsRef: HTMLElement, product: Product): Promise<Uint8Array> {
 	try {
 		// Capture elements once
@@ -227,21 +222,13 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
 	}
 }
 
-/**
- * Generates a technical sheet PDF for a product
- * @param product - The product data to generate the technical sheet from
- * @returns Promise<Buffer> - The generated PDF as a buffer
- */
+// Generate a technical sheet PDF
 export async function generateTechnicalSheetPDF(): Promise<Buffer> {
 	// TODO: Implement technical sheet generation logic
 	throw new Error('Not implemented');
 }
 
-/**
- * Generates a cost breakdown PDF for a product
- * @param product - The product data to generate the cost breakdown from
- * @returns Promise<Buffer> - The generated PDF as a buffer
- */
+// Generate a cost breakdown PDF
 export async function generateCostBreakdownPDF(): Promise<Buffer> {
 	// TODO: Implement cost breakdown generation logic
 	throw new Error('Not implemented');

@@ -5,14 +5,6 @@ import { ThreadList } from '@/components/assistant-ui/thread-list';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 export default function Page() {
-	// useEffect(() => {
-	// 	fetch('/api/openai', {
-	// 		method: 'POST',
-	// 	})
-	// 		.then((res) => res.json())
-	// 		.then((data) => console.log(data));
-	// }, []);
-
 	return (
 		<div className='h-full'>
 			<div className='grid h-full grid-cols-[200px_1fr] gap-x-2'>

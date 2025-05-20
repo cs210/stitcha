@@ -2,7 +2,7 @@ import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-// Retrieves all packaging materials
+// Get all packaging materials
 export async function GET() {
 	const { userId } = await auth();
 

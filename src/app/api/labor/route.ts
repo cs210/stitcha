@@ -2,7 +2,7 @@ import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-// Retrieves all labor types
+// Get all labor types
 export async function GET() {
 	const { userId } = await auth();
 

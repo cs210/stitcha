@@ -54,11 +54,74 @@ interface ProductCosts {
 	margin: number;
 }
 
-const emptyToNull = (value: any) => {
+// Convert empty strings to null
+function emptyToNull(value: any) {
 	if (value === '') return null;
+
 	return value;
 };
 
+// Get the product
+export async function getProduct(id: string, supabase: SupabaseClient) {
+	const { data, error }: { data: any; error: any } = await supabase
+		.from('products')
+		.select(
+			`
+			*,
+			products_users (
+				users!inner (*),
+				units_completed,
+				validated
+			),
+			products_labor (
+				*,
+				labor (*)
+			),
+			products_packaging_materials (
+				*,
+				packaging_materials (*)
+			),
+			products_raw_materials (
+				*,
+				raw_materials (*)
+			)
+		`
+		)
+		.eq('id', id)
+		.single();
+
+	const { data: progressData, error: progressError } = await supabase.from('progress').select('*').eq('product_id', id);
+
+	if (progressError) {
+		throw new Error(progressError.message);
+	}
+
+	// Rename the users, costs, progress, labor, packaging materials, and raw materials fields in the data object
+	if (data) {
+		data.users = data.products_users.map((product_user: any) => ({
+			...product_user.users,
+			validated: product_user.validated,
+			units_completed: product_user.units_completed,
+		}));
+		data.labor = data.products_labor;
+		data.packaging_materials = data.products_packaging_materials;
+		data.raw_materials = data.products_raw_materials;
+		data.progress = progressData;
+
+		delete data.products_users;
+		delete data.products_labor;
+		delete data.products_packaging_materials;
+		delete data.products_raw_materials;
+	}
+
+	if (error) {
+		throw new Error(error.message);
+	}
+
+	return data;
+}
+
+// Insert the product costs into the product_costs table
 export async function handleProductCostsInsert(productId: string, supabase: SupabaseClient, formData: FormData) {
 	const productCosts: ProductCosts = {
 		raw_material_cost: JSON.parse(formData.get('raw_material_cost') as string),
@@ -71,6 +134,7 @@ export async function handleProductCostsInsert(productId: string, supabase: Supa
 		selling_price: JSON.parse(formData.get('selling_price') as string),
 		margin: JSON.parse(formData.get('margin') as string),
 	};
+
 	// Insert the product costs into the product_costs table
 	const { data: productCostsData, error: productCostsError } = await supabase
 		.from('costs')
@@ -96,6 +160,7 @@ export async function handleProductCostsInsert(productId: string, supabase: Supa
 	return productCostsData.id;
 }
 
+// Insert the product into the product table
 export async function handleProductTableInsert(formData: FormData, supabase: SupabaseClient, userId: string) {
 	// Parse the product data fields from the form
 	const productData: ProductFormData = {
@@ -222,6 +287,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 	return productWithTechnicalSheet;
 }
 
+// Update the labor from the product
 export async function updateLaborFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
 	const labors = JSON.parse(formData.get('labor') as string) as LaborProduct[];
 
@@ -270,6 +336,7 @@ export async function updateLaborFromProduct(productId: string, supabase: Supaba
 	}
 }
 
+// Update the raw material from the product
 export async function updateRawMaterialFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
 	const materials = JSON.parse(formData.get('materials') as string) as RawMaterialProduct[];
 
@@ -296,6 +363,7 @@ export async function updateRawMaterialFromProduct(productId: string, supabase: 
 		}
 
 		let upsertData;
+		
 		if (existingRawMaterial) {
 			// Step 2: If a row exists, update it
 			upsertData = { ...existingRawMaterial, ...rawMaterial }; // Merge existing and new data
@@ -327,6 +395,8 @@ export async function updateRawMaterialFromProduct(productId: string, supabase: 
 		}
 	}
 }
+
+// Update the packaging material from the product
 export async function updatePackagingMaterialFromProduct(productId: string, supabase: any, formData: FormData) {
 	// Parse the packaging materials from the form data
 	const packaging_materials = JSON.parse(formData.get('packaging_materials') as string) as PackagingMaterialProduct[];
@@ -390,6 +460,7 @@ export async function updatePackagingMaterialFromProduct(productId: string, supa
 	}
 }
 
+// Update the technical sheet from the product
 export async function updateTechnicalSheetFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
 	const technical_sheet = formData.get('technical_sheet') as File;
 

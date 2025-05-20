@@ -1,6 +1,5 @@
 'use client';
 
-import { LangContext } from '@/app/layout';
 import { getDictionary } from '@/app/locales';
 import { Container } from '@/components/custom/container/container';
 import { HeaderContainer } from '@/components/custom/header/header-container';
@@ -11,6 +10,8 @@ import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-pro
 import { H2, H3 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+import { LangContext } from '@/lib/lang/LangContext';
 import { Product, User } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
 
@@ -18,8 +19,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: seamstressId } = use(params);
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
-
 	const [loading, setLoading] = useState<boolean>(true);
+	const { toast } = useToast();
+
 	const [seamstress, setSeamstress] = useState<User | null>(null);
 
 	useEffect(() => {
@@ -35,7 +37,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 			if (!error) {
 				setSeamstress(data);
 			} else {
-				console.error('Error fetching seamstress details:', error);
+				toast({
+					title: dict.seamstresses.notifications.error,
+					description: dict.seamstresses.notifications.errorDescription,
+					variant: 'destructive',
+				});
 			}
 
 			setLoading(false);

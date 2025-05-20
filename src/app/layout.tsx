@@ -1,23 +1,16 @@
 'use client';
 
 import { MyRuntimeProvider } from '@/app/runtime-provider';
+import { LangContext } from '@/lib/lang/LangContext';
 import '@/styles/globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
 import { Inter } from 'next/font/google';
-import { createContext, useState } from 'react';
+import { useState } from 'react';
 
 const inter = Inter({
 	subsets: ['latin'],
 	display: 'swap',
 	preload: true,
-});
-
-export const LangContext = createContext<{
-	lang: 'en' | 'pt-br';
-	setLang: React.Dispatch<React.SetStateAction<'en' | 'pt-br'>>;
-}>({
-	lang: 'en',
-	setLang: () => {},
 });
 
 export default function Layout({ children }: { children: React.ReactNode }) {

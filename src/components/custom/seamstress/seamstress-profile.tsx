@@ -8,7 +8,7 @@ export function SeamstressProfile({ seamstress }: { seamstress: User }) {
 		<div className='flex gap-8'>
 			<div className='w-48 h-48 rounded-lg overflow-hidden'>
 				<Image
-					src={seamstress.image_url || ''}
+					src={seamstress.image_url || '/images/placeholder-image.jpg'}
 					alt={`${seamstress.first_name} ${seamstress.last_name}`}
 					className='w-full h-full object-cover'
 					width={200}
@@ -23,7 +23,7 @@ export function SeamstressProfile({ seamstress }: { seamstress: User }) {
 					</div>
 					<div className='flex items-center gap-3'>
 						<Phone className='w-5 h-5' />
-						<P>{seamstress.phone_number ? `(${seamstress.phone_number.toString().slice(0,3)}) ${seamstress.phone_number.toString().slice(3,6)}-${seamstress.phone_number.toString().slice(6)}` : ''}</P>
+						<P>{seamstress.phone_number ? `+${seamstress.phone_number.toString().slice(1,2)} (${seamstress.phone_number.toString().slice(2,5)}) ${seamstress.phone_number.toString().slice(5,8)}-${seamstress.phone_number.toString().slice(8)}` : ''}</P>
 					</div>
 					<div className='flex items-center gap-3'>
 						<Mail className='w-5 h-5' />

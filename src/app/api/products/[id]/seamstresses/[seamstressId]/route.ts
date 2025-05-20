@@ -1,12 +1,10 @@
-import { NextRequest } from "next/server";
-
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
+import { getProduct } from "@/lib/utils/product";
 import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
-import { NextResponse } from "next/server";
-
-// Removes a seamstress from a product
-export async function DELETE(req: NextRequest, { params }: { params: { id: string, seamstressId: string } }) {
+// Remove a seamstress from a product
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string, seamstressId: string }> }) {
 	const { userId } = await auth();
 	const { id: productId, seamstressId } = await params;
 
@@ -17,9 +15,15 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('products_users').delete().eq('user_id', seamstressId).eq('product_id', productId);
+		const { error } = await supabase.from('products_users').delete().eq('user_id', seamstressId).eq('product_id', productId);
 
-		return NextResponse.json({ data, error }, { status: 200 });
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		const product = await getProduct(productId, supabase);		
+
+		return NextResponse.json({ data: product }, { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ error }, { status: 500 });
 	}

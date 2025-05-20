@@ -427,7 +427,7 @@ export type Database = {
           image_url: string | null
           last_name: string
           location: string | null
-          phone_number: number | null
+          phone_number: string | null
           username: string
         }
         Insert: {
@@ -437,7 +437,7 @@ export type Database = {
           image_url?: string | null
           last_name: string
           location?: string | null
-          phone_number?: number | null
+          phone_number?: string | null
           username: string
         }
         Update: {
@@ -447,7 +447,7 @@ export type Database = {
           image_url?: string | null
           last_name?: string
           location?: string | null
-          phone_number?: number | null
+          phone_number?: string | null
           username?: string
         }
         Relationships: []

@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Product, User } from '@/lib/schemas/global.types';
+import { removeSeamstressFromProduct } from '@/lib/utils/seamstress';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import Link from 'next/link';
@@ -18,10 +19,15 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-const formSchema = z.object({
-	seamstress: z.string(),
-	units: z.number().min(1),
-	description: z.string().optional(),
+const assignSeamstressFormSchema = z.object({
+	seamstress: z.string({ required_error: 'Seamstress is required' }),
+	units: z.number().min(1, { message: 'Units must be at least 1' }),
+	description: z.string({ required_error: 'Description is required' }),
+});
+
+const sendWhatsappMessageFormSchema = z.object({
+	seamstress: z.string({ required_error: 'Seamstress is required' }),
+	message: z.string({ required_error: 'Message is required' }),
 });
 
 export function ProductsSeamstresses({ dict, product }: { dict: any, product: Product }) {
@@ -30,95 +36,95 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 	const [assignedSeamstresses, setAssignedSeamstresses] = useState<User[]>([]);
 
-	const form = useForm<z.infer<typeof formSchema>>({
-		resolver: zodResolver(formSchema),
-		defaultValues: {
-			seamstress: '',
-			units: 0,
-			description: '',
+	const assignSeamstressForm = useForm<z.infer<typeof assignSeamstressFormSchema>>({
+		resolver: zodResolver(assignSeamstressFormSchema),
+		defaultValues: {			
+			units: 1,
 		},
 	});
 
+	const sendWhatsappMessageForm = useForm<z.infer<typeof sendWhatsappMessageFormSchema>>({
+		resolver: zodResolver(sendWhatsappMessageFormSchema)
+	});
+	
 	useEffect(() => {
 		(async () => {
 			const response = await fetch('/api/seamstresses');
 			const { data, error } = await response.json();
 
-			if (!error) {
-				setSeamstresses(data);
+			if (!error) {				
+				const filteredSeamstresses = data.filter((seamstress: User) => 
+					!product.users?.some((assignedSeamstress: User) => 
+						assignedSeamstress.id === seamstress.id
+					)
+				);
+
+				setSeamstresses(filteredSeamstresses);
 			}
+
+			setAssignedSeamstresses(product.users);
 		})();
 	}, []);
-	
-	async function onSubmit(values: z.infer<typeof formSchema>) {	
-		const formData = new FormData();
 
-		formData.append('seamstress', values.seamstress);
-		formData.append('units', values.units.toString());
-		formData.append('description', values.description);
+	// Assign a seamstress to a product
+	async function onAssignSeamstressSubmit(values: z.infer<typeof assignSeamstressFormSchema>) {	
+		try {
+			const formData = new FormData();
 
-		const response = await fetch(`/api/products/${product.id}/seamstresses`, {
-			method: 'POST',
-			body: formData,
-		});
-		const { data, error } = await response.json();
+			formData.append('seamstress', values.seamstress);
+			formData.append('units', values.units.toString());
+			formData.append('description', values.description);
 
-		if (error) {
-			console.error('Error assigning seamstress:', error);
+			const response = await fetch(`/api/products/${product.id}/seamstresses`, {
+				method: 'POST',
+				body: formData,
+			});
+			const { data, error } = await response.json();
 
+			if (error) {
+				throw new Error(error);
+			}
+
+			setAssignedSeamstresses(data);
+
+			toast({
+				title: dict.product.seamstresses.seamstressAssigned,
+				description: dict.product.seamstresses.seamstressAssignedDescription,
+			});
+
+			assignSeamstressForm.reset();
+		} catch (error) {
 			toast({
 				title: dict.product.seamstresses.seamstressAssigned.error.title,
 				description: dict.product.seamstresses.seamstressAssigned.error.description,
+				variant: 'destructive',
 			});
 		}
-		
-		form.reset();
-
-		setAssignedSeamstresses(data);
-
-		toast({
-			title: dict.product.seamstresses.seamstressAssigned,
-			description: dict.product.seamstresses.seamstressAssignedDescription,
-		});
 	}
 
-	const handleRemoveSeamstress = async (seamstressId: string) => {
-		const response = await fetch(`/api/products/${product.id}/seamstresses/${seamstressId}`, {
-			method: 'DELETE',
-		});
-		const { data, error } = await response.json();
-
-		if (error) {
-			console.error('Error removing seamstress:', error);
-		}
-
-		setAssignedSeamstresses(data);
-
-		toast({
-			title: dict.product.seamstresses.seamstressRemoved,
-			description: dict.product.seamstresses.seamstressRemovedDescription,
-		});
-	}
-
-	const handleSendWhatsapp = async () => {
+	// Send a WhatsApp message to a seamstress
+	const onWhatsappMessageSubmit = async (values: z.infer<typeof sendWhatsappMessageFormSchema>) => {
 		try {
 			const response = await fetch('/api/whatsapp', {
-				method: 'POST'
+				method: 'POST',
+				body: JSON.stringify(values),
 			});
 			const data = await response.json();
 			
 			if (data.success) {
 				toast({
-					title: 'WhatsApp message sent',
-					description: 'Message was sent successfully'
+					title: dict.product.seamstresses.sendWhatsappMessage.notifications.success.title,
+					description: dict.product.seamstresses.sendWhatsappMessage.notifications.success.description,
 				});
 			} else {
 				throw new Error(data.error);
 			}
+
+			sendWhatsappMessageForm.reset();
 		} catch (error) {
 			toast({
-				title: 'Error',
-				description: 'Failed to send WhatsApp message',
+				title: dict.product.seamstresses.sendWhatsappMessage.notifications.error.title,
+				description: dict.product.seamstresses.sendWhatsappMessage.notifications.error.description,
 				variant: 'destructive'
 			});
 		}
@@ -132,10 +138,10 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 						<Button className='mb-4'>{dict.product.seamstresses.assignSeamstressForm.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
-						<Form {...form}>
-							<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+						<Form {...assignSeamstressForm}>
+							<form onSubmit={assignSeamstressForm.handleSubmit(onAssignSeamstressSubmit)} className='space-y-8'>
 								<FormField
-									control={form.control}
+									control={assignSeamstressForm.control}
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
@@ -169,20 +175,20 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									)}
 								/>
 								<FormField
-									control={form.control}
+									control={assignSeamstressForm.control}
 									name='units'
 									render={({ field }) => (
 										<FormItem>
 											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
 											<FormControl>
-												<Input type='number' {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+												<Input type='number' min={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
 								<FormField
-									control={form.control}
+									control={assignSeamstressForm.control}
 									name='description'
 									render={({ field }) => (
 										<FormItem>
@@ -199,7 +205,65 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 						</Form>
 					</PopoverContent>
 				</Popover>
-				<Button variant='outline' onClick={handleSendWhatsapp}>{dict.product.seamstresses.sendWhatsappMessage}</Button>
+				<Popover>
+					<PopoverTrigger asChild>
+						<Button className='mb-4'>{dict.product.seamstresses.sendWhatsappMessage.title}</Button>
+					</PopoverTrigger>
+					<PopoverContent>
+						<Form {...sendWhatsappMessageForm}>
+							<form onSubmit={sendWhatsappMessageForm.handleSubmit(onWhatsappMessageSubmit)} className='space-y-8'>
+								<FormField
+									control={sendWhatsappMessageForm.control}
+									name='seamstress'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{dict.product.seamstresses.sendWhatsappMessage.seamstress.label}</FormLabel>
+											<Select onValueChange={field.onChange} defaultValue={field.value}>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder={dict.product.seamstresses.sendWhatsappMessage.seamstress.placeholder} />
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													{assignedSeamstresses.map((seamstress: User) => (
+														<SelectItem key={seamstress.id} value={seamstress.phone_number || ''}>
+															<div className='flex items-center gap-2'>
+																<Avatar className='h-8 w-8'>
+																	<AvatarImage src={seamstress.image_url ?? ''} />
+																	<AvatarFallback>
+																		{seamstress.first_name.charAt(0)} {seamstress.last_name.charAt(0)}
+																	</AvatarFallback>
+																</Avatar>
+																<P>
+																	{seamstress.first_name} {seamstress.last_name}
+																</P>
+															</div>
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={sendWhatsappMessageForm.control}
+									name='message'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{dict.product.seamstresses.sendWhatsappMessage.message.label}</FormLabel>
+											<FormControl>
+												<Input {...field} placeholder={dict.product.seamstresses.sendWhatsappMessage.message.placeholder} />
+											</FormControl>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<Button type='submit'>{dict.product.seamstresses.sendWhatsappMessage.send}</Button>
+							</form>
+						</Form>
+					</PopoverContent>
+				</Popover>
 			</div>
 
 			{assignedSeamstresses && assignedSeamstresses.length > 0 ? (
@@ -211,19 +275,27 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									<Link href={`/dashboard/seamstresses/${seamstress.id}`} className='flex items-center gap-2'>
 										<Avatar>
 											<AvatarImage src={seamstress.image_url ?? ''} />
-												<AvatarFallback>
-													{seamstress.first_name.charAt(0)} {seamstress.last_name.charAt(0)}
-												</AvatarFallback>
-											</Avatar>
-											<P>
-												{seamstress.first_name} {seamstress.last_name}
-											</P>
+											<AvatarFallback>
+												{seamstress.first_name.charAt(0)} {seamstress.last_name.charAt(0)}
+											</AvatarFallback>
+										</Avatar>
+										<P>
+											{seamstress.first_name} {seamstress.last_name}
+										</P>
 									</Link>
-									<Button size='icon' onClick={() => handleRemoveSeamstress(seamstress.id)}>
+									<Button size='icon' variant='ghost' onClick={() => {
+										removeSeamstressFromProduct(product, seamstress.id, setAssignedSeamstresses);
+
+										toast({
+											title: dict.product.seamstresses.seamstressRemoved,
+											description: dict.product.seamstresses.seamstressRemovedDescription,
+											variant: 'destructive',
+										});
+									}}>
 										<X className='w-4 h-4 cursor-pointer' />
 									</Button>
 								</div>
-								{index !== seamstresses.length - 1 && <Separator className='my-2' />}
+								{index !== assignedSeamstresses.length - 1 && <Separator className='my-2' />}
 							</div>
 						))}
 					</div>

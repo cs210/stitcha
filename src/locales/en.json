@@ -42,6 +42,10 @@
 			"noResults": "No results found",
 			"edit": "Edit",
 			"delete": "Delete"
+		},
+		"notifcations": {
+			"error": "Error",
+			"errorDescription": "Error fetching products"
 		}
 	},
 	"product": {
@@ -72,6 +76,7 @@
 			"noProgressUpdatesYet": "No progress updates yet"
 		},
 		"seamstresses": {
+			"noSeamstressesAssigned": "No seamstresses assigned",
 			"assignSeamstressForm": {
 				"title": "Assign Seamstress",
 				"seamstress": {
@@ -87,8 +92,18 @@
 				},
 				"submit": "Submit"
 			},
-			"sendWhatsappMessage": "Send WhatsApp Message",
-			"noSeamstressesAssigned": "No seamstresses assigned",
+			"sendWhatsappMessage": {
+				"title": "Send WhatsApp Message",
+				"seamstress": {
+					"label": "Seamstress",
+					"placeholder": "Select a seamstress"
+				},
+				"message": {
+					"label": "Message",
+					"placeholder": "Enter the message"
+				},
+				"send": "Send"
+			},
 			"notificiation": {
 				"seamstressAssigned": {
 					"success": {
@@ -106,7 +121,11 @@
 	"seamstresses": {
 		"title": "Seamstresses",
 		"description": "View and manage all seamstresses",
-		"products": "Products"
+		"products": "Products",
+		"notifications": {
+			"error": "Error",
+			"errorDescription": "Error fetching seamstresses"
+		}
 	},
 	"seamstress": {
 		"overallProgress": "Overall Progress",
@@ -149,6 +168,7 @@
 		"dashboard": "Dashboard"
 	},
 	"sidebar": {
+		"stitcha": "Stitcha",
 		"stitchaAi": "Stitcha AI",
 		"kanban": "Kanban",
 		"products": "Products",
