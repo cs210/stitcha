@@ -28,6 +28,7 @@ export function KanbanBoard({ dict }: { dict: any }) {
 		done: [],
 	});
 
+	// Pull in initial products and organise them by progress_level
 	useEffect(() => {
 		(async () => {
 			try {
@@ -60,13 +61,19 @@ export function KanbanBoard({ dict }: { dict: any }) {
 
 				setProducts(organized);
 			} catch (error) {
-				console.error('Error fetching products:', error);
+				toast({
+					title: dict.kanban.notifications.productsLoading.error.title,
+					description: dict.settings.notifications.productsLoading.error.description,
+					variant: 'destructive',
+				});
 			}
 		})();
 	}, []);
 
+	// Handle what happens when we drag element / card to new columnn
 	const onDragEnd = async (result: DropResult) => {
 		const { source, destination, draggableId } = result;
+
 		if (!destination) return;
 
 		const newProducts = { ...products };
@@ -115,8 +122,6 @@ export function KanbanBoard({ dict }: { dict: any }) {
 					description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
 				});
 			} catch (error) {
-				console.error('Error updating product status:', error);
-
 				toast({
 					title: dict.kanban.notifications.productStatusUpdated.error.title,
 					description: dict.kanban.notifications.productStatusUpdated.error.description,
@@ -148,9 +153,7 @@ export function KanbanBoard({ dict }: { dict: any }) {
 				title: dict.kanban.notifications.productDeleted.success.title,
 				description: dict.kanban.notifications.productDeleted.success.description,
 			});
-		} catch (error) {
-			console.error('Error deleting product:', error);
-			
+		} catch (error) {			
 			toast({
 				title: dict.kanban.notifications.productDeleted.error.title,
 				description: dict.kanban.notifications.productDeleted.error.description,

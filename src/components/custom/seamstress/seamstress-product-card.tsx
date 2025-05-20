@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { H4 } from '../text/headings';
 import { P } from '../text/text';
 
+// Product card for the individual seamstress page
 export function SeamstressProductCard({ dict, product }: { dict: any, product: Product }) {
 	return (
 		<Card className='flex flex-col gap-4 p-4'>

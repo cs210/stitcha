@@ -29,7 +29,7 @@
 		".next/types/**/*.ts",
 		"src/lib/utils/client.tsc",
 		"src/app/[lang]/api/products/[id]",
-		"src/components/custom/container"
+		"src/components/custom/containers"
 	],
 	"exclude": ["node_modules"]
 }

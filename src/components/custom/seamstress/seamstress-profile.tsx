@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from 'lucide-react';
 import Image from 'next/image';
 import { P } from '../text/text';
 
+// Individual seamstress profile / details
 export function SeamstressProfile({ seamstress }: { seamstress: User }) {
 	return (
 		<div className='flex gap-8'>

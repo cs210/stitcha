@@ -1,10 +1,9 @@
-import { ProductFormData } from '@/app/dashboard/products/new/page';
 import { UseFormReturn } from 'react-hook-form';
 import { Labor, PackagingMaterial, RawMaterial } from '../schemas/global.types';
 
 // Handle the material code change
 export const handleMaterialCodeChange = (
-    form: UseFormReturn<ProductFormData>,
+    form: UseFormReturn<any>,
     materials: RawMaterial[],
     index: number,
     value: string
@@ -27,7 +26,7 @@ export const handleMaterialCodeChange = (
 
 // Handle the material name change
 export const handleMaterialNameChange = (
-    form: UseFormReturn<ProductFormData>,
+    form: UseFormReturn<any>,
     materials: RawMaterial[],
     index: number,
 	value: string
@@ -51,7 +50,7 @@ export const handleMaterialNameChange = (
 
 // Handle the packaging material name change
 export const handlePackagingMaterialNameChange = (
-    form: UseFormReturn<ProductFormData>,
+    form: UseFormReturn<any>,
     packagingMaterials: PackagingMaterial[],
     index: number,
 	value: string
@@ -75,7 +74,7 @@ export const handlePackagingMaterialNameChange = (
 
 // Handle the packaging material code change
 export const handlePackagingMaterialCodeChange = (
-    form: UseFormReturn<ProductFormData>,
+    form: UseFormReturn<any>,
     packagingMaterials: PackagingMaterial[],
     index: number,
     value: string
@@ -99,7 +98,7 @@ export const handlePackagingMaterialCodeChange = (
 
 // Handle the labor change
 export const handleLaborChange = (
-    form: UseFormReturn<ProductFormData>,
+    form: UseFormReturn<any>,
     labor: Labor[],
     index: number,
     value: string

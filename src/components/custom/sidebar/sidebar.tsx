@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { H4 } from '../text/headings';
 
+// Sidebar component for the dashboard
 export function Sidebar({ dict }: { dict: any }) {
 	const pathname = usePathname();
 

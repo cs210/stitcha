@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { H3 } from '../text/headings';
 import { P } from '../text/text';
 
+// Seamstress card on the seamstresses page
 export function SeamstressCard({ seamstress }: { seamstress: User }) {
 	return (
 		<div className='p-4'>

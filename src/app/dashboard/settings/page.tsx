@@ -1,10 +1,9 @@
 'use client';
 
-import { getDictionary } from '@/app/locales';
-import { Container } from '@/components/custom/container/container';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
 

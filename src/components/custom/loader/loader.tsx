@@ -1,5 +1,6 @@
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils/utils';
 
+// Page loading element
 export function Loader() {
 	return (
 		<div className='flex items-center justify-center h-screen'>

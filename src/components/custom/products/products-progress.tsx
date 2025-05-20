@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card';
 import { Product, Progress } from '@/lib/schemas/global.types';
 import { P } from '../text/text';
 
+// The progress section for each individual product
 export function ProductsProgress({ dict, product }: { dict: any, product: Product }) {
 	return (
 		<div className='mb-4'>

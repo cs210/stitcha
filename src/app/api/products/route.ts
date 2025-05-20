@@ -1,22 +1,18 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { checkAuth } from '@/lib/utils/auth';
 import {
-	handleProductCostsInsert,
-	handleProductTableInsert,
+	insertProduct,
+	insertProductCost,
 	updateLaborFromProduct,
 	updatePackagingMaterialFromProduct,
 	updateRawMaterialFromProduct,
 	updateTechnicalSheetFromProduct,
 } from '@/lib/utils/product';
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Get all products
 export async function GET() {
-	const { userId } = await auth();
-
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	await checkAuth();
 
 	const supabase = await createClerkSupabaseClientSsr();
 
@@ -35,25 +31,21 @@ export async function GET() {
 
 // Create a new product
 export async function POST(req: NextRequest) {
-	const { userId } = await auth();
-	
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	await checkAuth();
 
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
 		const formData = await req.formData();
 
-		const updatedProduct = await handleProductTableInsert(formData, supabase, userId);
+		const updatedProduct = await insertProduct(formData, supabase);
 		const productId = updatedProduct.id;
 
 		await updateRawMaterialFromProduct(productId, supabase, formData);
 		await updatePackagingMaterialFromProduct(productId, supabase, formData);
 		await updateTechnicalSheetFromProduct(productId, supabase, formData);
 		await updateLaborFromProduct(productId, supabase, formData);
-		await handleProductCostsInsert(productId, supabase, formData);
+		await insertProductCost(productId, supabase, formData);
 
 		return NextResponse.json({ data: updatedProduct }, { status: 200 });
 	} catch (error) {

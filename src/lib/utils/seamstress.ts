@@ -68,21 +68,3 @@ export async function getSeamstress(id: string, supabase: SupabaseClient) {
 		throw new Error(error.message);
 	}
 }
-
-// Remove a seamstress from a product
-export async function removeSeamstressFromProduct(product: Product, seamstressId: string, setAssignedSeamstresses: any) {
-	try {
-		const response = await fetch(`/api/products/${product.id}/seamstresses/${seamstressId}`, {
-			method: 'DELETE',
-		});
-		const { data, error } = await response.json();
-
-		if (error) {
-			throw new Error(error.message);
-		}
-
-		setAssignedSeamstresses(data);
-	} catch (error) {
-		throw new Error(error.message);
-	}
-}

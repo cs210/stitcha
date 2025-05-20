@@ -1,16 +1,13 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { checkAuth } from '@/lib/utils/auth';
 import { getSeamstress } from '@/lib/utils/seamstress';
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Get a specific seamstress by id
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	const { userId } = await auth();
+	await checkAuth();
+	
 	const { id } = await params;
-
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
 
 	const supabase = await createClerkSupabaseClientSsr();
 

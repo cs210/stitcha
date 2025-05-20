@@ -9,7 +9,7 @@ const supabase = createClient(
 );
 
 // Webhook for Clerk events
-export async function POST(req: NextRequest) {
+export async function POST(req: NextRequest) {	
 	try {
 		const evt = await verifyWebhook(req)
 

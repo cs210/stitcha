@@ -1,15 +1,15 @@
 'use client';
 
+import { Breadcrumb } from '@/components/custom/breadcrumb/breadcrumb';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
-import { NavigationBreadcrumb } from '@/components/custom/navigation/navigation-breadcrumb';
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { LangContext } from '@/lib/lang/LangContext';
 import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../locales';
+import { getDictionary } from '../../lib/lang/locales';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const { lang } = useContext(LangContext);
@@ -44,8 +44,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 				<main className='flex-1 overflow-x-hidden overflow-y-auto p-8'>
 					<header className='flex items-center gap-4'>
 						<SidebarTrigger />
-
-						<NavigationBreadcrumb dict={dict} segments={segments} />
+						<Breadcrumb dict={dict} segments={segments} />
 					</header>
 
 					<div className='flex-1 flex-col h-full pt-8'>{children}</div>

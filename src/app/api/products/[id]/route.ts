@@ -1,16 +1,13 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
+import { checkAuth } from '@/lib/utils/auth';
 import { getProduct } from '@/lib/utils/product';
-import { auth } from '@clerk/nextjs/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Get a specific product by id
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	const { userId } = await auth();
-	const { id } = await params;
+	await checkAuth();
 
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	const { id } = await params;
 
 	const supabase = await createClerkSupabaseClientSsr();
 
@@ -25,12 +22,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 // Update a specific product by id
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	const { userId } = await auth();
-	const { id } = await params;
+	await checkAuth();
 
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	const { id } = await params;
 
 	const supabase = await createClerkSupabaseClientSsr();
 
@@ -51,12 +45,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
 // Delete a specific product by id
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	const { userId } = await auth();
+	await checkAuth();
+	
 	const { id } = await params;
-
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
 
 	const supabase = await createClerkSupabaseClientSsr();
 

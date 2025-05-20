@@ -1,10 +1,11 @@
 'use client';
 
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, Breadcrumb as NavigationBreadcrumb } from '@/components/ui/breadcrumb';
 
-export function NavigationBreadcrumb({ dict, segments }: { dict: any, segments: string[] }) {
+// Breadcrumb element for dashboard
+export function Breadcrumb({ dict, segments }: { dict: any, segments: string[] }) {
 	return (
-		<Breadcrumb>
+		<NavigationBreadcrumb>
 			<BreadcrumbList>
 				<BreadcrumbItem>
 					<BreadcrumbLink href='/dashboard/products'>{dict.navigation.dashboard}</BreadcrumbLink>
@@ -14,6 +15,6 @@ export function NavigationBreadcrumb({ dict, segments }: { dict: any, segments: 
 					<BreadcrumbLink href={`/dashboard/${segments[1]}`}>{segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}</BreadcrumbLink>
 				</BreadcrumbItem>
 			</BreadcrumbList>
-		</Breadcrumb>
+		</NavigationBreadcrumb>
 	);
 }

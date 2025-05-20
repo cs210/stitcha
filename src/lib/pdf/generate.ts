@@ -173,12 +173,12 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
 		pdf.addImage(productDetailsData, 'PNG', detailsLeftMargin, currentY, finalDetailsWidth, finalDetailsHeight);
 		currentY += finalDetailsHeight + 10;
 
-		// Add description
 		if (product.description) {
 			// Check if we need a new page for description
 			if (currentY + 40 > pageHeight - margin) {
 				// 40mm minimum space for description header
 				pdf.addPage();
+				
 				currentY = margin;
 			}
 
@@ -191,6 +191,7 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
 
 			// Check if description needs to span multiple pages
 			let currentLine = 0;
+
 			while (currentLine < lines.length) {
 				currentY += 10; // Space after "Description:" or continue from previous page
 
@@ -201,6 +202,7 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
 
 				// Add lines that fit on current page
 				const pageLines = lines.slice(currentLine, currentLine + linesPerPage);
+
 				pdf.text(pageLines, margin, currentY);
 
 				currentLine += linesPerPage;
@@ -212,24 +214,14 @@ export async function generateProductPDF(productImageRef: HTMLElement, productDe
 				}
 			}
 		}
-
-		// Return as Uint8Array
+		
 		const arrayBuffer = pdf.output('arraybuffer');
+
 		return new Uint8Array(arrayBuffer);
 	} catch (error) {
 		console.error('Error generating PDF:', error);
-		throw new Error('Failed to generate PDF');
 	}
 }
 
-// Generate a technical sheet PDF
-export async function generateTechnicalSheetPDF(): Promise<Buffer> {
-	// TODO: Implement technical sheet generation logic
-	throw new Error('Not implemented');
-}
-
-// Generate a cost breakdown PDF
-export async function generateCostBreakdownPDF(): Promise<Buffer> {
-	// TODO: Implement cost breakdown generation logic
-	throw new Error('Not implemented');
-}
+export async function generateTechnicalSheetPDF() {}
+export async function generateCostBreakdownPDF() {}

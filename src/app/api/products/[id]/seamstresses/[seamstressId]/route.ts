@@ -1,17 +1,14 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
+import { checkAuth } from "@/lib/utils/auth";
 import { getProduct } from "@/lib/utils/product";
-import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // Remove a seamstress from a product
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string, seamstressId: string }> }) {
-	const { userId } = await auth();
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string, seamstressId: string }> }) {	
+	await checkAuth();
+
 	const { id: productId, seamstressId } = await params;
-
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
-
+	
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {

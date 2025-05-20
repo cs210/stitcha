@@ -1,58 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-
-interface ProductFormData {
-	name: string;
-	system_code: string;
-	inmetro_cert_number?: string;
-	barcode?: string;
-	description?: string;
-	weight: number;
-	width: number;
-	height: number;
-	percent_pieces_lost: number;
-	product_type?: string;
-	progress_level: number;
-	total_units: number;
-}
-
-interface RawMaterialProduct {
-	code: string;
-	name: string;
-	purchase_price: number;
-	unit_consumption: number;
-	units?: string;
-	total_cost: number;
-}
-
-interface PackagingMaterialProduct {
-	code: string;
-	name: string;
-	purchase_price: number;
-	unit_consumption: number;
-	units?: string;
-	total_cost: number;
-}
-
-interface LaborProduct {
-	task: string;
-	time_per_unit: number;
-	conversion: number;
-	rework: number;
-	cost_per_minute: number;
-	total_cost: number;
-}
-
-interface ProductCosts {
-	raw_material_cost: number;
-	packaging_material_cost: number;
-	total_material_cost: number;
-	total_labor_cost: number;
-	general_expenses: number;
-	royalties: number;
-	total_cost: number;
-	selling_price: number;
-	margin: number;
-}
+import { Product } from '../schemas/global.types';
 
 // Convert empty strings to null
 function emptyToNull(value: any) {
@@ -61,7 +8,7 @@ function emptyToNull(value: any) {
 	return value;
 };
 
-// Get the product
+// Get a product by id
 export async function getProduct(id: string, supabase: SupabaseClient) {
 	const { data, error }: { data: any; error: any } = await supabase
 		.from('products')
@@ -121,9 +68,26 @@ export async function getProduct(id: string, supabase: SupabaseClient) {
 	return data;
 }
 
+// Handle deleting a product
+export const deleteProduct = async (productId: string) => {
+	try {
+		const response = await fetch(`/api/products/${productId}`, {
+			method: 'DELETE',
+		});
+
+		const data = await response.json();
+
+		if (!response.ok) {
+			throw new Error(data.error || 'Failed to delete product');
+		}
+	} catch (error) {
+		console.error('Error deleting product:', error);
+	}
+};
+
 // Insert the product costs into the product_costs table
-export async function handleProductCostsInsert(productId: string, supabase: SupabaseClient, formData: FormData) {
-	const productCosts: ProductCosts = {
+export async function insertProductCost(productId: string, supabase: SupabaseClient, formData: FormData) {
+	const productCosts: any = {
 		raw_material_cost: JSON.parse(formData.get('raw_material_cost') as string),
 		packaging_material_cost: JSON.parse(formData.get('packaging_cost') as string),
 		total_material_cost: JSON.parse(formData.get('total_material_cost') as string),
@@ -161,9 +125,8 @@ export async function handleProductCostsInsert(productId: string, supabase: Supa
 }
 
 // Insert the product into the product table
-export async function handleProductTableInsert(formData: FormData, supabase: SupabaseClient, userId: string) {
-	// Parse the product data fields from the form
-	const productData: ProductFormData = {
+export async function insertProduct(formData: FormData, supabase: SupabaseClient) {	
+	const productData: any = {
 		name: JSON.parse(formData.get('name') as string),
 		system_code: JSON.parse(formData.get('system_code') as string),
 		inmetro_cert_number: JSON.parse((formData.get('inmetro_cert_number') as string)?.trim() || 'null'),
@@ -216,7 +179,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 		// Process each file and upload to storage
 		for (const file of imageFiles) {
 			const fileExt = file.name.split('.').pop();
-			const fileName = `${userId}-${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+			const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
 			const filePath = `${productId}/${fileName}`;
 
 			// Convert file to ArrayBuffer for upload
@@ -289,7 +252,7 @@ export async function handleProductTableInsert(formData: FormData, supabase: Sup
 
 // Update the labor from the product
 export async function updateLaborFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
-	const labors = JSON.parse(formData.get('labor') as string) as LaborProduct[];
+	const labors = JSON.parse(formData.get('labor') as string) as any[];
 
 	if (!labors || labors.length === 0) {
 		return;
@@ -338,7 +301,7 @@ export async function updateLaborFromProduct(productId: string, supabase: Supaba
 
 // Update the raw material from the product
 export async function updateRawMaterialFromProduct(productId: string, supabase: SupabaseClient, formData: FormData) {
-	const materials = JSON.parse(formData.get('materials') as string) as RawMaterialProduct[];
+	const materials = JSON.parse(formData.get('materials') as string) as any[];
 
 	if (!materials || materials.length === 0) {
 		return;
@@ -399,7 +362,7 @@ export async function updateRawMaterialFromProduct(productId: string, supabase: 
 // Update the packaging material from the product
 export async function updatePackagingMaterialFromProduct(productId: string, supabase: any, formData: FormData) {
 	// Parse the packaging materials from the form data
-	const packaging_materials = JSON.parse(formData.get('packaging_materials') as string) as PackagingMaterialProduct[];
+	const packaging_materials = JSON.parse(formData.get('packaging_materials') as string) as any[];
 
 	if (!packaging_materials || packaging_materials.length === 0) {
 		return;
@@ -503,5 +466,23 @@ export async function updateTechnicalSheetFromProduct(productId: string, supabas
 
 	if (insertError) {
 		throw new Error(`Failed to insert technical sheet record: ${insertError.message}`);
+	}
+}
+
+// Remove a seamstress from a product
+export async function removeSeamstressFromProduct(product: Product, seamstressId: string, setAssignedSeamstresses: any) {
+	try {
+		const response = await fetch(`/api/products/${product.id}/seamstresses/${seamstressId}`, {
+			method: 'DELETE',
+		});
+		const { data, error } = await response.json();
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		setAssignedSeamstresses(data);
+	} catch (error) {
+		throw new Error(error.message);
 	}
 }

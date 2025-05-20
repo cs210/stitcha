@@ -1,11 +1,11 @@
 'use client';
 
-import { Container } from '@/components/custom/container/container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
-import { HeaderContainer } from '@/components/custom/header/header-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Badge } from '@/components/ui/badge';
@@ -20,22 +20,7 @@ import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../locales';
-const handleDeleteProduct = async (productId: string) => {
-	try {
-		const response = await fetch(`/api/products/${productId}`, {
-			method: 'DELETE',
-		});
-
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(data.error || 'Failed to delete product');
-		}
-	} catch (error) {
-		console.error('Error deleting product:', error);
-	}
-};
+import { getDictionary } from '../../../lib/lang/locales';
 
 const columns: ColumnDef<Product>[] = [
 	{

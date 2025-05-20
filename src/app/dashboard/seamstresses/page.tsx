@@ -1,16 +1,16 @@
 'use client';
 
-import { Container } from '@/components/custom/container/container';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressCard } from '@/components/custom/seamstress/seamstress-card';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { LangContext } from '@/lib/lang/LangContext';
 import { User } from '@/lib/schemas/global.types';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../locales';
+import { getDictionary } from '../../../lib/lang/locales';
 
 export default function Page() {
 	const { lang } = useContext(LangContext);

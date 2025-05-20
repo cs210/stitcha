@@ -1,8 +1,8 @@
 'use client';
 
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { ProductsDetails } from '@/components/custom/products/products-details';
 import { ProductsImages } from '@/components/custom/products/products-images';
 import { ProductsProgress } from '@/components/custom/products/products-progress';
@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
 import { Product } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../../locales';
+import { getDictionary } from '../../../../lib/lang/locales';
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
 	const { id: productId } = use(params);	

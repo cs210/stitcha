@@ -1,15 +1,12 @@
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/client";
-import { auth } from "@clerk/nextjs/server";
+import { checkAuth } from "@/lib/utils/auth";
 import { NextRequest, NextResponse } from "next/server";
 
 // Assigns a seamstress to a product
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-	const { userId } = await auth();
-	const { id } = await params;
+	await checkAuth();
 
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	const { id } = await params;
 
 	const supabase = await createClerkSupabaseClientSsr();
 

@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Product, User } from '@/lib/schemas/global.types';
-import { removeSeamstressFromProduct } from '@/lib/utils/seamstress';
+import { removeSeamstressFromProduct } from '@/lib/utils/product';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { X } from 'lucide-react';
 import Link from 'next/link';
@@ -30,6 +30,7 @@ const sendWhatsappMessageFormSchema = z.object({
 	message: z.string({ required_error: 'Message is required' }),
 });
 
+// The seamstress section for each individual product
 export function ProductsSeamstresses({ dict, product }: { dict: any, product: Product }) {
 	const { toast } = useToast();
 		
@@ -49,20 +50,28 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 	
 	useEffect(() => {
 		(async () => {
-			const response = await fetch('/api/seamstresses');
-			const { data, error } = await response.json();
+			try {
+				const response = await fetch('/api/seamstresses');
+				const { data, error } = await response.json();
 
-			if (!error) {				
-				const filteredSeamstresses = data.filter((seamstress: User) => 
-					!product.users?.some((assignedSeamstress: User) => 
-						assignedSeamstress.id === seamstress.id
-					)
-				);
+				if (!error) {				
+					const filteredSeamstresses = data.filter((seamstress: User) => 
+						!product.users?.some((assignedSeamstress: User) => 
+							assignedSeamstress.id === seamstress.id
+						)
+					);
 
-				setSeamstresses(filteredSeamstresses);
+					setSeamstresses(filteredSeamstresses);
+				}
+
+				setAssignedSeamstresses(product.users);
+			} catch (error) {
+				toast({
+					title: dict.product.notifications.seamstressesLoading.error.title,
+					description: dict.product.notifications.seamstressesLoading.error.description,
+					variant: 'destructive',
+				});
 			}
-
-			setAssignedSeamstresses(product.users);
 		})();
 	}, []);
 

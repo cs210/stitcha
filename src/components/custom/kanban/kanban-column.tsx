@@ -4,6 +4,7 @@ import { Droppable, DroppableProvided } from '@hello-pangea/dnd';
 import { P } from '../text/text';
 import { KanbanProductCard } from './kanban-product-card';
 
+// Column for the Kanban board
 export function KanbanColumn({
 	id,
 	title,

@@ -1,10 +1,9 @@
 'use client';
 
-import { getDictionary } from '@/app/locales';
-import { Container } from '@/components/custom/container/container';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
+import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
 import { H2, H3 } from '@/components/custom/text/headings';
@@ -12,6 +11,7 @@ import { P } from '@/components/custom/text/text';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { Product, User } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
 

@@ -8,6 +8,12 @@
 			"done": "Done"
 		},
 		"notifications": {
+			"productsLoading": {
+				"error": {
+					"title": "Error loading products.",
+					"description": "Failed to load all products."
+				}
+			},
 			"productStatusUpdated": {
 				"success": {
 					"title": "Product status updated.",
@@ -46,6 +52,9 @@
 		"notifcations": {
 			"error": "Error",
 			"errorDescription": "Error fetching products"
+		},
+		"new": {
+			"submit": "Submit"
 		}
 	},
 	"product": {
@@ -60,6 +69,8 @@
 			"description": "Description",
 			"importantInformation": "Important Information",
 			"dimensions": "Dimensions",
+			"packagingMaterials": "Packaging Materials",
+			"rawMaterials": "Raw Materials",
 			"technicalSheet": "Technical Sheet",
 			"systemCode": "System Code",
 			"inmetroCertNumber": "Inmetro Cert Number",
@@ -105,6 +116,12 @@
 				"send": "Send"
 			},
 			"notificiation": {
+				"seamstressLoading": {
+					"error": {
+						"title": "Error loading seamstresses",
+						"description": "Failed to load seamstresses."
+					}
+				},
 				"seamstressAssigned": {
 					"success": {
 						"title": "Seamstress assigned",

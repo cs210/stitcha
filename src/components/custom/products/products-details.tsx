@@ -7,6 +7,7 @@ import {
 import { Product } from "@/lib/schemas/global.types";
 import { P } from "../text/text";
 
+// The details section for each individual product
 export function ProductsDetails({ dict, product }: { dict: any, product: Product }) {
 	return (
 		<Accordion type='single' collapsible>
@@ -19,26 +20,62 @@ export function ProductsDetails({ dict, product }: { dict: any, product: Product
 			<AccordionItem value='item-2'>
 				<AccordionTrigger>{dict.product.details.importantInformation}</AccordionTrigger>
 				<AccordionContent>
-					<P><strong>{dict.product.details.systemCode}:</strong> {product.system_code}</P>
-					<P><strong>{dict.product.details.inmetroCertNumber}:</strong> {product.inmetro_cert_number}</P>
-					<P><strong>{dict.product.details.barcode}:</strong> {product.barcode}</P>
+					<P>
+						<strong>{dict.product.details.systemCode}:</strong> {product.system_code}
+					</P>
+					<P>
+						<strong>{dict.product.details.inmetroCertNumber}:</strong> {product.inmetro_cert_number}
+					</P>
+					<P>
+						<strong>{dict.product.details.barcode}:</strong> {product.barcode}
+					</P>
 				</AccordionContent>
 			</AccordionItem>
 			<AccordionItem value='item-3'>
+				<AccordionTrigger>{dict.product.details.packagingMaterials}</AccordionTrigger>
+				<AccordionContent>
+					<div className='flex flex-col'>
+						{product.packaging_materials?.map((material, index) => (
+							<P key={index}>
+								<strong>{material.name}:</strong> {material.quantity}
+							</P>
+						))}
+					</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem value='item-4'>
+				<AccordionTrigger>{dict.product.details.rawMaterials}</AccordionTrigger>
+				<AccordionContent>
+					<div className='flex flex-col'>
+						{product.raw_materials?.map((material, index) => (
+							<P key={index}>
+								<strong>{material.name}:</strong> {material.quantity}
+							</P>
+						))}
+					</div>
+				</AccordionContent>
+			</AccordionItem>
+			<AccordionItem value='item-5'>
 				<AccordionTrigger>{dict.product.details.dimensions}</AccordionTrigger>
 				<AccordionContent>
 					<div className='flex flex-col'>
-						<P><strong>{dict.product.details.width}:</strong> {product.width}cm</P>
-						<P><strong>{dict.product.details.height}:</strong> {product.height}cm</P>
-						<P><strong>{dict.product.details.weight}:</strong> {product.weight}g</P>
+						<P>
+							<strong>{dict.product.details.width}:</strong> {product.width}cm
+						</P>
+						<P>
+							<strong>{dict.product.details.height}:</strong> {product.height}cm
+						</P>
+						<P>
+							<strong>{dict.product.details.weight}:</strong> {product.weight}g
+						</P>
 					</div>
 				</AccordionContent>
 			</AccordionItem>
 			{product.technical_sheet && (
-				<AccordionItem value='item-4'>
+				<AccordionItem value='item-6'>
 					<AccordionTrigger>{dict.product.details.technicalSheet}</AccordionTrigger>
 					<AccordionContent>
-						<div className="flex justify-center">
+						<div className='flex justify-center'>
 							<iframe src={product.technical_sheet} width='80%' height='400px' />
 						</div>
 					</AccordionContent>

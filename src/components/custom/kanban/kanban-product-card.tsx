@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { H4 } from '../text/headings';
 import { P } from '../text/text';
 
+// Item for column in Kanban board
 export function KanbanProductCard({ product, index, onDelete }: { product: Product; index: number; onDelete: (productId: string) => void }) {
 	const router = useRouter();
 
