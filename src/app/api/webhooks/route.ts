@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // TODO: Use other supabase client once we set up RLS
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
 // Webhook for Clerk events
