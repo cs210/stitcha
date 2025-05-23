@@ -152,6 +152,10 @@
 			"noProgressUpdates": "No progress updates yet"
 		}
 	},
+	"wellness": {
+		"title": "Wellness",
+		"description": "Manage seamstress wellness and health"
+	},
 	"settings": {
 		"title": "Settings",
 		"description": "Manage your account settings and preferences",
@@ -181,15 +185,38 @@
 			}
 		}
 	},
+	"progress": {
+		"title": "Progress",
+		"description": "View and manage seamstress progress",
+		"form": {
+			"product": {
+				"label": "Product",
+				"placeholder": "Select a product"
+			},
+			"description": {
+				"label": "Description",
+				"placeholder": "Enter the description"
+			},
+			"emotion": {
+				"label": "Emotion",
+				"placeholder": "Enter the emotion"
+			},
+			"units_completed": {
+				"label": "Units completed",
+				"placeholder": "Enter the units completed"
+			},
+			"submit": "Submit"
+		}
+	},
 	"navigation": {
 		"dashboard": "Dashboard"
 	},
 	"sidebar": {
 		"stitcha": "Stitcha",
-		"stitchaAi": "Stitcha AI",
 		"kanban": "Kanban",
 		"products": "Products",
 		"seamstresses": "Seamstresses",
+		"wellness": "Wellness",
 		"settings": "Settings"
 	},
 	"table": {

@@ -92,12 +92,13 @@
     "goToLastPage": "Ir para a última página"
   },
   "sidebar": {
-    "stitchaAi": "Stitcha AI",
-    "kanban": "Kanban",
-    "products": "Produtos",
-    "seamstresses": "Costureiras",
-    "settings": "Configurações"
-  },
+		"stitcha": "Stitcha",
+		"kanban": "Kanban",
+		"products": "Produtos",
+		"seamstresses": "Costureiras",
+		"wellness": "Bem-estar",
+		"settings": "Configurações"
+	},
   "navigation": {
     "dashboard": "Painel de Controle"
   },

@@ -12,7 +12,7 @@ import {
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { UserButton } from '@clerk/nextjs';
-import { BrainIcon, KanbanIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
+import { HeartPulseIcon, KanbanIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -23,11 +23,6 @@ export function Sidebar({ dict }: { dict: any }) {
 	const pathname = usePathname();
 
 	const navRoutes = [
-		{
-			title: dict.sidebar.stitchaAi,
-			url: '/dashboard/assistant',
-			icon: BrainIcon,
-		},
 		{
 			title: dict.sidebar.kanban,
 			url: '/dashboard/kanban',
@@ -42,6 +37,11 @@ export function Sidebar({ dict }: { dict: any }) {
 			title: dict.sidebar.seamstresses,
 			url: '/dashboard/seamstresses',
 			icon: Users,
+		},
+		{
+			title: dict.sidebar.wellness,
+			url: '/dashboard/wellness',
+			icon: HeartPulseIcon,
 		},
 		{
 			title: dict.sidebar.settings,

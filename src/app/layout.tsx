@@ -1,6 +1,5 @@
 'use client';
 
-import { MyRuntimeProvider } from '@/app/runtime-provider';
 import { LangContext } from '@/lib/lang/LangContext';
 import '@/styles/globals.css';
 import { ClerkProvider } from '@clerk/nextjs';
@@ -17,14 +16,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 	const [lang, setLang] = useState<'en' | 'pt-br'>('en');
 
 	return (
-		<MyRuntimeProvider>
-			<ClerkProvider>
-				<LangContext.Provider value={{ lang, setLang }}>
-					<html suppressHydrationWarning>
-						<body className={inter.className}>{children}</body>
-					</html>
-				</LangContext.Provider>
-			</ClerkProvider>
-		</MyRuntimeProvider>
+		<ClerkProvider>
+			<LangContext.Provider value={{ lang, setLang }}>
+				<html suppressHydrationWarning>
+					<body className={inter.className}>{children}</body>
+				</html>
+			</LangContext.Provider>
+		</ClerkProvider>
 	);
 }
