@@ -10,18 +10,18 @@ import { ProductsSeamstresses } from '@/components/custom/products/products-seam
 import { H2, H4 } from '@/components/custom/text/headings';
 import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
-import { Product } from '@/lib/schemas/global.types';
+import { Product as ProductType } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
 import { getDictionary } from '../../../../lib/lang/locales';
 
-export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
+export default function Product({ params }: { params: Promise<{ id: string }> }) {
 	const { id: productId } = use(params);	
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
 
-	const [product, setProduct] = useState<Product | null>(null);
+	const [product, setProduct] = useState<ProductType | null>(null);
 
 	useEffect(() => {	
 		(async () => {

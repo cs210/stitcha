@@ -16,24 +16,25 @@ import { LangContext } from '@/lib/lang/LangContext';
 import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useContext, useEffect, useState } from 'react';
+import { use, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
 const progressFormSchema = z.object({
-	product: z.string({ required_error: 'Product is required' }),
-	description: z.string({ required_error: 'Description is required' }),
-	emotion: z.string({ required_error: 'Emotion is required' }),
+	product: z.string().min(1, { message: 'Product is required' }),
+	description: z.string(),
+	emotion: z.string().min(1, { message: 'Emotion is required' }),
 	units_completed: z.number().min(1, { message: 'Units completed must be at least 1' }),
 });
 
-export default function Page() {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
+	const { id: seamstressId } = use(params);	
 	const { lang, setLang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
 
-	const [products, setProducts] = useState<Product[]>([]);
+	const [products, setProducts] = useState<Product[]>([]);	
 
 	const progressForm = useForm<z.infer<typeof progressFormSchema>>({
 		resolver: zodResolver(progressFormSchema),
@@ -73,7 +74,35 @@ export default function Page() {
 
 	// Create a new progress entry for this seamstress
 	const progressFormSubmit = async (values: z.infer<typeof progressFormSchema>) => {
-		console.log(values);
+		try {
+			const formData = new FormData();
+
+			formData.append('product', values.product);
+			formData.append('description', values.description);
+			formData.append('emotion', values.emotion);
+			formData.append('units_completed', values.units_completed.toString());
+
+			const response = await fetch(`/api/seamstresses/${seamstressId}/progress`, {
+				method: 'POST',
+				body: formData,
+			});
+			const result = await response.json();
+
+			if (!response.ok) {
+				throw new Error(result.error);
+			}
+
+			toast({
+				title: dict.progress.notifications.progressUploaded.success.title,
+				description: dict.progress.notifications.progressUploaded.success.description,
+			});
+		} catch (error) {
+			toast({
+				title: dict.progress.notifications.progressUploaded.error.title,
+				description: dict.progress.notifications.progressUploaded.error.description,
+				variant: 'destructive',
+			});
+		}
 	};
 
 	if (loading) {
@@ -93,7 +122,7 @@ export default function Page() {
 
 			<Container>				
 				<Form {...progressForm}>
-					<form onSubmit={progressForm.handleSubmit(progressFormSubmit)} className='space-y-8'>
+					<form onSubmit={progressForm.handleSubmit(progressFormSubmit)} className='space-y-8'>					
 						<FormField
 							control={progressForm.control}
 							name='product'
