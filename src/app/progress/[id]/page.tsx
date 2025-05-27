@@ -8,7 +8,7 @@ import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
@@ -16,11 +16,13 @@ import { LangContext } from '@/lib/lang/LangContext';
 import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { use, useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import z from 'zod';
 
 const progressFormSchema = z.object({
+	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }).nullable(),
 	product: z.string().min(1, { message: 'Product is required' }),
 	description: z.string(),
 	emotion: z.string().min(1, { message: 'Emotion is required' }),
@@ -39,6 +41,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const progressForm = useForm<z.infer<typeof progressFormSchema>>({
 		resolver: zodResolver(progressFormSchema),
 		defaultValues: {
+			image_urls: null,
 			product: '',
 			description: '',
 			emotion: '',
@@ -76,6 +79,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const progressFormSubmit = async (values: z.infer<typeof progressFormSchema>) => {
 		try {
 			const formData = new FormData();
+
+			// Add image files if they exist
+			if (values.image_urls) {
+				values.image_urls.forEach((file, index) => {
+					formData.append(`image_urls`, file);
+				});
+			}
 
 			formData.append('product', values.product);
 			formData.append('description', values.description);
@@ -120,15 +130,94 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				<P className='mt-2'>{dict.progress.description}</P>
 			</HeaderContainer>
 
-			<Container>				
+			<Container>
 				<Form {...progressForm}>
-					<form onSubmit={progressForm.handleSubmit(progressFormSubmit)} className='space-y-8'>					
+					<form onSubmit={progressForm.handleSubmit(progressFormSubmit)} className='space-y-8'>
+						<FormField
+							control={progressForm.control}
+							name='image_urls'
+							render={({ field: { value, onChange, ...fieldProps } }) => (
+								<FormItem>
+									<FormLabel>
+										Progress Images <span className='text-red-500'>*</span>
+									</FormLabel>
+									<FormControl>
+										<div>
+											<div className='relative'>
+												<div className='flex items-center gap-2'>
+													<Button
+														type='button'
+														variant='outline'
+														onClick={() => {
+															const fileInput = document.createElement('input');
+
+															fileInput.type = 'file';
+															fileInput.accept = 'image/*';
+															fileInput.multiple = true;
+															fileInput.onchange = (e) => {
+																const newFiles = Array.from((e.target as HTMLInputElement).files || []);
+																onChange([...(value || []), ...newFiles]);
+															};
+															fileInput.click();
+														}}
+													>
+														Choose Files
+													</Button>
+													<span className='text-sm text-muted-foreground'>
+														{value && value.length > 0 ? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected` : 'No file chosen'}
+													</span>
+												</div>
+												<input
+													{...fieldProps}
+													type='file'
+													accept='image/*'
+													multiple
+													key={value?.length}
+													onChange={(e) => {
+														const newFiles = Array.from(e.target.files || []);
+														onChange([...(value || []), ...newFiles]);
+													}}
+													className='hidden'
+												/>
+											</div>
+											<div className='mt-2 space-y-2'>
+												{value?.map((file: File, index: number) => (
+													<div key={index} className='flex items-center gap-2'>
+														<Image src={URL.createObjectURL(file)} alt={file.name} width={100} height={100} />
+														<Button
+															type='button'
+															variant='ghost'
+															size='sm'
+															onClick={() => {
+																const newFiles = value.filter((_: File, i: number) => i !== index);
+																onChange(newFiles);
+																// Reset the file input
+																const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+																if (fileInput) {
+																	fileInput.value = '';
+																}
+															}}
+														>
+															Remove
+														</Button>
+													</div>
+												))}
+											</div>
+										</div>
+									</FormControl>
+									<FormDescription>You can select multiple images</FormDescription>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 						<FormField
 							control={progressForm.control}
 							name='product'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{dict.progress.form.product.label}</FormLabel>
+									<FormLabel>
+										{dict.progress.form.product.label} <span className='text-red-500'>*</span>
+									</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
 											<SelectTrigger>
@@ -140,19 +229,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 												<SelectItem key={product.id} value={product.id}>
 													<div className='flex items-center gap-2'>
 														<Avatar className='h-8 w-8'>
-															<AvatarImage src={product.image_urls[0] ?? ''} />
-															<AvatarFallback>
-																{product.name.charAt(0)}
-															</AvatarFallback>
+															<AvatarImage src={product.image_urls?.[0] ?? ''} />
+															<AvatarFallback>{product.name.charAt(0)}</AvatarFallback>
 														</Avatar>
-														<P>
-															{product.name}
-														</P>
+														<P>{product.name}</P>
 													</div>
 												</SelectItem>
 											))}
 										</SelectContent>
 									</Select>
+									<FormDescription>Select the product that you are working on</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -167,6 +253,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 										<Input {...field} placeholder={dict.progress.form.description.placeholder} />
 									</FormControl>
 									<FormMessage />
+									<FormDescription>Describe the progress of the product</FormDescription>
 								</FormItem>
 							)}
 						/>
@@ -175,11 +262,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							name='emotion'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{dict.progress.form.emotion.label}</FormLabel>
+									<FormLabel>
+										{dict.progress.form.emotion.label} <span className='text-red-500'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input {...field} placeholder={dict.progress.form.emotion.placeholder} />
 									</FormControl>
 									<FormMessage />
+									<FormDescription>Select how you were feeling while working on the product</FormDescription>
 								</FormItem>
 							)}
 						/>
@@ -188,11 +278,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							name='units_completed'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{dict.progress.form.units_completed.label}</FormLabel>
+									<FormLabel>
+										{dict.progress.form.units_completed.label} <span className='text-red-500'>*</span>
+									</FormLabel>
 									<FormControl>
 										<Input type='number' min={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 									</FormControl>
 									<FormMessage />
+									<FormDescription>Enter the number of units completed</FormDescription>
 								</FormItem>
 							)}
 						/>

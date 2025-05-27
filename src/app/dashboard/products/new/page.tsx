@@ -17,6 +17,7 @@ import { getDictionary } from '@/lib/lang/locales';
 import { Labor, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
 import { handleLaborChange, handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange } from '@/lib/utils/product-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
 import { useContext, useEffect, useState } from 'react';
@@ -354,20 +355,23 @@ export default function Page() {
 
 			<div className='py-4'>
 				<Form {...form}>
-					<FormContainer dict={dict} onSubmit={form.handleSubmit(onSubmit, (errors) => {
-						// Get the first error field
-						const firstError = Object.keys(errors)[0];
-						if (firstError) {
-							// Find the input element for the first error
-							const errorInput = document.querySelector(`[name="${firstError}"]`) as HTMLElement;
-							if (errorInput) {
-								// Scroll the error into view
-								errorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-								// Focus the input
-								errorInput.focus();
+					<FormContainer
+						dict={dict}
+						onSubmit={form.handleSubmit(onSubmit, (errors) => {
+							// Get the first error field
+							const firstError = Object.keys(errors)[0];
+							if (firstError) {
+								// Find the input element for the first error
+								const errorInput = document.querySelector(`[name="${firstError}"]`) as HTMLElement;
+								if (errorInput) {
+									// Scroll the error into view
+									errorInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+									// Focus the input
+									errorInput.focus();
+								}
 							}
-						}
-					})}>
+						})}
+					>
 						<FormField
 							control={form.control}
 							name='name'
@@ -390,11 +394,11 @@ export default function Page() {
 									<FormLabel>Product Images *</FormLabel>
 									<FormControl>
 										<div>
-											<div className="relative">
-												<div className="flex items-center gap-2">
+											<div className='relative'>
+												<div className='flex items-center gap-2'>
 													<Button
-														type="button"
-														variant="outline"
+														type='button'
+														variant='outline'
 														onClick={() => {
 															const fileInput = document.createElement('input');
 															fileInput.type = 'file';
@@ -409,10 +413,8 @@ export default function Page() {
 													>
 														Choose Files
 													</Button>
-													<span className="text-sm text-muted-foreground">
-														{value && value.length > 0
-															? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected`
-															: 'No file chosen'}
+													<span className='text-sm text-muted-foreground'>
+														{value && value.length > 0 ? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected` : 'No file chosen'}
 													</span>
 												</div>
 												<input
@@ -425,21 +427,19 @@ export default function Page() {
 														const newFiles = Array.from(e.target.files || []);
 														onChange([...(value || []), ...newFiles]);
 													}}
-													className="hidden"
+													className='hidden'
 												/>
-											</div>
-
-											{/* Display selected files */}
+											</div>											
 											<div className='mt-2 space-y-2'>
-												{value?.map((file, index) => (
+												{value?.map((file: File, index: number) => (
 													<div key={index} className='flex items-center gap-2'>
-														<span className='text-sm'>{file.name}</span>
+														<Image src={URL.createObjectURL(file)} alt={file.name} width={100} height={100} />
 														<Button
 															type='button'
 															variant='ghost'
 															size='sm'
 															onClick={() => {
-																const newFiles = value.filter((_, i) => i !== index);
+																const newFiles = value.filter((_: File, i: number) => i !== index);
 																onChange(newFiles);
 																// Reset the file input
 																const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;

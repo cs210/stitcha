@@ -185,9 +185,13 @@
 			}
 		}
 	},
+	"education": {
+		"title": "Education",
+		"description": "View education videos"
+	},
 	"progress": {
 		"title": "Progress",
-		"description": "View and manage seamstress progress",
+		"description": "Upload progress updates",
 		"form": {
 			"product": {
 				"label": "Product",
