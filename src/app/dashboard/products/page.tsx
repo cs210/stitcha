@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
 import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
+import { useUser } from '@clerk/nextjs';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
@@ -23,6 +24,7 @@ import { useContext, useEffect, useState } from 'react';
 
 export default function Page() {
 	const { lang } = useContext(LangContext);
+	const { user } = useUser();
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState(true);
 	const { toast } = useToast();
@@ -95,11 +97,15 @@ export default function Page() {
 			accessorKey: 'system_code',
 			header: ({ column }) => <DataTableColumnHeader dict={dict} column={column} title={dict.adminsSection.products.table.systemCode} />,
 		},
-
 		{
 			id: 'actions',
 			cell: ({ row }) => {
 				const product = row.original;
+
+				// Only admins can edit and delete products
+				if (user?.organizationMemberships[0].role !== 'org:admin') {
+					return null;
+				}
 
 				return (
 					<DropdownMenu>
@@ -126,20 +132,34 @@ export default function Page() {
 	];
 
 	useEffect(() => {
+		if (!user) return;
+		
 		(async () => {
 			try {
 				const dict = await getDictionary(lang);
 
 				setDict(dict);
 
-				const response = await fetch('/api/products');
-				const result = await response.json();
+				if (user?.organizationMemberships[0].role === 'org:admin') {
+					const response = await fetch('/api/products');
+					const result = await response.json();
 
-				if (!response.ok) {
-					throw new Error(result.error);
+					if (!response.ok) {
+						throw new Error(result.error);
+					}
+
+					setProducts(result.data);
+				} else {
+					const response = await fetch(`/api/seamstresses/${user?.id}`);
+					const result = await response.json();					
+
+					if (!response.ok) {
+						throw new Error(result.error);
+					}
+
+					setProducts(result.data.products);
 				}
-
-				setProducts(result.data);
+				
 				setLoading(false);
 			} catch (error) {
 				// toast({
@@ -149,7 +169,7 @@ export default function Page() {
 				// });
 			}
 		})();
-	}, [lang]);
+	}, [lang, user]);
 
 	if (loading) return <Loader />;
 
@@ -161,7 +181,7 @@ export default function Page() {
 			</HeaderContainer>
 
 			<Container>
-				<DataTable dict={dict} columns={columns} searchPlaceholder={dict.adminsSection.products.table.search} path='products' data={products} />
+				<DataTable dict={dict} columns={columns} searchPlaceholder={dict.adminsSection.products.table.search} isAdmin={user?.organizationMemberships[0].role === 'org:admin'} path='products' data={products} />
 			</Container>
 		</>
 	);

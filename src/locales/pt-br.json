@@ -245,7 +245,8 @@
           "weight": "Peso"
         },
         "progress": {
-          "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda"
+          "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda",
+          "unitsCompleted": "unidades concluídas"
         }
       }
     },
@@ -323,7 +324,11 @@
         "assignedProducts": "Produtos Designados",
         "productCard": {
           "progressUpdates": "Atualizações de Progresso",
-          "noProgressUpdates": "Nenhuma atualização de progresso ainda"
+          "noProgressUpdates": "Nenhuma atualização de progresso ainda",
+          "systemCode": "Código do Sistema",
+          "validated": "Validado",
+          "unitsAssigned": "Unidades Atribuídas",
+          "unitsCompleted": "Unidades Concluídas"
         }
       }
     },
@@ -402,7 +407,8 @@
       "seamstresses": {
         "label": "Costureiras",
         "education": "Educação",
-        "progress": "Atualização de Progresso"
+        "progress": "Progresso",
+        "products": "Produtos"
       },
       "general": {
         "label": "Geral",
@@ -483,11 +489,11 @@
       },
       "progressUploaded": {
         "success": {
-          "title": "Sucesso",
+          "title": "Atualização de progresso criada.",
           "description": "Atualização de progresso criada com sucesso."
         },
         "error": {
-          "title": "Erro",
+          "title": "Erro ao criar atualização de progresso.",
           "description": "Falha ao criar atualização de progresso."
         }
       },

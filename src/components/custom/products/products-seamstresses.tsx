@@ -22,7 +22,7 @@ import { z } from 'zod';
 const assignSeamstressFormSchema = z.object({
 	seamstress: z.string({ required_error: 'Seamstress is required' }),
 	units: z.number().min(1, { message: 'Units must be at least 1' }),
-	description: z.string({ required_error: 'Description is required' }),
+	description: z.string().optional(),
 });
 
 const sendWhatsappMessageFormSchema = z.object({
@@ -41,6 +41,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 		resolver: zodResolver(assignSeamstressFormSchema),
 		defaultValues: {			
 			units: 1,
+			description: '',
 		},
 	});
 
@@ -82,7 +83,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 
 			formData.append('seamstress', values.seamstress);
 			formData.append('units', values.units.toString());
-			formData.append('description', values.description);
+			formData.append('description', values.description ?? '');
 
 			const response = await fetch(`/api/products/${product.id}/seamstresses`, {
 				method: 'POST',
@@ -100,8 +101,6 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 			// 	title: dict.adminsSection.product.seamstresses.seamstressAssigned,
 			// 	description: dict.adminsSection.product.seamstresses.seamstressAssignedDescription,
 			// });
-
-			assignSeamstressForm.reset();
 		} catch (error) {
 			// toast({
 			// 	title: dict.adminsSection.product.seamstresses.seamstressAssigned.error.title,

@@ -31,7 +31,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 			
 			// Get seamstress details
 			const seamstressResponse = await fetch(`/api/seamstresses/${seamstressId}`);
-			const { data, error } = await seamstressResponse.json();					
+			const { data, error } = await seamstressResponse.json();								
 
 			if (!error) {
 				setSeamstress(data);
@@ -61,13 +61,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 					{seamstress?.products.length > 0 && (
 						<>
-							<H3>{dict.seamstress.overallProgress}</H3>
+							<H3>{dict.adminsSection.seamstresses.seamstress.overallProgress}</H3>
 							<div className='flex flex-row items-center gap-2'>
 								<Progress value={(seamstress?.total_units_completed / seamstress?.total_units_assigned) * 100} className='w-[60%]' />
 								<P>{`${seamstress?.total_units_completed} / ${seamstress?.total_units_assigned}`}</P>
 							</div>
 
-							<H3>{dict.seamstress.assignedProducts}</H3>
+							<H3>{dict.adminsSection.seamstresses.seamstress.assignedProducts}</H3>
 							<div className='flex flex-wrap gap-6'>
 								{seamstress?.products.map((product: Product) => (
 									<SeamstressProductCard key={product.id} dict={dict} product={product} />

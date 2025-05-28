@@ -49,14 +49,19 @@ export function Sidebar({ dict }: { dict: any }) {
 
 	const seamstressRoutes = [
 		{
-			title: dict.general.sidebar.seamstresses.education,
-			url: '/dashboard/education',
-			icon: GraduationCapIcon,
+			title: dict.general.sidebar.seamstresses.products,
+			url: '/dashboard/products',
+			icon: ShirtIcon,
 		},
 		{
 			title: dict.general.sidebar.seamstresses.progress,
 			url: `/dashboard/progress/${user?.id}`,
 			icon: LoaderIcon,
+		},
+		{
+			title: dict.general.sidebar.seamstresses.education,
+			url: '/dashboard/education',
+			icon: GraduationCapIcon,
 		},
 	];
 
@@ -78,40 +83,44 @@ export function Sidebar({ dict }: { dict: any }) {
 				</SidebarHeader>
 			</Link>
 			<SidebarContent>
-				<SidebarGroup>
-					<SidebarGroupLabel>{dict.general.sidebar.admins.label}</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{adminRoutes.map((adminRoute) => (
-								<SidebarMenuItem key={adminRoute.title}>
-									<SidebarMenuButton asChild isActive={pathname.startsWith(adminRoute.url)}>
-										<Link href={adminRoute.url} className='flex items-center gap-3'>
-											<adminRoute.icon />
-											<span>{adminRoute.title}</span>
-										</Link>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
-				<SidebarGroup>
-					<SidebarGroupLabel>{dict.general.sidebar.seamstresses.label}</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenu>
-							{seamstressRoutes.map((seamstressRoute) => (
-								<SidebarMenuItem key={seamstressRoute.title}>
-									<SidebarMenuButton asChild isActive={pathname.startsWith(seamstressRoute.url)}>
-										<Link href={seamstressRoute.url} className='flex items-center gap-3'>
-											<seamstressRoute.icon />
-											<span>{seamstressRoute.title}</span>
-										</Link>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
-							))}
-						</SidebarMenu>
-					</SidebarGroupContent>
-				</SidebarGroup>
+				{user?.organizationMemberships[0].role === 'org:admin' && (
+					<SidebarGroup>
+						<SidebarGroupLabel>{dict.general.sidebar.admins.label}</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								{adminRoutes.map((adminRoute) => (
+									<SidebarMenuItem key={adminRoute.title}>
+										<SidebarMenuButton asChild isActive={pathname.startsWith(adminRoute.url)}>
+											<Link href={adminRoute.url} className='flex items-center gap-3'>
+												<adminRoute.icon />
+												<span>{adminRoute.title}</span>
+											</Link>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				)}
+				{user?.organizationMemberships[0].role === 'org:seamstress' && (
+					<SidebarGroup>
+						<SidebarGroupLabel>{dict.general.sidebar.seamstresses.label}</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenu>
+								{seamstressRoutes.map((seamstressRoute) => (
+									<SidebarMenuItem key={seamstressRoute.title}>
+										<SidebarMenuButton asChild isActive={pathname.startsWith(seamstressRoute.url)}>
+											<Link href={seamstressRoute.url} className='flex items-center gap-3'>
+												<seamstressRoute.icon />
+												<span>{seamstressRoute.title}</span>
+											</Link>
+										</SidebarMenuButton>
+									</SidebarMenuItem>
+								))}
+							</SidebarMenu>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				)}
 				<SidebarGroup>
 					<SidebarGroupLabel>{dict.general.sidebar.general.label}</SidebarGroupLabel>
 					<SidebarGroupContent>

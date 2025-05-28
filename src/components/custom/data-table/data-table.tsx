@@ -25,9 +25,10 @@ interface DataTableProps<TData, TValue> {
 	data: TData[];
 	searchPlaceholder: string;
 	path: string;
+	isAdmin: boolean;
 }
 
-export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholder, path }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholder, isAdmin, path }: DataTableProps<TData, TValue>) {
 	const [sorting, setSorting] = useState<SortingState>([]);
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 	const [rowSelection, setRowSelection] = useState({});
@@ -56,12 +57,14 @@ export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholde
 		<div>
 			<div className='flex gap-4 mb-4 w-full'>
 				<Input placeholder={searchPlaceholder} value={globalFilter} onChange={(e) => setGlobalFilter(String(e.target.value))} className='flex-1' />
-				<Button asChild>
-					<Link href={`/dashboard/${path}/new`}>
-						<Plus size={16} />
-						{dict.general.table.filter.new}
-					</Link>
-				</Button>
+				{isAdmin && (
+					<Button asChild>
+						<Link href={`/dashboard/${path}/new`}>
+							<Plus size={16} />
+							{dict.general.table.filter.new}
+						</Link>
+					</Button>
+				)}
 			</div>
 			<div className='rounded-md border'>
 				<Table>

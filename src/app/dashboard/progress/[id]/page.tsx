@@ -15,6 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
 import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
+import { useUser } from '@clerk/nextjs';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import { use, useContext, useEffect, useState } from 'react';
@@ -32,6 +33,7 @@ const progressFormSchema = z.object({
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: seamstressId } = use(params);
 	const { lang, setLang } = useContext(LangContext);
+	const { user } = useUser();
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
@@ -56,21 +58,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 				setDict(dict);
 
-				const response = await fetch('/api/products');
+				const response = await fetch(`/api/seamstresses/${seamstressId}`);
 				const result = await response.json();
 
 				if (!response.ok) {
 					throw new Error(result.error);
 				}
 
-				setProducts(result.data);
+				setProducts(result.data.products);
 				setLoading(false);
 			} catch (error) {
-				// toast({
-				// 	title: dict.products.notifcations.error,
-				// 	description: dict.products.notifcations.errorDescription,
-				// 	variant: 'destructive',
-				// });
+				toast({
+					title: dict.general.notifcations.productsLoading.error.title,
+					description: dict.general.notifcations.productsLoading.error.description,
+					variant: 'destructive',
+				});
 			}
 		})();
 	}, [lang]);
@@ -102,16 +104,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				throw new Error(result.error);
 			}
 
-			// toast({
-			// 	title: dict.progress.notifications.progressUploaded.success.title,
-			// 	description: dict.progress.notifications.progressUploaded.success.description,
-			// });
+			toast({
+				title: dict.general.notifications.progressUploaded.success.title,
+				description: dict.general.notifications.progressUploaded.success.description,
+			});
 		} catch (error) {
-			// toast({
-			// 	title: dict.progress.notifications.progressUploaded.error.title,
-			// 	description: dict.progress.notifications.progressUploaded.error.description,
-			// 	variant: 'destructive',
-			// });
+			toast({
+				title: dict.general.notifications.progressUploaded.error.title,
+				description: dict.general.notifications.progressUploaded.error.description,
+				variant: 'destructive',
+			});
 		}
 	};
 

@@ -11,11 +11,13 @@ import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
 import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
+import { useUser } from '@clerk/nextjs';
 import { use, useContext, useEffect, useState } from 'react';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: productId } = use(params);	
 	const { lang } = useContext(LangContext);
+	const { user } = useUser();
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
@@ -23,6 +25,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const [product, setProduct] = useState<Product | null>(null);
 
 	useEffect(() => {	
+		if (!user) return;
+
 		(async () => {
 			const dict = await getDictionary(lang);
 
@@ -43,7 +47,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 			setLoading(false);
 		})();
-	}, [productId, lang]);
+	}, [productId, lang, user]);
 
 	if (loading) return <Loader />;
 
@@ -57,18 +61,22 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				<div className='w-[80%]'>
 					<ProductsImages dict={dict} product={product} />
 				</div>				
-				<div className='w-full'>
-					<H4 className='mb-4'>{dict.adminsSection.products.product.assignedSeamstresses}</H4>
-					<ProductsSeamstresses dict={dict} product={product} />
-				</div>
+				{user?.organizationMemberships[0].role === 'org:admin' && (
+					<div className='w-full'>
+						<H4 className='mb-4'>{dict.adminsSection.products.product.assignedSeamstresses}</H4>
+						<ProductsSeamstresses dict={dict} product={product} />
+					</div>
+				)}
 				<div className='w-full'>
 					<H4 className='mb-4'>{dict.adminsSection.products.product.productDetails}</H4>
 					<ProductsDetails dict={dict} product={product} />
 				</div>
-				<div className='w-full'>
-					<H4 className='mb-4'>{dict.adminsSection.products.product.progressUpdates}</H4>
-					<ProductsProgress dict={dict} product={product} />
-				</div>
+				{user?.organizationMemberships[0].role === 'org:admin' && (
+					<div className='w-full'>
+						<H4 className='mb-4'>{dict.adminsSection.products.product.progressUpdates}</H4>
+						<ProductsProgress dict={dict} product={product} />
+					</div>
+				)}
 			</div>
 		</>
 	);

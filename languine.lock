@@ -47,12 +47,17 @@ files:
     adminsSection.products.product.details.width: 32954654ac8fe66a1d09be19001de2d4
     adminsSection.products.product.details.height: eec6c4bdbd339edf8cbea68becb85244
     adminsSection.products.product.details.weight: 8c489d0946f66d17d73f26366a4bf620
+    adminsSection.products.product.progress.unitsCompleted: bed969379f7f9f32d6ca110e38e5f903
     adminsSection.products.product.progress.noProgressUpdatesYet: d92986bc3aa97a52c8f36566e4e4268a
     adminsSection.seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     adminsSection.seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
     adminsSection.seamstresses.seamstress.products: 068f80c7519d0528fb08e82137a72131
     adminsSection.seamstresses.seamstress.overallProgress: e9d52e029c46fd088e81503b4d0cc142
     adminsSection.seamstresses.seamstress.assignedProducts: bdcd42605de0e27f3328921e68afb228
+    adminsSection.seamstresses.seamstress.productCard.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    adminsSection.seamstresses.seamstress.productCard.validated: 5364259abab90e94890f2ed2481b9824
+    adminsSection.seamstresses.seamstress.productCard.unitsAssigned: 00c256c88a101bc01e9676d149c605a5
+    adminsSection.seamstresses.seamstress.productCard.unitsCompleted: 6568b4e6a853aa2683789a272f4e948a
     adminsSection.seamstresses.seamstress.productCard.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
     adminsSection.seamstresses.seamstress.productCard.noProgressUpdates: d92986bc3aa97a52c8f36566e4e4268a
     adminsSection.wellness.title: 32a07c6643e39bb3fe494292db9ae233
@@ -92,8 +97,9 @@ files:
     general.sidebar.admins.seamstresses: 9e91116c7f0918c4c3e50e73f6dba966
     general.sidebar.admins.wellness: 32a07c6643e39bb3fe494292db9ae233
     general.sidebar.seamstresses.label: 9e91116c7f0918c4c3e50e73f6dba966
+    general.sidebar.seamstresses.products: 068f80c7519d0528fb08e82137a72131
+    general.sidebar.seamstresses.progress: 46b5f8c58b679b4243cbdb5749642c86
     general.sidebar.seamstresses.education: de7a22a0c94aa64ba2449e520aa20c99
-    general.sidebar.seamstresses.progress: 18c431cc6c5d07f5e5937d99ef9c32d0
     general.sidebar.general.label: 0db377921f4ce762c62526131097968f
     general.sidebar.general.settings: f4f70727dc34561dfde1a3c529b6205c
     general.table.filter.new: 03c2e7e41ffc181a4e84080b4710e81e
@@ -120,6 +126,10 @@ files:
     general.time.minutes: 1442a7b6e2c20b27775175eecba84dac
     general.notifications.productsLoading.error.title: e0850a34e981ba1447ef25d59d929de4
     general.notifications.productsLoading.error.description: d7cd82a5d0d6075a5e57d9d6c95e846b
+    general.notifications.progressUploaded.success.title: a789440f660321572ca5461a85617851
+    general.notifications.progressUploaded.success.description: 80eb4efb891a03f2b452298a0470b9bd
+    general.notifications.progressUploaded.error.title: 97c2996efb09e26de91647becab290fe
+    general.notifications.progressUploaded.error.description: 691651e563a17253adf16255326b59af
     general.notifications.productStatusUpdated.success.title: 05501ec7a6b1efced6b9f4371d0c023e
     general.notifications.productStatusUpdated.success.description: 5a18957c38d158bfea3ad163f7354720
     general.notifications.productStatusUpdated.error.title: a803b0003dbd984e00bb5a5561b2bce8
@@ -132,10 +142,6 @@ files:
     general.notifications.languageChanged.success.description: 4a73fe6e717e2534861eb70af646f419
     general.notifications.languageChanged.error.title: a782d5415f0d23cfea14f499eb570a47
     general.notifications.languageChanged.error.description: 0d44ba592d4e82ef56871ad75fa46c4b
-    general.notifications.progressUploaded.success.title: 505a83f220c02df2f85c3810cd9ceb38
-    general.notifications.progressUploaded.success.description: 80eb4efb891a03f2b452298a0470b9bd
-    general.notifications.progressUploaded.error.title: 902b0d55fddef6f8d651fe1035b7d4bd
-    general.notifications.progressUploaded.error.description: 691651e563a17253adf16255326b59af
     general.notifications.seamstressLoading.error.title: d7165f0c80bce8a4b9006dfd84cb5541
     general.notifications.seamstressLoading.error.description: 2bcbf60b2155f11c5449caab302197c8
     general.notifications.seamstressAssigned.success.title: a8f20e707b39a21e92e6136b2bafd03b

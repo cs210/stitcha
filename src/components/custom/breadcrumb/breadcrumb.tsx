@@ -12,7 +12,7 @@ export function Breadcrumb({ dict, segments }: { dict: any, segments: string[] }
 				</BreadcrumbItem>
 				<BreadcrumbSeparator />
 				<BreadcrumbItem>
-					<BreadcrumbLink href={`/dashboard/${segments[1]}`}>{segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}</BreadcrumbLink>
+					{segments[1] && <BreadcrumbLink href={`/dashboard/${segments[1]}`}>{segments[1].charAt(0).toUpperCase() + segments[1].slice(1)}</BreadcrumbLink>}
 				</BreadcrumbItem>
 			</BreadcrumbList>
 		</NavigationBreadcrumb>

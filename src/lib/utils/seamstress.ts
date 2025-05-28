@@ -6,15 +6,15 @@ export async function getSeamstress(id: string, supabase: SupabaseClient) {
 	try {
 		const { data: seamstressData, error: seamstressError } = await supabase
 			.from('users')
-			.select(
-				`
+			.select(`
 				*,
 				products_users (
-				products (*),
-				*
+					*,
+					products (*)
 				)
 			`)
 			.eq('id', id)
+			.eq('role', 'seamstress')
 			.single();
 
 		if (seamstressError) {

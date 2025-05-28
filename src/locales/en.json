@@ -75,6 +75,7 @@
 					"weight": "Weight"
 				},
 				"progress": {
+					"unitsCompleted": "units completed",
 					"noProgressUpdatesYet": "No progress updates yet"
 				}
 			}
@@ -87,8 +88,12 @@
 				"overallProgress": "Overall Progress",
 				"assignedProducts": "Assigned Products",
 				"productCard": {
+					"systemCode": "System Code",
+					"validated": "Validated",
+					"unitsAssigned": "Units Assigned",
+					"unitsCompleted": "Units Completed",
 					"progressUpdates": "Progress Updates",
-					"noProgressUpdates": "No progress updates yet"
+					"noProgressUpdates": "No progress updates yet"					
 				}
 			}
 		},
@@ -165,8 +170,9 @@
 			},
 			"seamstresses": {
 				"label": "Seamstresses",
-				"education": "Education",
-				"progress": "Progress Update"
+				"products": "Products",
+				"progress": "Progress",
+				"education": "Education"
 			},
 			"general": {
 				"label": "General",
@@ -218,6 +224,16 @@
 					"description": "Failed to load all products."
 				}
 			},
+			"progressUploaded": {
+				"success": {
+					"title": "Progress update created.",
+					"description": "Successfully created progress update."
+				},
+				"error": {
+					"title": "Error creating progress update.",
+					"description": "Failed to create progress update."
+				}
+			},
 			"productStatusUpdated": {
 				"success": {
 					"title": "Product status updated.",
@@ -246,16 +262,6 @@
 				"error": {
 					"title": "Error changing language.",
 					"description": "Failed to change language."
-				}
-			},
-			"progressUploaded": {
-				"success": {
-					"title": "Success",
-					"description": "Successfully created progress update."
-				},
-				"error": {
-					"title": "Error",
-					"description": "Failed to create progress update."
 				}
 			},
 			"seamstressLoading": {

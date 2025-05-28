@@ -428,6 +428,7 @@ export type Database = {
           last_name: string
           location: string | null
           phone_number: string | null
+          role: Database["public"]["Enums"]["role"]
           username: string
         }
         Insert: {
@@ -438,6 +439,7 @@ export type Database = {
           last_name: string
           location?: string | null
           phone_number?: string | null
+          role?: Database["public"]["Enums"]["role"]
           username: string
         }
         Update: {
@@ -448,6 +450,7 @@ export type Database = {
           last_name?: string
           location?: string | null
           phone_number?: string | null
+          role?: Database["public"]["Enums"]["role"]
           username?: string
         }
         Relationships: []
@@ -464,6 +467,7 @@ export type Database = {
     }
     Enums: {
       progress_level: "Not Started" | "In Progress" | "Done"
+      role: "admin" | "seamstress"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -580,6 +584,7 @@ export const Constants = {
   public: {
     Enums: {
       progress_level: ["Not Started", "In Progress", "Done"],
+      role: ["admin", "seamstress"],
     },
   },
 } as const

@@ -9,7 +9,7 @@ export async function GET() {
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('users').select('*');
+		const { data, error } = await supabase.from('users').select('*').eq('role', 'seamstress');
 
 		if (error) {
 			throw new Error(error.message);
