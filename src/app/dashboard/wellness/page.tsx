@@ -2,7 +2,6 @@
 
 import { Container } from '@/components/custom/containers/container';
 import { HeaderContainer } from '@/components/custom/containers/header-container';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
@@ -24,19 +23,13 @@ export default function Page() {
 		})();
 	}, [lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>
 			<HeaderContainer>
-				<H2>{dict.wellness.title}</H2>
-				<P className='mt-2'>{dict.wellness.description}</P>
+				<H2>{dict.adminsSection.wellness.title}</H2>
+				<P className='mt-2'>{dict.adminsSection.wellness.description}</P>
 			</HeaderContainer>
 
 			<Container>

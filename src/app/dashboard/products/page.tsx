@@ -2,7 +2,6 @@
 
 import { Container } from '@/components/custom/containers/container';
 import { HeaderContainer } from '@/components/custom/containers/header-container';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { DataTable } from '@/components/custom/data-table/data-table';
 import { DataTableColumnHeader } from '@/components/custom/data-table/data-table-column-header';
 import { Loader } from '@/components/custom/loader/loader';
@@ -14,13 +13,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { Product } from '@/lib/schemas/global.types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../../lib/lang/locales';
 
 const columns: ColumnDef<Product>[] = [
 	{
@@ -89,11 +88,11 @@ const columns: ColumnDef<Product>[] = [
 					<DropdownMenuContent align='end'>
 						<DropdownMenuItem>
 							<Pencil className='mr-2 h-4 w-4' />
-							Edit
+							{dict.general.table.body.edit}
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={() => handleDeleteProduct(product.id)}>
 							<Trash className='mr-2 h-4 w-4' />
-							Delete
+							{dict.general.table.body.edit}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -127,28 +126,22 @@ export default function Page() {
 				setProducts(result.data);
 				setLoading(false);
 			} catch (error) {
-				toast({
-					title: dict.products.notifcations.error,
-					description: dict.products.notifcations.errorDescription,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.products.notifcations.error,
+				// 	description: dict.products.notifcations.errorDescription,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, [lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>
 			<HeaderContainer>
-				<H2>{dict.products.title}</H2>
-				<P className='mt-2'>{dict.products.description}</P>
+				<H2>{dict.adminsSection.products.title}</H2>
+				<P className='mt-2'>{dict.adminsSection.products.description}</P>
 			</HeaderContainer>
 
 			<Container>

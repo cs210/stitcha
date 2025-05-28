@@ -31,19 +31,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 					upsert: false,
 				});
 
-				console.log(error);
-
 				if (error) {
 					throw new Error(`Error uploading file: ${error.message}`);
 				}
 
 				const { data } = await supabase.storage.from('products').createSignedUrl(filePath, 60 * 60 * 24 * 365);
 
-				console.log(data);
-
 				imageUrls.push(data?.signedUrl || '');
-
-				console.log(imageUrls);
 			}
 		}
 

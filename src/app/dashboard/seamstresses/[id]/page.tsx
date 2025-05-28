@@ -2,7 +2,6 @@
 
 import { Container } from '@/components/custom/containers/container';
 import { HeaderContainer } from '@/components/custom/containers/header-container';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { SeamstressProductCard } from '@/components/custom/seamstress/seamstress-product-card';
 import { SeamstressProfile } from '@/components/custom/seamstress/seamstress-profile';
@@ -37,24 +36,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 			if (!error) {
 				setSeamstress(data);
 			} else {
-				toast({
-					title: dict.seamstresses.notifications.error,
-					description: dict.seamstresses.notifications.errorDescription,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.adminsSection.seamstresses.notifications.error,
+				// 	description: dict.adminsSection.seamstresses.notifications.errorDescription,
+				// 	variant: 'destructive',
+				// });
 			}
 
 			setLoading(false);
 		})();
 	}, [seamstressId, lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>

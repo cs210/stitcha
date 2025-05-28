@@ -158,13 +158,16 @@
 				"kanban": "Kanban",
 				"products": "Products",
 				"seamstresses": "Seamstresses",
-				"wellness": "Wellness",
-				"settings": "Settings"
+				"wellness": "Wellness"
 			},
 			"seamstresses": {
 				"label": "Seamstresses",
 				"education": "Education",
-				"progress": "Progress Updates"
+				"progress": "Progress Update"
+			},
+			"general": {
+				"label": "General",
+				"settings": "Settings"
 			}
 		},
 		"table": {
@@ -201,6 +204,9 @@
 				"remove": "Remove"
 			},
 			"submit": "Submit"
+		},
+		"time": {
+			"minutes": "mins"
 		},
 		"notifications": {
 			"productsLoading": {

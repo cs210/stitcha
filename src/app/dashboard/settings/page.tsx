@@ -2,7 +2,6 @@
 
 import { Container } from '@/components/custom/containers/container';
 import { HeaderContainer } from '@/components/custom/containers/header-container';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { H2 } from '@/components/custom/text/headings';
 import { P } from '@/components/custom/text/text';
@@ -54,13 +53,7 @@ export default function Page() {
 		}
 	};
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>

@@ -92,13 +92,13 @@
     "goToLastPage": "Ir para a última página"
   },
   "sidebar": {
-		"stitcha": "Stitcha",
-		"kanban": "Kanban",
-		"products": "Produtos",
-		"seamstresses": "Costureiras",
-		"wellness": "Bem-estar",
-		"settings": "Configurações"
-	},
+    "stitcha": "Stitcha",
+    "kanban": "Kanban",
+    "products": "Produtos",
+    "seamstresses": "Costureiras",
+    "wellness": "Bem-estar",
+    "settings": "Configurações"
+  },
   "navigation": {
     "dashboard": "Painel de Controle"
   },
@@ -167,6 +167,281 @@
     "productCard": {
       "progressUpdates": "Atualizações de Progresso",
       "noProgressUpdates": "Ainda não há atualizações de progresso"
+    }
+  },
+  "adminsSection": {
+    "kanban": {
+      "title": "Kanban",
+      "description": "Gerenciar e acompanhar o progresso do produto",
+      "columns": {
+        "notStarted": "Não Iniciado",
+        "inProgress": "Em Andamento",
+        "done": "Concluído"
+      }
+    },
+    "products": {
+      "title": "Produtos",
+      "description": "Visualizar e gerenciar todos os produtos",
+      "table": {
+        "search": "Pesquisar produtos por nome, tipo ou código do sistema...",
+        "image": "Imagem",
+        "name": "Nome",
+        "type": "Tipo",
+        "systemCode": "Código do Sistema"
+      }
+    },
+    "product": {
+      "assignedSeamstresses": "Costureiras Atribuídas",
+      "productDetails": "Detalhes do Produto",
+      "progressUpdates": "Atualizações de Progresso",
+      "systemCode": "Código do Sistema",
+      "validated": "Validado",
+      "unitsAssigned": "Unidades Atribuídas",
+      "unitsCompleted": "Unidades Concluídas",
+      "details": {
+        "description": "Descrição",
+        "importantInformation": "Informações Importantes",
+        "dimensions": "Dimensões",
+        "packagingMaterials": "Materiais de Embalagem",
+        "rawMaterials": "Matérias-Primas",
+        "technicalSheet": "Ficha Técnica",
+        "systemCode": "Código do Sistema",
+        "inmetroCertNumber": "Número do Certificado Inmetro",
+        "barcode": "Código de Barras",
+        "width": "Largura",
+        "height": "Altura",
+        "weight": "Peso"
+      },
+      "images": {
+        "productImage": "Imagem do Produto",
+        "noImagesAvailable": "Nenhuma imagem disponível"
+      },
+      "progress": {
+        "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda"
+      },
+      "seamstresses": {
+        "noSeamstressesAssigned": "Nenhuma costureira atribuída",
+        "assignSeamstressForm": {
+          "title": "Atribuir Costureira",
+          "seamstress": {
+            "label": "Costureira",
+            "placeholder": "Selecionar uma costureira"
+          },
+          "units": {
+            "label": "Unidades"
+          },
+          "description": {
+            "label": "Descrição",
+            "placeholder": "Digite a descrição"
+          }
+        },
+        "sendWhatsappMessage": {
+          "title": "Enviar Mensagem pelo WhatsApp",
+          "seamstress": {
+            "label": "Costureira",
+            "placeholder": "Selecionar uma costureira"
+          },
+          "message": {
+            "label": "Mensagem",
+            "placeholder": "Digite a mensagem"
+          }
+        }
+      }
+    },
+    "seamstresses": {
+      "title": "Costureiras",
+      "description": "Visualizar e gerenciar todas as costureiras",
+      "products": "Produtos",
+      "overallProgress": "Progresso Geral",
+      "assignedProducts": "Produtos Atribuídos",
+      "productCard": {
+        "progressUpdates": "Atualizações de Progresso",
+        "noProgressUpdates": "Nenhuma atualização de progresso ainda"
+      }
+    },
+    "wellness": {
+      "title": "Bem-Estar",
+      "description": "Gerenciar o bem-estar e a saúde das costureiras"
+    },
+    "settings": {
+      "title": "Configurações",
+      "description": "Gerenciar as configurações e preferências da sua conta",
+      "form": {
+        "fullName": "Nome Completo",
+        "email": "Email",
+        "language": {
+          "label": "Idioma",
+          "placeholder": "Selecionar idioma",
+          "options": {
+            "en": "Inglês",
+            "pt": "Português"
+          }
+        }
+      }
+    }
+  },
+  "seamstressesSection": {
+    "education": {
+      "title": "Educação",
+      "description": "Visualizar vídeos educacionais"
+    },
+    "progress": {
+      "title": "Progresso",
+      "description": "Enviar atualizações de progresso",
+      "form": {
+        "imageUrls": {
+          "label": "Imagens de Progresso",
+          "placeholder": "Selecionar imagens de progresso",
+          "description": "Selecionar as imagens de progresso"
+        },
+        "product": {
+          "label": "Produto",
+          "placeholder": "Selecionar um produto",
+          "description": "Selecionar o produto no qual você está trabalhando"
+        },
+        "description": {
+          "label": "Descrição",
+          "placeholder": "Digite a descrição",
+          "description": "Descreva o progresso do produto"
+        },
+        "emotion": {
+          "label": "Emoção",
+          "placeholder": "Digite a emoção",
+          "description": "Selecione como você estava se sentindo enquanto trabalhava no produto"
+        },
+        "unitsCompleted": {
+          "label": "Unidades concluídas",
+          "placeholder": "Digite as unidades concluídas",
+          "description": "Digite o número de unidades concluídas"
+        }
+      }
+    }
+  },
+  "general": {
+    "navigation": {
+      "dashboard": "Painel"
+    },
+    "sidebar": {
+      "stitcha": "Stitcha",
+      "admins": {
+        "label": "Administradores",
+        "kanban": "Kanban",
+        "products": "Produtos",
+        "seamstresses": "Costureiras",
+        "wellness": "Bem-Estar",
+        "settings": "Configurações"
+      },
+      "seamstresses": {
+        "label": "Costureiras",
+        "education": "Educação",
+        "progress": "Atualização de Progresso"
+      },
+      "general": {
+        "label": "Geral",
+        "settings": "Configurações"
+      }
+    },
+    "table": {
+      "filter": {
+        "new": "Novo"
+      },
+      "header": {
+        "asc": "Asc",
+        "desc": "Desc",
+        "hide": "Ocultar"
+      },
+      "body": {
+        "edit": "Editar",
+        "delete": "Excluir",
+        "noResults": "Nenhum resultado."
+      },
+      "pagination": {
+        "rowsSelected": "{{count}} de {{total}} linha(s) selecionada(s).",
+        "rowsPerPage": "Linhas por página",
+        "pageCount": "Página {{count}} de {{total}}",
+        "goToFirstPage": "Ir para a primeira página",
+        "goToPreviousPage": "Ir para a página anterior",
+        "goToNextPage": "Ir para a próxima página",
+        "goToLastPage": "Ir para a última página"
+      }
+    },
+    "form": {
+      "imagePicker": {
+        "chooseImages": "Escolher Imagens",
+        "image": "imagem",
+        "images": "imagens",
+        "selected": "selecionado",
+        "noImagesSelected": "Nenhuma imagem selecionada",
+        "remove": "Remover"
+      },
+      "submit": "Enviar"
+    },
+    "notifications": {
+      "productsLoading": {
+        "error": {
+          "title": "Erro ao carregar produtos.",
+          "description": "Falha ao carregar todos os produtos."
+        }
+      },
+      "productStatusUpdated": {
+        "success": {
+          "title": "Status do produto atualizado.",
+          "description": "Status do produto atualizado com sucesso para {{status}}."
+        },
+        "error": {
+          "title": "Erro ao atualizar o status do produto.",
+          "description": "Falha ao atualizar o status do produto."
+        }
+      },
+      "productDeleted": {
+        "success": {
+          "title": "Produto excluído.",
+          "description": "Produto excluído com sucesso."
+        },
+        "error": {
+          "title": "Erro ao excluir produto.",
+          "description": "Falha ao excluir produto."
+        }
+      },
+      "languageChanged": {
+        "success": {
+          "title": "Idioma alterado.",
+          "description": "Idioma alterado com sucesso para {{language}}."
+        },
+        "error": {
+          "title": "Erro ao alterar idioma.",
+          "description": "Falha ao alterar idioma."
+        }
+      },
+      "progressUploaded": {
+        "success": {
+          "title": "Sucesso",
+          "description": "Atualização de progresso criada com sucesso."
+        },
+        "error": {
+          "title": "Erro",
+          "description": "Falha ao criar atualização de progresso."
+        }
+      },
+      "seamstressLoading": {
+        "error": {
+          "title": "Erro ao carregar costureiras",
+          "description": "Falha ao carregar costureiras."
+        }
+      },
+      "seamstressAssigned": {
+        "success": {
+          "title": "Costureira designada",
+          "description": "Costureira designada ao produto com sucesso."
+        },
+        "error": {
+          "title": "Erro ao designar costureira",
+          "description": "Falha ao designar costureira ao produto."
+        }
+      }
+    },
+    "time": {
+      "minutes": "mins"
     }
   }
 }

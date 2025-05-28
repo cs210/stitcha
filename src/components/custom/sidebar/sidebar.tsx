@@ -44,12 +44,7 @@ export function Sidebar({ dict }: { dict: any }) {
 			title: dict.general.sidebar.admins.wellness,
 			url: '/dashboard/wellness',
 			icon: HeartPulseIcon,
-		},
-		{
-			title: dict.general.sidebar.admins.settings,
-			url: '/dashboard/settings',
-			icon: SettingsIcon,
-		},
+		}
 	];
 
 	const seamstressRoutes = [
@@ -62,6 +57,14 @@ export function Sidebar({ dict }: { dict: any }) {
 			title: dict.general.sidebar.seamstresses.progress,
 			url: `/dashboard/progress/${user?.id}`,
 			icon: LoaderIcon,
+		},
+	];
+
+	const generalRoutes = [
+		{
+			title: dict.general.sidebar.general.settings,
+			url: '/dashboard/settings',
+			icon: SettingsIcon,
 		},
 	];
 
@@ -102,6 +105,23 @@ export function Sidebar({ dict }: { dict: any }) {
 										<Link href={seamstressRoute.url} className='flex items-center gap-3'>
 											<seamstressRoute.icon />
 											<span>{seamstressRoute.title}</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							))}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup>
+					<SidebarGroupLabel>{dict.general.sidebar.general.label}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							{generalRoutes.map((generalRoute) => (
+								<SidebarMenuItem key={generalRoute.title}>
+									<SidebarMenuButton asChild isActive={pathname.startsWith(generalRoute.url)}>
+										<Link href={generalRoute.url} className='flex items-center gap-3'>
+											<generalRoute.icon />
+											<span>{generalRoute.title}</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>

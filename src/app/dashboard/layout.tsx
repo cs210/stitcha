@@ -1,15 +1,14 @@
 'use client';
 
 import { Breadcrumb } from '@/components/custom/breadcrumb/breadcrumb';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { Sidebar } from '@/components/custom/sidebar/sidebar';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/toaster';
 import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../lib/lang/locales';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 	const { lang } = useContext(LangContext);
@@ -28,13 +27,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 		})();
 	}, [lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;	
 
 	return (
 		<SidebarProvider>

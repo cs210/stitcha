@@ -1,7 +1,6 @@
 'use client';
 
 import { HeaderContainer } from '@/components/custom/containers/header-container';
-import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { ProductsDetails } from '@/components/custom/products/products-details';
 import { ProductsImages } from '@/components/custom/products/products-images';
@@ -10,18 +9,18 @@ import { ProductsSeamstresses } from '@/components/custom/products/products-seam
 import { H2, H4 } from '@/components/custom/text/headings';
 import { useToast } from '@/hooks/use-toast';
 import { LangContext } from '@/lib/lang/LangContext';
-import { Product as ProductType } from '@/lib/schemas/global.types';
+import { getDictionary } from '@/lib/lang/locales';
+import { Product } from '@/lib/schemas/global.types';
 import { use, useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../../../lib/lang/locales';
 
-export default function Product({ params }: { params: Promise<{ id: string }> }) {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	const { id: productId } = use(params);	
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
 	const { toast } = useToast();
 
-	const [product, setProduct] = useState<ProductType | null>(null);
+	const [product, setProduct] = useState<Product | null>(null);
 
 	useEffect(() => {	
 		(async () => {
@@ -46,13 +45,7 @@ export default function Product({ params }: { params: Promise<{ id: string }> })
 		})();
 	}, [productId, lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>
