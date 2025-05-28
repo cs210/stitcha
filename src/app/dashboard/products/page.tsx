@@ -31,6 +31,23 @@ export default function Page() {
 
 	const [products, setProducts] = useState<Product[]>([]);
 
+	// Handle deleting a product
+	const handleDeleteProduct = async (id: string) => {
+		const response = await fetch(`/api/products/${id}`, {
+			method: 'DELETE',
+		});
+
+		const result = await response.json();
+
+		if (!response.ok) {
+			throw new Error(result.error);
+		}
+
+		const newProducts = products.filter((product) => product.id !== id);
+
+		setProducts(newProducts);
+	};
+
 	const columns: ColumnDef<Product>[] = [
 		{
 			id: 'select',
@@ -60,7 +77,7 @@ export default function Page() {
 		},
 		{
 			accessorKey: 'name',
-			header: ({ column }) => <DataTableColumnHeader dict={dict} column={column} title='Name' />,
+			header: ({ column }) => <DataTableColumnHeader dict={dict} column={column} title={dict.adminsSection.products.table.name} />,
 			cell: ({ row }) => (
 				<Link href={`/dashboard/products/${row.original.id}`} className='font-medium'>
 					{row.original.name}
@@ -120,7 +137,11 @@ export default function Page() {
 								<Pencil className='mr-2 h-4 w-4' />
 								{dict.general.table.body.edit}
 							</DropdownMenuItem>
-							<DropdownMenuItem> {/* onClick={() => handleDeleteProduct(product.id)}> */}
+							<DropdownMenuItem
+								onClick={() => {
+									handleDeleteProduct(product.id);
+								}}
+							>
 								<Trash className='mr-2 h-4 w-4' />
 								{dict.general.table.body.delete}
 							</DropdownMenuItem>

@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from 'uuid';
 import { Product } from "../schemas/global.types";
 
 // Get a seamstress
@@ -64,7 +65,56 @@ export async function getSeamstress(id: string, supabase: SupabaseClient) {
 		}
 
 		return data;
-	} catch (error) {
+	} catch (error: any) {
+		throw new Error(error.message);
+	}
+}
+
+// Create a new progress update for a seamstress
+export async function createProgressUpdate(seamstressId: string, supabase: SupabaseClient, formData: FormData) {
+	try {
+		const imageFiles = formData.getAll('image_urls') as File[];
+		const imageUrls: string[] = [];
+
+		if (imageFiles && imageFiles.length > 0) {
+			for (const file of imageFiles) {
+				const fileExt = file.name.split('.').pop();
+				const fileName = `${uuidv4()}.${fileExt}`;
+				const filePath = `${formData.get('product')}/progress/${seamstressId}/${fileName}`;
+
+				const arrayBuffer = await file.arrayBuffer();
+				const fileBuffer = new Uint8Array(arrayBuffer);
+
+				const { error } = await supabase.storage.from('products').upload(filePath, fileBuffer, {
+					contentType: file.type,
+					upsert: false,
+				});
+
+				if (error) {
+					throw new Error(`Error uploading file: ${error.message}`);
+				}
+
+				const { data } = await supabase.storage.from('products').createSignedUrl(filePath, 60 * 60 * 24 * 365);
+
+				imageUrls.push(data?.signedUrl || '');
+			}
+		}
+
+		const { data, error } = await supabase.from('progress').insert({
+			user_id: seamstressId,
+			product_id: formData.get('product'),
+			description: formData.get('description'),
+			emotion: formData.get('emotion'),
+			units_completed: formData.get('units_completed'),
+			image_urls: imageUrls,
+		});
+
+		if (error) {
+			throw new Error(error.message);
+		}
+
+		return data;
+	} catch (error: any) {
 		throw new Error(error.message);
 	}
 }

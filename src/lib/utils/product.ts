@@ -69,19 +69,29 @@ export async function getProduct(id: string, supabase: SupabaseClient) {
 }
 
 // Handle deleting a product
-export const deleteProduct = async (productId: string) => {
+export const deleteProduct = async (id: string, supabase: SupabaseClient) => {
 	try {
-		const response = await fetch(`/api/products/${productId}`, {
-			method: 'DELETE',
-		});
+		const { data, error } = await supabase.from('products').delete().eq('id', id);
 
-		const data = await response.json();
-
-		if (!response.ok) {
-			throw new Error(data.error || 'Failed to delete product');
+		if (error) {
+			throw new Error(error.message);
 		}
-	} catch (error) {
-		console.error('Error deleting product:', error);
+
+		const { error: productStorageError } = await supabase.storage.from('products').remove([`${id}`]);
+
+		if (productStorageError) {
+			throw new Error(productStorageError.message);
+		}
+
+		const { error: technicalSheetStorageError } = await supabase.storage.from('technical-sheets').remove([`${id}`]);
+
+		if (technicalSheetStorageError) {
+			throw new Error(technicalSheetStorageError.message);
+		}
+
+		return data;
+	} catch (error: any) {
+		throw new Error(error.message);
 	}
 };
 

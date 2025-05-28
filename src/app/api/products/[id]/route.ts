@@ -1,6 +1,6 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { checkAuth } from '@/lib/utils/auth';
-import { getProduct } from '@/lib/utils/product';
+import { deleteProduct, getProduct } from '@/lib/utils/product';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Get a specific product by id
@@ -52,25 +52,9 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('products').delete().eq('id', id);
+		const product = await deleteProduct(id, supabase);
 
-		if (error) {
-			throw new Error(error.message);
-		}
-
-		const { error: productStorageError } = await supabase.storage.from('products').remove([`${id}`]);
-
-		if (productStorageError) {
-			throw new Error(productStorageError.message);
-		}
-
-		const { error: technicalSheetStorageError } = await supabase.storage.from('technical-sheets').remove([`${id}`]);
-
-		if (technicalSheetStorageError) {
-			throw new Error(technicalSheetStorageError.message);
-		}
-
-		return NextResponse.json({ data }, { status: 200 });
+		return NextResponse.json({ data: product }, { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ error }, { status: 500 });
 	}

@@ -2,7 +2,7 @@ import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
 import { checkAuth } from '@/lib/utils/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
-// Get a specific education by id
+// Get a specific education video by id
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
 	await checkAuth();
 
