@@ -348,9 +348,7 @@ export default function Page() {
 
 			<div className='py-4'>
 				<Form {...form}>
-					<FormContainer
-						dict={dict}
-						onSubmit={form.handleSubmit(onSubmit, (errors) => {
+					<form onSubmit={form.handleSubmit(onSubmit, (errors) => {
 							// Get the first error field
 							const firstError = Object.keys(errors)[0];
 							if (firstError) {
@@ -363,8 +361,7 @@ export default function Page() {
 									errorInput.focus();
 								}
 							}
-						})}
-					>
+						})} className='space-y-8'>
 						<FormField
 							control={form.control}
 							name='name'
@@ -1706,7 +1703,7 @@ export default function Page() {
 								</FormItem>
 							)}
 						/>
-					</FormContainer>
+					</form>
 				</Form>
 			</div>
 		</div>

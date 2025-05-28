@@ -34,11 +34,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 			if (!error) {
 				setProduct(data);
 			} else {
-				toast({
-					title: dict.product.seamstresses.seamstressRemoved,
-					description: dict.product.seamstresses.seamstressRemovedDescription,
-					variant: 'destructive',
-				});	
+				// toast({
+				// 	title: dict.adminsSection.products.seamstress.seamstressRemoved,
+				// 	description: dict.adminsSection.products.seamstresses.seamstressRemovedDescription,
+				// 	variant: 'destructive',
+				// });	
 			}
 
 			setLoading(false);
@@ -58,15 +58,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 					<ProductsImages dict={dict} product={product} />
 				</div>				
 				<div className='w-full'>
-					<H4 className='mb-4'>{dict.product.assignedSeamstresses}</H4>
+					<H4 className='mb-4'>{dict.adminsSection.products.product.assignedSeamstresses}</H4>
 					<ProductsSeamstresses dict={dict} product={product} />
 				</div>
 				<div className='w-full'>
-					<H4 className='mb-4'>{dict.product.productDetails}</H4>
+					<H4 className='mb-4'>{dict.adminsSection.products.product.productDetails}</H4>
 					<ProductsDetails dict={dict} product={product} />
 				</div>
 				<div className='w-full'>
-					<H4 className='mb-4'>{dict.product.progressUpdates}</H4>
+					<H4 className='mb-4'>{dict.adminsSection.products.product.progressUpdates}</H4>
 					<ProductsProgress dict={dict} product={product} />
 				</div>
 			</div>

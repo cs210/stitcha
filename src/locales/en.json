@@ -11,82 +11,85 @@
 		},
 		"products": {
 			"title": "Products",
-			"description": "View and manage all products",			
+			"description": "View and manage all products",
 			"table": {
 				"search": "Search products by name, type, or system code...",
 				"image": "Image",
 				"name": "Name",
 				"type": "Type",
+				"progressLevel": "Progress Level",
 				"systemCode": "System Code"
-			}
-		},
-		"product": {
-			"assignedSeamstresses": "Assigned Seamstresses",
-			"productDetails": "Product Details",
-			"progressUpdates": "Progress Updates",
-			"systemCode": "System Code",
-			"validated": "Validated",
-			"unitsAssigned": "Units Assigned",
-			"unitsCompleted": "Units Completed",
-			"details": {
-				"description": "Description",
-				"importantInformation": "Important Information",
-				"dimensions": "Dimensions",
-				"packagingMaterials": "Packaging Materials",
-				"rawMaterials": "Raw Materials",
-				"technicalSheet": "Technical Sheet",
+			},
+			"product": {
+				"assignedSeamstresses": "Assigned Seamstresses",
+				"productDetails": "Product Details",
+				"progressUpdates": "Progress Updates",
 				"systemCode": "System Code",
-				"inmetroCertNumber": "Inmetro Cert Number",
-				"barcode": "Barcode",
-				"width": "Width",
-				"height": "Height",
-				"weight": "Weight"
-			},
-			"images": {
-				"productImage": "Product Image",
-				"noImagesAvailable": "No images available"
-			},
-			"progress": {
-				"noProgressUpdatesYet": "No progress updates yet"
-			},
-			"seamstresses": {
-				"noSeamstressesAssigned": "No seamstresses assigned",
-				"assignSeamstressForm": {
-					"title": "Assign Seamstress",
-					"seamstress": {
-						"label": "Seamstress",
-						"placeholder": "Select a seamstress"
-					},
-					"units": {
-						"label": "Units"
-					},
-					"description": {
-						"label": "Description",
-						"placeholder": "Enter the description"
-					}				
+				"validated": "Validated",
+				"unitsAssigned": "Units Assigned",
+				"unitsCompleted": "Units Completed",
+				"images": {
+					"productImage": "Product Image",
+					"noImagesAvailable": "No images available"
 				},
-				"sendWhatsappMessage": {
-					"title": "Send WhatsApp Message",
-					"seamstress": {
-						"label": "Seamstress",
-						"placeholder": "Select a seamstress"
+				"seamstresses": {
+					"noSeamstressesAssigned": "No seamstresses assigned",
+					"assignSeamstressForm": {
+						"title": "Assign Seamstress",
+						"seamstress": {
+							"label": "Seamstress",
+							"placeholder": "Select a seamstress"
+						},
+						"units": {
+							"label": "Units"
+						},
+						"description": {
+							"label": "Description",
+							"placeholder": "Enter the description"
+						}
 					},
-					"message": {
-						"label": "Message",
-						"placeholder": "Enter the message"
+					"sendWhatsappMessage": {
+						"title": "Send WhatsApp Message",
+						"seamstress": {
+							"label": "Seamstress",
+							"placeholder": "Select a seamstress"
+						},
+						"message": {
+							"label": "Message",
+							"placeholder": "Enter the message"
+						}
 					}
+				},
+				"details": {
+					"description": "Description",
+					"importantInformation": "Important Information",
+					"dimensions": "Dimensions",
+					"packagingMaterials": "Packaging Materials",
+					"rawMaterials": "Raw Materials",
+					"technicalSheet": "Technical Sheet",
+					"systemCode": "System Code",
+					"inmetroCertNumber": "Inmetro Cert Number",
+					"barcode": "Barcode",
+					"width": "Width",
+					"height": "Height",
+					"weight": "Weight"
+				},
+				"progress": {
+					"noProgressUpdatesYet": "No progress updates yet"
 				}
 			}
 		},
 		"seamstresses": {
 			"title": "Seamstresses",
 			"description": "View and manage all seamstresses",
-			"products": "Products",
-			"overallProgress": "Overall Progress",
-			"assignedProducts": "Assigned Products",
-			"productCard": {
-				"progressUpdates": "Progress Updates",
-				"noProgressUpdates": "No progress updates yet"
+			"seamstress": {
+				"products": "Products",
+				"overallProgress": "Overall Progress",
+				"assignedProducts": "Assigned Products",
+				"productCard": {
+					"progressUpdates": "Progress Updates",
+					"noProgressUpdates": "No progress updates yet"
+				}
 			}
 		},
 		"wellness": {

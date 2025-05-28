@@ -187,7 +187,66 @@
         "image": "Imagem",
         "name": "Nome",
         "type": "Tipo",
-        "systemCode": "Código do Sistema"
+        "systemCode": "Código do Sistema",
+        "progressLevel": "Nível de Progresso"
+      },
+      "product": {
+        "assignedSeamstresses": "Costureiras Designadas",
+        "productDetails": "Detalhes do Produto",
+        "progressUpdates": "Atualizações de Progresso",
+        "systemCode": "Código do Sistema",
+        "validated": "Validado",
+        "unitsAssigned": "Unidades Designadas",
+        "unitsCompleted": "Unidades Concluídas",
+        "images": {
+          "productImage": "Imagem do Produto",
+          "noImagesAvailable": "Nenhuma imagem disponível"
+        },
+        "seamstresses": {
+          "noSeamstressesAssigned": "Nenhuma costureira designada",
+          "assignSeamstressForm": {
+            "title": "Designar Costureira",
+            "seamstress": {
+              "label": "Costureira",
+              "placeholder": "Selecione uma costureira"
+            },
+            "units": {
+              "label": "Unidades"
+            },
+            "description": {
+              "label": "Descrição",
+              "placeholder": "Digite a descrição"
+            }
+          },
+          "sendWhatsappMessage": {
+            "title": "Enviar Mensagem pelo WhatsApp",
+            "seamstress": {
+              "label": "Costureira",
+              "placeholder": "Selecione uma costureira"
+            },
+            "message": {
+              "label": "Mensagem",
+              "placeholder": "Digite a mensagem"
+            }
+          }
+        },
+        "details": {
+          "description": "Descrição",
+          "importantInformation": "Informações Importantes",
+          "dimensions": "Dimensões",
+          "packagingMaterials": "Materiais de Embalagem",
+          "rawMaterials": "Matérias-Primas",
+          "technicalSheet": "Ficha Técnica",
+          "systemCode": "Código do Sistema",
+          "inmetroCertNumber": "Número do Certificado Inmetro",
+          "barcode": "Código de Barras",
+          "width": "Largura",
+          "height": "Altura",
+          "weight": "Peso"
+        },
+        "progress": {
+          "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda"
+        }
       }
     },
     "product": {
@@ -257,6 +316,15 @@
       "productCard": {
         "progressUpdates": "Atualizações de Progresso",
         "noProgressUpdates": "Nenhuma atualização de progresso ainda"
+      },
+      "seamstress": {
+        "products": "Produtos",
+        "overallProgress": "Progresso Geral",
+        "assignedProducts": "Produtos Designados",
+        "productCard": {
+          "progressUpdates": "Atualizações de Progresso",
+          "noProgressUpdates": "Nenhuma atualização de progresso ainda"
+        }
       }
     },
     "wellness": {

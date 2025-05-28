@@ -144,7 +144,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 			<div className='flex flex-row gap-2'>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button className='mb-4'>{dict.adminsSection.product.seamstresses.assignSeamstressForm.title}</Button>
+						<Button className='mb-4'>{dict.adminsSection.products.product.seamstresses.assignSeamstressForm.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<Form {...assignSeamstressForm}>
@@ -154,11 +154,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.seamstress.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.assignSeamstressForm.seamstress.label}</FormLabel>
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder={dict.adminsSection.product.seamstresses.assignSeamstressForm.seamstress.placeholder} />
+														<SelectValue placeholder={dict.adminsSection.products.product.seamstresses.assignSeamstressForm.seamstress.placeholder} />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -188,7 +188,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='units'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
 											<FormControl>
 												<Input type='number' min={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 											</FormControl>
@@ -201,22 +201,22 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='description'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.description.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.assignSeamstressForm.description.label}</FormLabel>
 											<FormControl>
-												<Input {...field} placeholder={dict.adminsSection.product.seamstresses.assignSeamstressForm.description.placeholder} />
+												<Input {...field} placeholder={dict.adminsSection.products.product.seamstresses.assignSeamstressForm.description.placeholder} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type='submit'>{dict.adminsSection.product.seamstresses.assignSeamstressForm.submit}</Button>
+								<Button type='submit'>{dict.general.form.submit}</Button>
 							</form>
 						</Form>
 					</PopoverContent>
 				</Popover>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button className='mb-4'>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.title}</Button>
+						<Button className='mb-4'>{dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<Form {...sendWhatsappMessageForm}>
@@ -226,11 +226,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.seamstress.label}</FormLabel>
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder={dict.adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.placeholder} />
+														<SelectValue placeholder={dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.seamstress.placeholder} />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -260,15 +260,15 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='message'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.message.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.message.label}</FormLabel>
 											<FormControl>
-												<Input {...field} placeholder={dict.adminsSection.product.seamstresses.sendWhatsappMessage.message.placeholder} />
+												<Input {...field} placeholder={dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.message.placeholder} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type='submit'>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.send}</Button>
+								<Button type='submit'>{dict.general.form.submit}</Button>
 							</form>
 						</Form>
 					</PopoverContent>
@@ -310,7 +310,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 					</div>
 				</ScrollArea>
 			) : (
-				<P>{dict.adminsSection.product.seamstresses.noSeamstressesAssigned}</P>
+				<P>{dict.adminsSection.products.product.seamstresses.noSeamstressesAssigned}</P>
 			)}
 		</>
 	);

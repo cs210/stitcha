@@ -12,48 +12,49 @@ files:
     adminsSection.products.table.image: be53a0541a6d36f6ecb879fa2c584b08
     adminsSection.products.table.name: 49ee3087348e8d44e1feda1917443987
     adminsSection.products.table.type: a1fa27779242b4902f7ae3bdd5c6d508
+    adminsSection.products.table.progressLevel: a2d56a5b73c510ce56b99c2c671175c3
     adminsSection.products.table.systemCode: 5e860fbc0633d2694a94a521d623fef8
-    adminsSection.product.assignedSeamstresses: 2937bcfbabdcfd36154ae59ba924c0ce
-    adminsSection.product.productDetails: b8900d8adf598b6653bb8c071bc49a1d
-    adminsSection.product.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
-    adminsSection.product.systemCode: 5e860fbc0633d2694a94a521d623fef8
-    adminsSection.product.validated: 5364259abab90e94890f2ed2481b9824
-    adminsSection.product.unitsAssigned: 00c256c88a101bc01e9676d149c605a5
-    adminsSection.product.unitsCompleted: 6568b4e6a853aa2683789a272f4e948a
-    adminsSection.product.details.description: b5a7adde1af5c87d7fd797b6245c2a39
-    adminsSection.product.details.importantInformation: e89802a186e0e9ab926718844e2495a8
-    adminsSection.product.details.dimensions: f4843c1c797abf1a256c8802b6cd9f51
-    adminsSection.product.details.packagingMaterials: 6ba3774c150562892ebdf26b4df263f3
-    adminsSection.product.details.rawMaterials: 84a63dd706b562a4a7d4101b7309e8bb
-    adminsSection.product.details.technicalSheet: 1fd598f44c8f21357f24b6b93c9000ef
-    adminsSection.product.details.systemCode: 5e860fbc0633d2694a94a521d623fef8
-    adminsSection.product.details.inmetroCertNumber: 70c1f7d0995d297fbcb6ccca42d5a520
-    adminsSection.product.details.barcode: b93eaef026c32ad9b73e53ba24a5875e
-    adminsSection.product.details.width: 32954654ac8fe66a1d09be19001de2d4
-    adminsSection.product.details.height: eec6c4bdbd339edf8cbea68becb85244
-    adminsSection.product.details.weight: 8c489d0946f66d17d73f26366a4bf620
-    adminsSection.product.images.productImage: 3c38027cd61ce6345509574bc269f54c
-    adminsSection.product.images.noImagesAvailable: 0db5b7f91d78cab06983ce9f5446baba
-    adminsSection.product.progress.noProgressUpdatesYet: d92986bc3aa97a52c8f36566e4e4268a
-    adminsSection.product.seamstresses.noSeamstressesAssigned: 798fd554cecaa96aa4c3ff3ea37354d1
-    adminsSection.product.seamstresses.assignSeamstressForm.title: 097e0c8fe6e69553b90c6101139a09c8
-    adminsSection.product.seamstresses.assignSeamstressForm.seamstress.label: eff328e6d76c7741ea2a4d3fe183b1e7
-    adminsSection.product.seamstresses.assignSeamstressForm.seamstress.placeholder: 6d51f7902743be8c34aa68e8d2bc4aa6
-    adminsSection.product.seamstresses.assignSeamstressForm.units.label: e5771a362d88a71a657bfcd21ca54b3f
-    adminsSection.product.seamstresses.assignSeamstressForm.description.label: b5a7adde1af5c87d7fd797b6245c2a39
-    adminsSection.product.seamstresses.assignSeamstressForm.description.placeholder: c95b359ee1aeee5b8f3b7a912a1175f7
-    adminsSection.product.seamstresses.sendWhatsappMessage.title: 88c0352defd5a0598f3fdd650d8a309f
-    adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.label: eff328e6d76c7741ea2a4d3fe183b1e7
-    adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.placeholder: 6d51f7902743be8c34aa68e8d2bc4aa6
-    adminsSection.product.seamstresses.sendWhatsappMessage.message.label: 4c2a8fe7eaf24721cc7a9f0175115bd4
-    adminsSection.product.seamstresses.sendWhatsappMessage.message.placeholder: 3eb7539aabd8bbf023cc6a537bb7d154
+    adminsSection.products.product.assignedSeamstresses: 2937bcfbabdcfd36154ae59ba924c0ce
+    adminsSection.products.product.productDetails: b8900d8adf598b6653bb8c071bc49a1d
+    adminsSection.products.product.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
+    adminsSection.products.product.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    adminsSection.products.product.validated: 5364259abab90e94890f2ed2481b9824
+    adminsSection.products.product.unitsAssigned: 00c256c88a101bc01e9676d149c605a5
+    adminsSection.products.product.unitsCompleted: 6568b4e6a853aa2683789a272f4e948a
+    adminsSection.products.product.images.productImage: 3c38027cd61ce6345509574bc269f54c
+    adminsSection.products.product.images.noImagesAvailable: 0db5b7f91d78cab06983ce9f5446baba
+    adminsSection.products.product.seamstresses.noSeamstressesAssigned: 798fd554cecaa96aa4c3ff3ea37354d1
+    adminsSection.products.product.seamstresses.assignSeamstressForm.title: 097e0c8fe6e69553b90c6101139a09c8
+    adminsSection.products.product.seamstresses.assignSeamstressForm.seamstress.label: eff328e6d76c7741ea2a4d3fe183b1e7
+    adminsSection.products.product.seamstresses.assignSeamstressForm.seamstress.placeholder: 6d51f7902743be8c34aa68e8d2bc4aa6
+    adminsSection.products.product.seamstresses.assignSeamstressForm.units.label: e5771a362d88a71a657bfcd21ca54b3f
+    adminsSection.products.product.seamstresses.assignSeamstressForm.description.label: b5a7adde1af5c87d7fd797b6245c2a39
+    adminsSection.products.product.seamstresses.assignSeamstressForm.description.placeholder: c95b359ee1aeee5b8f3b7a912a1175f7
+    adminsSection.products.product.seamstresses.sendWhatsappMessage.title: 88c0352defd5a0598f3fdd650d8a309f
+    adminsSection.products.product.seamstresses.sendWhatsappMessage.seamstress.label: eff328e6d76c7741ea2a4d3fe183b1e7
+    adminsSection.products.product.seamstresses.sendWhatsappMessage.seamstress.placeholder: 6d51f7902743be8c34aa68e8d2bc4aa6
+    adminsSection.products.product.seamstresses.sendWhatsappMessage.message.label: 4c2a8fe7eaf24721cc7a9f0175115bd4
+    adminsSection.products.product.seamstresses.sendWhatsappMessage.message.placeholder: 3eb7539aabd8bbf023cc6a537bb7d154
+    adminsSection.products.product.details.description: b5a7adde1af5c87d7fd797b6245c2a39
+    adminsSection.products.product.details.importantInformation: e89802a186e0e9ab926718844e2495a8
+    adminsSection.products.product.details.dimensions: f4843c1c797abf1a256c8802b6cd9f51
+    adminsSection.products.product.details.packagingMaterials: 6ba3774c150562892ebdf26b4df263f3
+    adminsSection.products.product.details.rawMaterials: 84a63dd706b562a4a7d4101b7309e8bb
+    adminsSection.products.product.details.technicalSheet: 1fd598f44c8f21357f24b6b93c9000ef
+    adminsSection.products.product.details.systemCode: 5e860fbc0633d2694a94a521d623fef8
+    adminsSection.products.product.details.inmetroCertNumber: 70c1f7d0995d297fbcb6ccca42d5a520
+    adminsSection.products.product.details.barcode: b93eaef026c32ad9b73e53ba24a5875e
+    adminsSection.products.product.details.width: 32954654ac8fe66a1d09be19001de2d4
+    adminsSection.products.product.details.height: eec6c4bdbd339edf8cbea68becb85244
+    adminsSection.products.product.details.weight: 8c489d0946f66d17d73f26366a4bf620
+    adminsSection.products.product.progress.noProgressUpdatesYet: d92986bc3aa97a52c8f36566e4e4268a
     adminsSection.seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     adminsSection.seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
-    adminsSection.seamstresses.products: 068f80c7519d0528fb08e82137a72131
-    adminsSection.seamstresses.overallProgress: e9d52e029c46fd088e81503b4d0cc142
-    adminsSection.seamstresses.assignedProducts: bdcd42605de0e27f3328921e68afb228
-    adminsSection.seamstresses.productCard.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
-    adminsSection.seamstresses.productCard.noProgressUpdates: d92986bc3aa97a52c8f36566e4e4268a
+    adminsSection.seamstresses.seamstress.products: 068f80c7519d0528fb08e82137a72131
+    adminsSection.seamstresses.seamstress.overallProgress: e9d52e029c46fd088e81503b4d0cc142
+    adminsSection.seamstresses.seamstress.assignedProducts: bdcd42605de0e27f3328921e68afb228
+    adminsSection.seamstresses.seamstress.productCard.progressUpdates: 5aab079a0cecc77f083533c5339ce55e
+    adminsSection.seamstresses.seamstress.productCard.noProgressUpdates: d92986bc3aa97a52c8f36566e4e4268a
     adminsSection.wellness.title: 32a07c6643e39bb3fe494292db9ae233
     adminsSection.wellness.description: 64557e78e30093b081efd0b6187965e6
     adminsSection.settings.title: f4f70727dc34561dfde1a3c529b6205c

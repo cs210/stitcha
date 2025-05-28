@@ -12,13 +12,13 @@ export function ProductsImages({ dict, product }: { dict: any, product: Product 
 					product.image_urls.map((imageUrl: string, index: number) => (
 						<CarouselItem key={index}>
 							<div className="w-full h-full flex items-center justify-center">
-								<Image src={imageUrl} alt={`${dict.adminsSection.product.images.productImage} ${index + 1}`} className="w-96 h-96 object-contain" width={96} height={96} />
+								<Image src={imageUrl} alt={`${dict.adminsSection.products.product.images.productImage} ${index + 1}`} className="w-96 h-96 object-contain" width={96} height={96} />
 							</div>
 						</CarouselItem>
 					))
 				) : (
 					<CarouselItem>
-						<P>{dict.adminsSection.product.images.noImagesAvailable}</P>
+						<P>{dict.adminsSection.products.product.images.noImagesAvailable}</P>
 					</CarouselItem>
 				)}
 			</CarouselContent>
