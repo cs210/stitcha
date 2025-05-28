@@ -5,6 +5,7 @@ import { HeaderContainer } from '@/components/custom/containers/header-container
 import { LoaderContainer } from '@/components/custom/containers/loader-container';
 import { Loader } from '@/components/custom/loader/loader';
 import { H2 } from '@/components/custom/text/headings';
+import { RequiredAsterisk } from '@/components/custom/text/required-asterisk';
 import { P } from '@/components/custom/text/text';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,7 @@ const progressFormSchema = z.object({
 });
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
-	const { id: seamstressId } = use(params);	
+	const { id: seamstressId } = use(params);
 	const { lang, setLang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -66,11 +67,11 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				setProducts(result.data);
 				setLoading(false);
 			} catch (error) {
-				toast({
-					title: dict.products.notifcations.error,
-					description: dict.products.notifcations.errorDescription,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.products.notifcations.error,
+				// 	description: dict.products.notifcations.errorDescription,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, [lang]);
@@ -82,7 +83,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
 			// Add image files if they exist
 			if (values.image_urls) {
-				values.image_urls.forEach((file, index) => {
+				values.image_urls.forEach((file) => {
 					formData.append(`image_urls`, file);
 				});
 			}
@@ -102,16 +103,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 				throw new Error(result.error);
 			}
 
-			toast({
-				title: dict.progress.notifications.progressUploaded.success.title,
-				description: dict.progress.notifications.progressUploaded.success.description,
-			});
+			// toast({
+			// 	title: dict.progress.notifications.progressUploaded.success.title,
+			// 	description: dict.progress.notifications.progressUploaded.success.description,
+			// });
 		} catch (error) {
-			toast({
-				title: dict.progress.notifications.progressUploaded.error.title,
-				description: dict.progress.notifications.progressUploaded.error.description,
-				variant: 'destructive',
-			});
+			// toast({
+			// 	title: dict.progress.notifications.progressUploaded.error.title,
+			// 	description: dict.progress.notifications.progressUploaded.error.description,
+			// 	variant: 'destructive',
+			// });
 		}
 	};
 
@@ -124,10 +125,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 	}
 
 	return (
-		<div className='max-w-2xl p-8 mx-auto'>
+		<>
 			<HeaderContainer>
-				<H2>{dict.progress.title}</H2>
-				<P className='mt-2'>{dict.progress.description}</P>
+				<H2>{dict.seamstressesSection.progress.title}</H2>
+				<P className='mt-2'>{dict.seamstressesSection.progress.description}</P>
 			</HeaderContainer>
 
 			<Container>
@@ -139,7 +140,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							render={({ field: { value, onChange, ...fieldProps } }) => (
 								<FormItem>
 									<FormLabel>
-										Progress Images <span className='text-red-500'>*</span>
+										{dict.seamstressesSection.progress.form.imageUrls.label} <RequiredAsterisk />
 									</FormLabel>
 									<FormControl>
 										<div>
@@ -156,15 +157,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 															fileInput.multiple = true;
 															fileInput.onchange = (e) => {
 																const newFiles = Array.from((e.target as HTMLInputElement).files || []);
+
 																onChange([...(value || []), ...newFiles]);
 															};
 															fileInput.click();
 														}}
 													>
-														Choose Files
+														{dict.general.form.imagePicker.chooseImages}
 													</Button>
 													<span className='text-sm text-muted-foreground'>
-														{value && value.length > 0 ? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected` : 'No file chosen'}
+														{value && value.length > 0 ? `${value.length} ${value.length === 1 ? dict.general.form.imagePicker.image : dict.general.form.imagePicker.images} ${dict.general.form.imagePicker.selected}` : `${dict.general.form.imagePicker.noImagesSelected}`}
 													</span>
 												</div>
 												<input
@@ -175,6 +177,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 													key={value?.length}
 													onChange={(e) => {
 														const newFiles = Array.from(e.target.files || []);
+
 														onChange([...(value || []), ...newFiles]);
 													}}
 													className='hidden'
@@ -190,22 +193,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 															size='sm'
 															onClick={() => {
 																const newFiles = value.filter((_: File, i: number) => i !== index);
+
 																onChange(newFiles);
-																// Reset the file input
+
 																const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+
 																if (fileInput) {
 																	fileInput.value = '';
 																}
 															}}
 														>
-															Remove
+															{dict.general.form.imagePicker.remove}
 														</Button>
 													</div>
 												))}
 											</div>
 										</div>
 									</FormControl>
-									<FormDescription>You can select multiple images</FormDescription>
+									<FormDescription>{dict.seamstressesSection.progress.form.imageUrls.description}</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -216,12 +221,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
-										{dict.progress.form.product.label} <span className='text-red-500'>*</span>
+										{dict.seamstressesSection.progress.form.product.label} <RequiredAsterisk />
 									</FormLabel>
 									<Select onValueChange={field.onChange} defaultValue={field.value}>
 										<FormControl>
 											<SelectTrigger>
-												<SelectValue placeholder={dict.progress.form.product.placeholder} />
+												<SelectValue placeholder={dict.seamstressesSection.progress.form.product.placeholder} />
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
@@ -238,7 +243,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 											))}
 										</SelectContent>
 									</Select>
-									<FormDescription>Select the product that you are working on</FormDescription>
+									<FormDescription>{dict.seamstressesSection.progress.form.product.description}</FormDescription>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -248,12 +253,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							name='description'
 							render={({ field }) => (
 								<FormItem>
-									<FormLabel>{dict.progress.form.description.label}</FormLabel>
+									<FormLabel>{dict.seamstressesSection.progress.form.description.label}</FormLabel>
 									<FormControl>
-										<Input {...field} placeholder={dict.progress.form.description.placeholder} />
+										<Input {...field} placeholder={dict.seamstressesSection.progress.form.description.placeholder} />
 									</FormControl>
 									<FormMessage />
-									<FormDescription>Describe the progress of the product</FormDescription>
+									<FormDescription>{dict.seamstressesSection.progress.form.description.description}</FormDescription>
 								</FormItem>
 							)}
 						/>
@@ -263,13 +268,13 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
-										{dict.progress.form.emotion.label} <span className='text-red-500'>*</span>
+										{dict.seamstressesSection.progress.form.emotion.label} <RequiredAsterisk />
 									</FormLabel>
 									<FormControl>
-										<Input {...field} placeholder={dict.progress.form.emotion.placeholder} />
+										<Input {...field} placeholder={dict.seamstressesSection.progress.form.emotion.placeholder} />
 									</FormControl>
 									<FormMessage />
-									<FormDescription>Select how you were feeling while working on the product</FormDescription>
+									<FormDescription>{dict.seamstressesSection.progress.form.emotion.description}</FormDescription>
 								</FormItem>
 							)}
 						/>
@@ -279,21 +284,21 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>
-										{dict.progress.form.units_completed.label} <span className='text-red-500'>*</span>
+										{dict.seamstressesSection.progress.form.unitsCompleted.label} <RequiredAsterisk />
 									</FormLabel>
 									<FormControl>
 										<Input type='number' min={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 									</FormControl>
 									<FormMessage />
-									<FormDescription>Enter the number of units completed</FormDescription>
+									<FormDescription>{dict.seamstressesSection.progress.form.unitsCompleted.description}</FormDescription>
 								</FormItem>
 							)}
 						/>
 
-						<Button type='submit'>{dict.progress.form.submit}</Button>
+						<Button type='submit'>{dict.general.form.submit}</Button>
 					</form>
 				</Form>
 			</Container>
-		</div>
+		</>
 	);
 }

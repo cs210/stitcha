@@ -61,11 +61,11 @@ export function KanbanBoard({ dict }: { dict: any }) {
 
 				setProducts(organized);
 			} catch (error) {
-				toast({
-					title: dict.kanban.notifications.productsLoading.error.title,
-					description: dict.settings.notifications.productsLoading.error.description,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.kanban.notifications.productsLoading.error.title,
+				// 	description: dict.settings.notifications.productsLoading.error.description,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, []);
@@ -117,16 +117,16 @@ export function KanbanBoard({ dict }: { dict: any }) {
 					throw new Error('Failed to update product status');
 				}
 
-				toast({
-					title: dict.kanban.notifications.productStatusUpdated.success.title,
-					description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
-				});
+				// toast({
+				// 	title: dict.kanban.notifications.productStatusUpdated.success.title,
+				// 	description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
+				// });
 			} catch (error) {
-				toast({
-					title: dict.kanban.notifications.productStatusUpdated.error.title,
-					description: dict.kanban.notifications.productStatusUpdated.error.description,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.kanban.notifications.productStatusUpdated.error.title,
+				// 	description: dict.kanban.notifications.productStatusUpdated.error.description,
+				// 	variant: 'destructive',
+				// });
 			}
 		}
 	};
@@ -149,16 +149,16 @@ export function KanbanBoard({ dict }: { dict: any }) {
 
 			setProducts(newProducts);
 
-			toast({
-				title: dict.kanban.notifications.productDeleted.success.title,
-				description: dict.kanban.notifications.productDeleted.success.description,
-			});
+			// toast({
+			// 	title: dict.kanban.notifications.productDeleted.success.title,
+			// 	description: dict.kanban.notifications.productDeleted.success.description,
+			// });
 		} catch (error) {			
-			toast({
-				title: dict.kanban.notifications.productDeleted.error.title,
-				description: dict.kanban.notifications.productDeleted.error.description,
-				variant: 'destructive',
-			});
+			// toast({
+			// 	title: dict.kanban.notifications.productDeleted.error.title,
+			// 	description: dict.kanban.notifications.productDeleted.error.description,
+			// 	variant: 'destructive',
+			// });
 		}
 	};
 
@@ -167,17 +167,17 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-4 h-full'>
-						<KanbanColumn id='notStarted' title={dict.kanban.columns.notStarted} badgeColor='bg-red-500' products={products.notStarted} onDelete={onDelete} />
+						<KanbanColumn id='notStarted' title={dict.adminsSection.kanban.columns.notStarted} badgeColor='bg-red-500' products={products.notStarted} onDelete={onDelete} />
 						<KanbanColumn
 							id='inProgress'
-							title={dict.kanban.columns.inProgress}
+							title={dict.adminsSection.kanban.columns.inProgress}
 							badgeColor='bg-yellow-400'
 							products={products.inProgress}
 							onDelete={onDelete}
 						/>
 						<KanbanColumn
 							id='done'
-							title={dict.kanban.columns.done}
+							title={dict.adminsSection.kanban.columns.done}
 							badgeColor='bg-green-500'
 							products={products.done}
 							onDelete={onDelete}

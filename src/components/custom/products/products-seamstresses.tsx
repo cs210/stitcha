@@ -66,11 +66,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 
 				setAssignedSeamstresses(product.users);
 			} catch (error) {
-				toast({
-					title: dict.product.notifications.seamstressesLoading.error.title,
-					description: dict.product.notifications.seamstressesLoading.error.description,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.adminsSection.product.notifications.seamstressesLoading.error.title,
+				// 	description: dict.adminsSection.product.notifications.seamstressesLoading.error.description,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, []);
@@ -96,18 +96,18 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 
 			setAssignedSeamstresses(data);
 
-			toast({
-				title: dict.product.seamstresses.seamstressAssigned,
-				description: dict.product.seamstresses.seamstressAssignedDescription,
-			});
+			// toast({
+			// 	title: dict.adminsSection.product.seamstresses.seamstressAssigned,
+			// 	description: dict.adminsSection.product.seamstresses.seamstressAssignedDescription,
+			// });
 
 			assignSeamstressForm.reset();
 		} catch (error) {
-			toast({
-				title: dict.product.seamstresses.seamstressAssigned.error.title,
-				description: dict.product.seamstresses.seamstressAssigned.error.description,
-				variant: 'destructive',
-			});
+			// toast({
+			// 	title: dict.adminsSection.product.seamstresses.seamstressAssigned.error.title,
+			// 	description: dict.adminsSection.product.seamstresses.seamstressAssigned.error.description,
+			// 	variant: 'destructive',
+			// });
 		}
 	}
 
@@ -121,21 +121,21 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 			const data = await response.json();
 			
 			if (data.success) {
-				toast({
-					title: dict.product.seamstresses.sendWhatsappMessage.notifications.success.title,
-					description: dict.product.seamstresses.sendWhatsappMessage.notifications.success.description,
-				});
+				// toast({
+				// 	title: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.success.title,
+				// 	description: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.success.description,
+				// });
 			} else {
 				throw new Error(data.error);
 			}
 
 			sendWhatsappMessageForm.reset();
 		} catch (error) {
-			toast({
-				title: dict.product.seamstresses.sendWhatsappMessage.notifications.error.title,
-				description: dict.product.seamstresses.sendWhatsappMessage.notifications.error.description,
-				variant: 'destructive'
-			});
+			// toast({
+			// 	title: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.error.title,
+			// 	description: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.error.description,
+			// 	variant: 'destructive'
+			// });
 		}
 	};
 
@@ -144,7 +144,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 			<div className='flex flex-row gap-2'>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button className='mb-4'>{dict.product.seamstresses.assignSeamstressForm.title}</Button>
+						<Button className='mb-4'>{dict.adminsSection.product.seamstresses.assignSeamstressForm.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<Form {...assignSeamstressForm}>
@@ -154,11 +154,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.seamstress.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.seamstress.label}</FormLabel>
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder={dict.product.seamstresses.assignSeamstressForm.seamstress.placeholder} />
+														<SelectValue placeholder={dict.adminsSection.product.seamstresses.assignSeamstressForm.seamstress.placeholder} />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -188,7 +188,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='units'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.units.label}</FormLabel>
 											<FormControl>
 												<Input type='number' min={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
 											</FormControl>
@@ -201,22 +201,22 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='description'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.product.seamstresses.assignSeamstressForm.description.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.product.seamstresses.assignSeamstressForm.description.label}</FormLabel>
 											<FormControl>
-												<Input {...field} placeholder={dict.product.seamstresses.assignSeamstressForm.description.placeholder} />
+												<Input {...field} placeholder={dict.adminsSection.product.seamstresses.assignSeamstressForm.description.placeholder} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type='submit'>{dict.product.seamstresses.assignSeamstressForm.submit}</Button>
+								<Button type='submit'>{dict.adminsSection.product.seamstresses.assignSeamstressForm.submit}</Button>
 							</form>
 						</Form>
 					</PopoverContent>
 				</Popover>
 				<Popover>
 					<PopoverTrigger asChild>
-						<Button className='mb-4'>{dict.product.seamstresses.sendWhatsappMessage.title}</Button>
+						<Button className='mb-4'>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.title}</Button>
 					</PopoverTrigger>
 					<PopoverContent>
 						<Form {...sendWhatsappMessageForm}>
@@ -226,11 +226,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='seamstress'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.product.seamstresses.sendWhatsappMessage.seamstress.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.label}</FormLabel>
 											<Select onValueChange={field.onChange} defaultValue={field.value}>
 												<FormControl>
 													<SelectTrigger>
-														<SelectValue placeholder={dict.product.seamstresses.sendWhatsappMessage.seamstress.placeholder} />
+														<SelectValue placeholder={dict.adminsSection.product.seamstresses.sendWhatsappMessage.seamstress.placeholder} />
 													</SelectTrigger>
 												</FormControl>
 												<SelectContent>
@@ -260,15 +260,15 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									name='message'
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel>{dict.product.seamstresses.sendWhatsappMessage.message.label}</FormLabel>
+											<FormLabel>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.message.label}</FormLabel>
 											<FormControl>
-												<Input {...field} placeholder={dict.product.seamstresses.sendWhatsappMessage.message.placeholder} />
+												<Input {...field} placeholder={dict.adminsSection.product.seamstresses.sendWhatsappMessage.message.placeholder} />
 											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
 								/>
-								<Button type='submit'>{dict.product.seamstresses.sendWhatsappMessage.send}</Button>
+								<Button type='submit'>{dict.adminsSection.product.seamstresses.sendWhatsappMessage.send}</Button>
 							</form>
 						</Form>
 					</PopoverContent>
@@ -295,11 +295,11 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 									<Button size='icon' variant='ghost' onClick={() => {
 										removeSeamstressFromProduct(product, seamstress.id, setAssignedSeamstresses);
 
-										toast({
-											title: dict.product.seamstresses.seamstressRemoved,
-											description: dict.product.seamstresses.seamstressRemovedDescription,
-											variant: 'destructive',
-										});
+										// toast({
+										// 	title: dict.adminsSection.product.seamstresses.seamstressRemoved,
+										// 	description: dict.adminsSection.product.seamstresses.seamstressRemovedDescription,
+										// 	variant: 'destructive',
+										// });
 									}}>
 										<X className='w-4 h-4 cursor-pointer' />
 									</Button>
@@ -310,7 +310,7 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 					</div>
 				</ScrollArea>
 			) : (
-				<P>{dict.product.seamstresses.noSeamstressesAssigned}</P>
+				<P>{dict.adminsSection.product.seamstresses.noSeamstressesAssigned}</P>
 			)}
 		</>
 	);

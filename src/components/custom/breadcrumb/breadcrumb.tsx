@@ -8,7 +8,7 @@ export function Breadcrumb({ dict, segments }: { dict: any, segments: string[] }
 		<NavigationBreadcrumb>
 			<BreadcrumbList>
 				<BreadcrumbItem>
-					<BreadcrumbLink href='/dashboard/products'>{dict.navigation.dashboard}</BreadcrumbLink>
+					<BreadcrumbLink href='/dashboard/products'>{dict.general.navigation.dashboard}</BreadcrumbLink>
 				</BreadcrumbItem>
 				<BreadcrumbSeparator />
 				<BreadcrumbItem>

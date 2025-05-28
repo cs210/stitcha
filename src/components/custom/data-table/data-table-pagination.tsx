@@ -13,13 +13,13 @@ export function DataTablePagination<TData>({ dict, table }: DataTablePaginationP
 	return (
 		<div className='flex items-center justify-between px-2'>
 			<div className='flex-1 text-sm text-muted-foreground'>
-				{dict.table.rowsSelected
+				{dict.general.table.pagination.rowsSelected
 					.replace('{{count}}', table.getFilteredSelectedRowModel().rows.length)
 					.replace('{{total}}', table.getFilteredRowModel().rows.length)}
 			</div>
 			<div className='flex items-center space-x-6 lg:space-x-8'>
 				<div className='flex items-center space-x-2'>
-					<p className='text-sm font-medium'>{dict.table.rowsPerPage}</p>
+					<p className='text-sm font-medium'>{dict.general.table.pagination.rowsPerPage}</p>
 					<Select
 						value={`${table.getState().pagination.pageSize}`}
 						onValueChange={(value) => {
@@ -39,19 +39,19 @@ export function DataTablePagination<TData>({ dict, table }: DataTablePaginationP
 					</Select>
 				</div>
 				<div className='flex w-[100px] items-center justify-center text-sm font-medium'>
-					{dict.table.pageCount.replace('{{count}}', table.getState().pagination.pageIndex + 1).replace('{{total}}', table.getPageCount())}
+					{dict.general.table.pagination.pageCount.replace('{{count}}', table.getState().pagination.pageIndex + 1).replace('{{total}}', table.getPageCount())}
 				</div>
 				<div className='flex items-center space-x-2'>
 					<Button variant='outline' className='hidden h-8 w-8 p-0 lg:flex' onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
-						<span className='sr-only'>{dict.table.goToFirstPage}</span>
+						<span className='sr-only'>{dict.general.table.pagination.goToFirstPage}</span>
 						<ChevronsLeft />
 					</Button>
 					<Button variant='outline' className='h-8 w-8 p-0' onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-						<span className='sr-only'>{dict.table.goToPreviousPage}</span>
+						<span className='sr-only'>{dict.general.table.pagination.goToPreviousPage}</span>
 						<ChevronLeft />
 					</Button>
 					<Button variant='outline' className='h-8 w-8 p-0' onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-						<span className='sr-only'>{dict.table.goToNextPage}</span>
+						<span className='sr-only'>{dict.general.table.pagination.goToNextPage}</span>
 						<ChevronRight />
 					</Button>
 					<Button
@@ -60,7 +60,7 @@ export function DataTablePagination<TData>({ dict, table }: DataTablePaginationP
 						onClick={() => table.setPageIndex(table.getPageCount() - 1)}
 						disabled={!table.getCanNextPage()}
 					>
-						<span className='sr-only'>{dict.table.goToLastPage}</span>
+						<span className='sr-only'>{dict.general.table.pagination.goToLastPage}</span>
 						<ChevronsRight />
 					</Button>
 				</div>

@@ -59,7 +59,7 @@ export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholde
 				<Button asChild>
 					<Link href={`/dashboard/${path}/new`}>
 						<Plus size={16} />
-						{dict.table.new}
+						{dict.general.table.filter.new}
 					</Link>
 				</Button>
 			</div>
@@ -86,7 +86,7 @@ export function DataTable<TData, TValue>({ dict, columns, data, searchPlaceholde
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className='h-24 text-center'>
-									{dict.table.noResults}
+									{dict.general.table.body.noResults}
 								</TableCell>
 							</TableRow>
 						)}

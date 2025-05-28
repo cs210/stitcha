@@ -6,13 +6,14 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
+	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { UserButton } from '@clerk/nextjs';
-import { HeartPulseIcon, KanbanIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
+import { UserButton, useUser } from '@clerk/nextjs';
+import { GraduationCapIcon, HeartPulseIcon, KanbanIcon, LoaderIcon, SettingsIcon, ShirtIcon, Users } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -21,32 +22,46 @@ import { H4 } from '../text/headings';
 // Sidebar component for the dashboard
 export function Sidebar({ dict }: { dict: any }) {
 	const pathname = usePathname();
+	const { user } = useUser();
 
-	const navRoutes = [
+	const adminRoutes = [
 		{
-			title: dict.sidebar.kanban,
+			title: dict.general.sidebar.admins.kanban,
 			url: '/dashboard/kanban',
 			icon: KanbanIcon,
 		},
 		{
-			title: dict.sidebar.products,
+			title: dict.general.sidebar.admins.products,
 			url: '/dashboard/products',
 			icon: ShirtIcon,
 		},
 		{
-			title: dict.sidebar.seamstresses,
+			title: dict.general.sidebar.admins.seamstresses,
 			url: '/dashboard/seamstresses',
 			icon: Users,
 		},
 		{
-			title: dict.sidebar.wellness,
+			title: dict.general.sidebar.admins.wellness,
 			url: '/dashboard/wellness',
 			icon: HeartPulseIcon,
 		},
 		{
-			title: dict.sidebar.settings,
+			title: dict.general.sidebar.admins.settings,
 			url: '/dashboard/settings',
 			icon: SettingsIcon,
+		},
+	];
+
+	const seamstressRoutes = [
+		{
+			title: dict.general.sidebar.seamstresses.education,
+			url: '/dashboard/education',
+			icon: GraduationCapIcon,
+		},
+		{
+			title: dict.general.sidebar.seamstresses.progress,
+			url: `/dashboard/progress/${user?.id}`,
+			icon: LoaderIcon,
 		},
 	];
 
@@ -54,21 +69,39 @@ export function Sidebar({ dict }: { dict: any }) {
 		<SidebarComponent>
 			<Link href='/dashboard/products'>
 				<SidebarHeader className='flex flex-row items-center p-4'>
-					<Image src='/images/orientavida.jpeg' alt='Stitcha Logo' width={30} height={30} />
+					<Image src='/images/orientavida.jpeg' alt={dict.general.sidebar.stitcha} width={30} height={30} />
 
-					<H4>{dict.sidebar.stitcha}</H4>
+					<H4>{dict.general.sidebar.stitcha}</H4>
 				</SidebarHeader>
 			</Link>
 			<SidebarContent>
 				<SidebarGroup>
+					<SidebarGroupLabel>{dict.general.sidebar.admins.label}</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
-							{navRoutes.map((navRoute) => (
-								<SidebarMenuItem key={navRoute.title}>
-									<SidebarMenuButton asChild isActive={pathname.startsWith(navRoute.url)}>
-										<Link href={navRoute.url} className='flex items-center gap-3'>
-											<navRoute.icon />
-											<span>{navRoute.title}</span>
+							{adminRoutes.map((adminRoute) => (
+								<SidebarMenuItem key={adminRoute.title}>
+									<SidebarMenuButton asChild isActive={pathname.startsWith(adminRoute.url)}>
+										<Link href={adminRoute.url} className='flex items-center gap-3'>
+											<adminRoute.icon />
+											<span>{adminRoute.title}</span>
+										</Link>
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+							))}
+						</SidebarMenu>
+					</SidebarGroupContent>
+				</SidebarGroup>
+				<SidebarGroup>
+					<SidebarGroupLabel>{dict.general.sidebar.seamstresses.label}</SidebarGroupLabel>
+					<SidebarGroupContent>
+						<SidebarMenu>
+							{seamstressRoutes.map((seamstressRoute) => (
+								<SidebarMenuItem key={seamstressRoute.title}>
+									<SidebarMenuButton asChild isActive={pathname.startsWith(seamstressRoute.url)}>
+										<Link href={seamstressRoute.url} className='flex items-center gap-3'>
+											<seamstressRoute.icon />
+											<span>{seamstressRoute.title}</span>
 										</Link>
 									</SidebarMenuButton>
 								</SidebarMenuItem>

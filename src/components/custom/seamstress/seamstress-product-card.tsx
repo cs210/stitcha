@@ -16,10 +16,10 @@ export function SeamstressProductCard({ dict, product }: { dict: any, product: P
 					<Link href={`/dashboard/products/${product.id}`}>
 						<H4>{product.name}</H4>
 					</Link>
-					<P><strong>{dict.product.systemCode}:</strong> {product.system_code}</P>
-					<P><strong>{dict.product.validated}:</strong> {product.validated ? 'Yes' : 'No'}</P>
-					<P><strong>{dict.product.unitsAssigned}:</strong> {product.units_assigned}</P>
-					<P><strong>{dict.product.unitsCompleted}:</strong> {product.units_completed}</P>
+					<P><strong>{dict.adminsSection.product.systemCode}:</strong> {product.system_code}</P>
+					<P><strong>{dict.adminsSection.product.validated}:</strong> {product.validated ? 'Yes' : 'No'}</P>
+					<P><strong>{dict.adminsSection.product.unitsAssigned}:</strong> {product.units_assigned}</P>
+					<P><strong>{dict.adminsSection.product.unitsCompleted}:</strong> {product.units_completed}</P>
 				</div>
 			</div>
 
@@ -37,7 +37,7 @@ export function SeamstressProductCard({ dict, product }: { dict: any, product: P
 						))}
 					</div>
 				) : (
-					<P>{dict.seamstress.productCard.noProgressUpdates}</P>
+					<P>{dict.adminsSection.seamstresses.productCard.noProgressUpdates}</P>
 				)}
 			</div>
 		</Card>

@@ -39,11 +39,11 @@ export default function Page() {
 				setEducation(result.data);
 				setLoading(false);
 			} catch (error) {
-				toast({
-					title: dict.products.notifcations.error,
-					description: dict.products.notifcations.errorDescription,
-					variant: 'destructive',
-				});
+				// toast({
+				// 	title: dict.products.notifcations.error,
+				// 	description: dict.products.notifcations.errorDescription,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, [lang]);
@@ -57,14 +57,14 @@ export default function Page() {
 	}
 
 	return (
-		<div className='max-w-2xl p-8 mx-auto'>
+		<>
 			<HeaderContainer>
-				<H2>{dict.education.title}</H2>
-				<P className='mt-2'>{dict.education.description}</P>
+				<H2>{dict.seamstressesSection.education.title}</H2>
+				<P className='mt-2'>{dict.seamstressesSection.education.description}</P>
 			</HeaderContainer>
 
 			<Container>
-				<div className='flex flex-col gap-4'>
+				<div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
 					{education.map((educationItem) => (
 						<Card key={educationItem.id} className='flex flex-row justify-center items-center p-4'>
 							<Image src={educationItem.thumbnail_url} alt={educationItem.name} className='rounded-md' width={100} height={100} />
@@ -77,6 +77,6 @@ export default function Page() {
 					))}
 				</div>
 			</Container>
-		</div>
+		</>
 	);
 }
