@@ -87,7 +87,7 @@ const formSchema = z.object({
 		.min(0, { message: 'Percent pieces lost must be 0 or greater' })
 		.max(100, { message: 'Percent pieces lost must be 100 or less' })
 		.optional(),
-	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }).nullable(),
+	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }),
 	status: progressLevelSchema,
 	materials: z
 		.array(
@@ -358,8 +358,13 @@ export default function Page() {
 
 			const result = await response.json();
 
+			if (response.status === 409) {
+				toast.error(result.message || 'Product already exists. Please delete it before creating a new one.');
+				return; // Don't proceed with navigation
+			}
+
 			if (!response.ok) {
-				throw new Error(result.error || 'Failed to create product');
+				throw new Error(result.message || result.error || 'Failed to create product');
 			}
 
 			toast.success('Product created successfully');
@@ -367,6 +372,7 @@ export default function Page() {
 			router.push('/dashboard/products');
 		} catch (error) {
 			console.error('Error submitting form:', error);
+			toast.error(error instanceof Error ? error.message : 'Failed to create product');
 		} finally {
 			setLoading(false);
 			setIsPending(false);

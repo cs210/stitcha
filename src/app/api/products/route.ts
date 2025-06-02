@@ -4,7 +4,6 @@ import {
 	updateLaborFromProduct,
 	updatePackagingMaterialFromProduct,
 	updateRawMaterialFromProduct,
-	updateTechnicalSheetFromProduct,
 	handleProductCostsInsert,
 } from '@/lib/supabase/utils';
 import { auth } from '@clerk/nextjs/server';
@@ -51,14 +50,24 @@ export async function POST(req: NextRequest) {
 
 		await updateRawMaterialFromProduct(productId, supabase, formData);
 		await updatePackagingMaterialFromProduct(productId, supabase, formData);
-		await updateTechnicalSheetFromProduct(productId, supabase, formData);
 		await updateLaborFromProduct(productId, supabase, formData);
 		await handleProductCostsInsert(productId, supabase, formData);
 
 
 		return NextResponse.json({ data: updatedProduct }, { status: 200 });
-	} catch (error) {
+	} catch (error: any) {
 		console.log('Error creating product', error);
-		return NextResponse.json({ error }, { status: 500 });
+
+		if (error.name === 'DuplicateProductError') {
+			return NextResponse.json(
+				{ message: error.message },
+				{ status: 409 } // Conflict
+			);
+		}
+
+		return NextResponse.json(
+			{ error },
+			{ status: 500 }
+		);
 	}
 }
