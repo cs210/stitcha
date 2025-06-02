@@ -9,6 +9,56 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      costs: {
+        Row: {
+          general_expenses: number
+          id: string
+          margin: number
+          packaging_cost: number
+          product_id: string
+          raw_material_cost: number
+          royalties: number
+          selling_price: number
+          total_cost: number
+          total_labor_cost: number
+          total_material_cost: number
+        }
+        Insert: {
+          general_expenses?: number
+          id?: string
+          margin?: number
+          packaging_cost?: number
+          product_id: string
+          raw_material_cost?: number
+          royalties?: number
+          selling_price?: number
+          total_cost?: number
+          total_labor_cost?: number
+          total_material_cost?: number
+        }
+        Update: {
+          general_expenses?: number
+          id?: string
+          margin?: number
+          packaging_cost?: number
+          product_id?: string
+          raw_material_cost?: number
+          royalties?: number
+          selling_price?: number
+          total_cost?: number
+          total_labor_cost?: number
+          total_material_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_costs_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: true
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       education: {
         Row: {
           description: string
@@ -78,86 +128,6 @@ export type Database = {
         }
         Relationships: []
       }
-      product_costs: {
-        Row: {
-          general_expenses: number
-          id: string
-          margin: number
-          packaging_cost: number
-          product_id: string
-          raw_material_cost: number
-          royalties: number
-          selling_price: number
-          total_cost: number
-          total_labor_cost: number
-          total_material_cost: number
-        }
-        Insert: {
-          general_expenses?: number
-          id?: string
-          margin?: number
-          packaging_cost?: number
-          product_id: string
-          raw_material_cost?: number
-          royalties?: number
-          selling_price?: number
-          total_cost?: number
-          total_labor_cost?: number
-          total_material_cost?: number
-        }
-        Update: {
-          general_expenses?: number
-          id?: string
-          margin?: number
-          packaging_cost?: number
-          product_id?: string
-          raw_material_cost?: number
-          royalties?: number
-          selling_price?: number
-          total_cost?: number
-          total_labor_cost?: number
-          total_material_cost?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_costs_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: true
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      product_progress: {
-        Row: {
-          product_id: string
-          progress_id: string
-        }
-        Insert: {
-          product_id: string
-          progress_id: string
-        }
-        Update: {
-          product_id?: string
-          progress_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "product_progress_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: false
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "product_progress_progress_id_fkey"
-            columns: ["progress_id"]
-            isOneToOne: false
-            referencedRelation: "progress"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       products: {
         Row: {
           barcode: string | null
@@ -171,6 +141,8 @@ export type Database = {
           product_type: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
           system_code: string
+          technical_sheet: string | null
+          total_units: number
           weight: number
           width: number
         }
@@ -186,6 +158,8 @@ export type Database = {
           product_type?: string | null
           progress_level: Database["public"]["Enums"]["progress_level"]
           system_code?: string
+          technical_sheet?: string | null
+          total_units?: number
           weight?: number
           width?: number
         }
@@ -201,6 +175,8 @@ export type Database = {
           product_type?: string | null
           progress_level?: Database["public"]["Enums"]["progress_level"]
           system_code?: string
+          technical_sheet?: string | null
+          total_units?: number
           weight?: number
           width?: number
         }
@@ -331,17 +307,26 @@ export type Database = {
       }
       products_users: {
         Row: {
+          description: string | null
           product_id: string
+          units_assigned: number
+          units_completed: number
           user_id: string
           validated: boolean
         }
         Insert: {
+          description?: string | null
           product_id: string
+          units_assigned?: number
+          units_completed?: number
           user_id: string
           validated?: boolean
         }
         Update: {
+          description?: string | null
           product_id?: string
+          units_assigned?: number
+          units_completed?: number
           user_id?: string
           validated?: boolean
         }
@@ -369,6 +354,8 @@ export type Database = {
           emotion: string | null
           id: string
           image_urls: Json | null
+          product_id: string
+          units_completed: number
           user_id: string
         }
         Insert: {
@@ -377,6 +364,8 @@ export type Database = {
           emotion?: string | null
           id?: string
           image_urls?: Json | null
+          product_id: string
+          units_completed?: number
           user_id: string
         }
         Update: {
@@ -385,9 +374,18 @@ export type Database = {
           emotion?: string | null
           id?: string
           image_urls?: Json | null
+          product_id?: string
+          units_completed?: number
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "progress_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "progress_user_id_fkey"
             columns: ["user_id"]
@@ -421,32 +419,6 @@ export type Database = {
         }
         Relationships: []
       }
-      technical_sheets: {
-        Row: {
-          id: number
-          product_id: string
-          technical_sheet: string | null
-        }
-        Insert: {
-          id?: number
-          product_id: string
-          technical_sheet?: string | null
-        }
-        Update: {
-          id?: number
-          product_id?: string
-          technical_sheet?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "technical_sheets_product_id_fkey"
-            columns: ["product_id"]
-            isOneToOne: true
-            referencedRelation: "products"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           email: string
@@ -455,7 +427,8 @@ export type Database = {
           image_url: string | null
           last_name: string
           location: string | null
-          phone_number: number | null
+          phone_number: string | null
+          role: Database["public"]["Enums"]["role"]
           username: string
         }
         Insert: {
@@ -465,7 +438,8 @@ export type Database = {
           image_url?: string | null
           last_name: string
           location?: string | null
-          phone_number?: number | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["role"]
           username: string
         }
         Update: {
@@ -475,7 +449,8 @@ export type Database = {
           image_url?: string | null
           last_name?: string
           location?: string | null
-          phone_number?: number | null
+          phone_number?: string | null
+          role?: Database["public"]["Enums"]["role"]
           username?: string
         }
         Relationships: []
@@ -492,6 +467,7 @@ export type Database = {
     }
     Enums: {
       progress_level: "Not Started" | "In Progress" | "Done"
+      role: "admin" | "seamstress"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -608,6 +584,7 @@ export const Constants = {
   public: {
     Enums: {
       progress_level: ["Not Started", "In Progress", "Done"],
+      role: ["admin", "seamstress"],
     },
   },
 } as const

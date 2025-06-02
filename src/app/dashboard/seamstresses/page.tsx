@@ -1,29 +1,24 @@
 'use client';
 
-import { Container } from '@/components/custom/container/container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
 import { SeamstressCard } from '@/components/custom/seamstress/seamstress-card';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
+import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { User } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
-import { getDictionary } from '../../locales';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
-	const { user } = useUser();
 	const { lang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
-
 	const [loading, setLoading] = useState<boolean>(true);
+	
 	const [seamstresses, setSeamstresses] = useState<User[]>([]);
 
 	useEffect(() => {
-		if (!user) return;
-
 		(async () => {
 			const dict = await getDictionary(lang);
 
@@ -38,25 +33,19 @@ export default function Page() {
 
 			setLoading(false);
 		})();
-	}, [user, lang]);
+	}, [lang]);
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={dict.seamstresses.title} />
-				<Description text={dict.seamstresses.description} />
+				<H2>{dict.adminsSection.seamstresses.title}</H2>
+				<P className='mt-2'>{dict.adminsSection.seamstresses.description}</P>
 			</HeaderContainer>
 
 			<Container>
-				<div className='grid grid-cols-4 gap-6'>
+				<div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
 					{seamstresses.map((seamstress: User) => (
 						<SeamstressCard key={seamstress.id} seamstress={seamstress} />
 					))}

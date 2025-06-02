@@ -1,26 +1,28 @@
 'use client';
 
-import { getDictionary } from '@/app/locales';
-import { Container } from '@/components/custom/container/container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { Container } from '@/components/custom/containers/container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { useUser } from '@clerk/nextjs';
 import { useContext, useEffect, useState } from 'react';
-import { LangContext } from '@/app/layout';
 
 export default function Page() {
 	const { user } = useUser();
-	const { lang, setLang } = useContext(LangContext);
+	const { lang, setLang } = useContext(LangContext);	
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
-	const [selectedLanguage, setSelectedLanguage] = useState<string>(lang);
+	const { toast } = useToast();
+
+	const [selectedLanguage, setSelectedLanguage] = useState<'en' | 'pt-br'>(lang as 'en' | 'pt-br');
 
 	useEffect(() => {
 		if (!user) return;
@@ -33,55 +35,59 @@ export default function Page() {
 		})();
 	}, [user, lang]);
 
-	const handleSubmit = () => {				
+	// Handle language change
+	const handleLanguageChange = () => {
 		if (setLang && selectedLanguage) {
-			console.log('selectedLanguage', selectedLanguage);
-
 			setLang(selectedLanguage);
+
+			// toast({
+			// 	title: dict.settings.notifications.languageChanged.success.title,
+			// 	description: dict.settings.notifications.languageChanged.success.description.replace('{{language}}', selectedLanguage === 'en' ? 'English' : 'Portuguese'),
+			// });
+		} else {
+			// toast({
+			// 	title: dict.settings.notifications.languageChanged.error.title,
+			// 	description: dict.settings.notifications.languageChanged.error.description,
+			// 	variant: 'destructive',
+			// });
 		}
 	};
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<>
 			<HeaderContainer>
-				<Header text={dict.settings.title} />
-				<Description text={dict.settings.description} />
+				<H2>{dict.adminsSection.settings.title}</H2>
+				<P className='mt-2'>{dict.adminsSection.settings.description}</P>
 			</HeaderContainer>
 
 			<Container>
 				<div className='space-y-8 w-full'>
-					<div className='grid grid-cols-2 gap-6'>
+					<div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
 						<div className='space-y-2'>
-							<Label>{dict.settings.form.fullName}</Label>
+							<Label>{dict.adminsSection.settings.form.fullName}</Label>
 							<Input value={user?.fullName || ''} disabled />
 						</div>
 						<div className='space-y-2'>
-							<Label>{dict.settings.form.email}</Label>
+							<Label>{dict.adminsSection.settings.form.email}</Label>
 							<Input value={user?.primaryEmailAddress?.emailAddress || ''} disabled />
 						</div>
 						<div className='space-y-2'>
-							<Label>{dict.settings.form.language.title}</Label>
-							<Select defaultValue={lang} onValueChange={(value) => setSelectedLanguage(value)}>
+							<Label>{dict.adminsSection.settings.form.language.label}</Label>
+							<Select defaultValue={lang} onValueChange={(value) => setSelectedLanguage(value as 'en' | 'pt-br')}>
 								<SelectTrigger>
-									<SelectValue placeholder={dict.settings.form.language.placeholder} />
+									<SelectValue placeholder={dict.adminsSection.settings.form.language.placeholder} />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem value='pt-br'>{dict.settings.form.language.options.pt}</SelectItem>
-									<SelectItem value='en'>{dict.settings.form.language.options.en}</SelectItem>
+									<SelectItem value='pt-br'>{dict.adminsSection.settings.form.language.options.pt}</SelectItem>
+									<SelectItem value='en'>{dict.adminsSection.settings.form.language.options.en}</SelectItem>
 								</SelectContent>
 							</Select>
 						</div>
 					</div>
 
-					<Button onClick={handleSubmit}>{dict.settings.form.save}</Button>
+					<Button onClick={handleLanguageChange}>{dict.general.form.submit}</Button>
 				</div>
 			</Container>
 		</>

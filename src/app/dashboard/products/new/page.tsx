@@ -1,11 +1,9 @@
 'use client';
 
-import { FormContainer } from '@/components/custom/form/form-container';
-import { Description } from '@/components/custom/header/description';
-import { Header } from '@/components/custom/header/header';
-import { HeaderContainer } from '@/components/custom/header/header-container';
+import { HeaderContainer } from '@/components/custom/containers/header-container';
 import { Loader } from '@/components/custom/loader/loader';
-import { LoaderContainer } from '@/components/custom/loader/loader-container';
+import { H2 } from '@/components/custom/text/headings';
+import { P } from '@/components/custom/text/text';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ComboboxFormField } from '@/components/ui/combobox-form-field';
@@ -13,63 +11,21 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { LangContext } from '@/lib/lang/LangContext';
+import { getDictionary } from '@/lib/lang/locales';
 import { Labor, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/schemas/global.types';
-import { useUser } from '@clerk/nextjs';
+import { handleLaborChange, handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange } from '@/lib/utils/product-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange, handleLaborChange } from '@/lib/utils/form-utils';
 
-const progressLevelValues = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
-const progressLevelSchema = z.enum(progressLevelValues);
-
-export type ProductFormData = {
-	name: string;
-	system_code: string;
-	inmetro_cert_number: string;
-	barcode: string;
-	description: string;
-	weight: number;
-	width: number;
-	height: number;
-	total_units: number;
-	percent_pieces_lost?: number;
-	image_urls: File[] | null;
-	product_type: string;
-	status: ProgressLevel;
-	materials?: {
-		code: string;
-		name: string;
-		purchase_price: number;
-		unit_consumption: number;
-		units?: string;
-		total_cost: number;
-	}[];
-	packaging_materials?: {
-		code: string;
-		name: string;
-		purchase_price: number;
-		unit_consumption: number;
-		units?: string;
-		total_cost: number;
-	}[];
-	labor?: {
-		task: string;
-		time_per_unit: number;
-		conversion: number;
-		rework: number;
-		cost_per_minute: number;
-		total_cost: number;
-	}[];
-	general_expenses: number;
-	royalties: number;
-	selling_price: number;
-	technical_sheet?: File | null;
-};
+const PROGRESS_LEVEL_VALUES = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
+const PROGRESS_LEVEL_SCHEMA = z.enum(PROGRESS_LEVEL_VALUES);
 
 const formSchema = z.object({
 	product_type: z.string().min(1, { message: 'Product type is required' }),
@@ -87,8 +43,8 @@ const formSchema = z.object({
 		.min(0, { message: 'Percent pieces lost must be 0 or greater' })
 		.max(100, { message: 'Percent pieces lost must be 100 or less' })
 		.optional(),
-	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }),
-	status: progressLevelSchema,
+	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }).nullable(),
+	status: PROGRESS_LEVEL_SCHEMA,
 	materials: z
 		.array(
 			z.object({
@@ -156,10 +112,11 @@ const formSchema = z.object({
 });
 
 export default function Page() {
-	const { user } = useUser();
 	const router = useRouter();
-
+	const { lang, setLang } = useContext(LangContext);
+	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
+
 	const [isPending, setIsPending] = useState<boolean>(false);
 	const [materials, setMaterials] = useState<RawMaterial[]>([]);
 	const [packagingMaterials, setPackagingMaterials] = useState<PackagingMaterial[]>([]);
@@ -177,7 +134,7 @@ export default function Page() {
 	const [collapsedPackagingMaterials, setCollapsedPackagingMaterials] = useState<boolean[]>([]);
 	const [collapsedLabor, setCollapsedLabor] = useState<boolean[]>([]);
 
-	const form = useForm<ProductFormData>({
+	const form = useForm<any>({
 		resolver: zodResolver(formSchema),
 		mode: 'onBlur',
 		defaultValues: {
@@ -205,6 +162,12 @@ export default function Page() {
 	});
 
 	useEffect(() => {
+		async function fetchDict() {
+			const dict = await getDictionary(lang);
+
+			setDict(dict);
+		}
+
 		// Fetch materials from the database
 		async function fetchMaterials() {
 			try {
@@ -299,6 +262,7 @@ export default function Page() {
 			}
 		}
 
+		fetchDict();
 		fetchMaterials();
 		fetchPackagingMaterials();
 		fetchLabor();
@@ -379,24 +343,18 @@ export default function Page() {
 		}
 	}
 
-	if (loading) {
-		return (
-			<LoaderContainer>
-				<Loader />
-			</LoaderContainer>
-		);
-	}
+	if (loading) return <Loader />;
 
 	return (
 		<div className='flex flex-col min-h-0'>
 			<HeaderContainer>
-				<Header text='Products' />
-				<Description text='Manage and track customer products.' />
+				<H2>New Product</H2>
+				<P className='mt-2'>Create a new product.</P>
 			</HeaderContainer>
 
 			<div className='py-4'>
 				<Form {...form}>
-					<FormContainer onSubmit={form.handleSubmit(onSubmit, (errors) => {
+					<form onSubmit={form.handleSubmit(onSubmit, (errors) => {
 						// Get the first error field
 						const firstError = Object.keys(errors)[0];
 						if (firstError) {
@@ -409,7 +367,7 @@ export default function Page() {
 								errorInput.focus();
 							}
 						}
-					})}>
+					})} className='space-y-8'>
 						<FormField
 							control={form.control}
 							name='name'
@@ -432,11 +390,11 @@ export default function Page() {
 									<FormLabel>Product Images *</FormLabel>
 									<FormControl>
 										<div>
-											<div className="relative">
-												<div className="flex items-center gap-2">
+											<div className='relative'>
+												<div className='flex items-center gap-2'>
 													<Button
-														type="button"
-														variant="outline"
+														type='button'
+														variant='outline'
 														onClick={() => {
 															const fileInput = document.createElement('input');
 															fileInput.type = 'file';
@@ -451,10 +409,8 @@ export default function Page() {
 													>
 														Choose Files
 													</Button>
-													<span className="text-sm text-muted-foreground">
-														{value && value.length > 0
-															? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected`
-															: 'No file chosen'}
+													<span className='text-sm text-muted-foreground'>
+														{value && value.length > 0 ? `${value.length} ${value.length === 1 ? 'file' : 'files'} selected` : 'No file chosen'}
 													</span>
 												</div>
 												<input
@@ -467,21 +423,19 @@ export default function Page() {
 														const newFiles = Array.from(e.target.files || []);
 														onChange([...(value || []), ...newFiles]);
 													}}
-													className="hidden"
+													className='hidden'
 												/>
 											</div>
-
-											{/* Display selected files */}
 											<div className='mt-2 space-y-2'>
-												{value?.map((file, index) => (
+												{value?.map((file: File, index: number) => (
 													<div key={index} className='flex items-center gap-2'>
-														<span className='text-sm'>{file.name}</span>
+														<Image src={URL.createObjectURL(file)} alt={file.name} width={100} height={100} />
 														<Button
 															type='button'
 															variant='ghost'
 															size='sm'
 															onClick={() => {
-																const newFiles = value.filter((_, i) => i !== index);
+																const newFiles = value.filter((_: File, i: number) => i !== index);
 																onChange(newFiles);
 																// Reset the file input
 																const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -1744,7 +1698,7 @@ export default function Page() {
 											</SelectTrigger>
 										</FormControl>
 										<SelectContent>
-											{(Object.values(progressLevelValues) as ProgressLevel[]).map((status) => (
+											{(Object.values(PROGRESS_LEVEL_VALUES) as ProgressLevel[]).map((status) => (
 												<SelectItem key={status} value={status}>
 													{status}
 												</SelectItem>
@@ -1755,7 +1709,7 @@ export default function Page() {
 								</FormItem>
 							)}
 						/>
-					</FormContainer>
+					</form>
 				</Form>
 			</div>
 		</div>

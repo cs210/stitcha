@@ -1,5 +1,6 @@
 'use client';
 
+import { useToast } from '@/hooks/use-toast';
 import { Product } from '@/lib/schemas/global.types';
 import type { DropResult } from '@hello-pangea/dnd';
 import { DragDropContext } from '@hello-pangea/dnd';
@@ -19,12 +20,15 @@ const REVERSE_STATUS_MAPPING = {
 } as const;
 
 export function KanbanBoard({ dict }: { dict: any }) {
+	const { toast } = useToast();
+
 	const [products, setProducts] = useState<Record<string, Product[]>>({
 		notStarted: [],
 		inProgress: [],
 		done: [],
 	});
 
+	// Pull in initial products and organise them by progress_level
 	useEffect(() => {
 		(async () => {
 			try {
@@ -57,13 +61,19 @@ export function KanbanBoard({ dict }: { dict: any }) {
 
 				setProducts(organized);
 			} catch (error) {
-				console.error('Error fetching products:', error);
+				// toast({
+				// 	title: dict.kanban.notifications.productsLoading.error.title,
+				// 	description: dict.settings.notifications.productsLoading.error.description,
+				// 	variant: 'destructive',
+				// });
 			}
 		})();
 	}, []);
 
+	// Handle what happens when we drag element / card to new columnn
 	const onDragEnd = async (result: DropResult) => {
 		const { source, destination, draggableId } = result;
+
 		if (!destination) return;
 
 		const newProducts = { ...products };
@@ -106,10 +116,17 @@ export function KanbanBoard({ dict }: { dict: any }) {
 				if (!response.ok) {
 					throw new Error('Failed to update product status');
 				}
-			} catch (error) {
-				console.error('Error updating product status:', error);
 
-				setProducts(newProducts);
+				// toast({
+				// 	title: dict.kanban.notifications.productStatusUpdated.success.title,
+				// 	description: dict.kanban.notifications.productStatusUpdated.success.description.replace('{{status}}', `"${newStatus}"`),
+				// });
+			} catch (error) {
+				// toast({
+				// 	title: dict.kanban.notifications.productStatusUpdated.error.title,
+				// 	description: dict.kanban.notifications.productStatusUpdated.error.description,
+				// 	variant: 'destructive',
+				// });
 			}
 		}
 	};
@@ -131,8 +148,17 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			});
 
 			setProducts(newProducts);
-		} catch (error) {
-			console.error('Error deleting product:', error);
+
+			// toast({
+			// 	title: dict.kanban.notifications.productDeleted.success.title,
+			// 	description: dict.kanban.notifications.productDeleted.success.description,
+			// });
+		} catch (error) {			
+			// toast({
+			// 	title: dict.kanban.notifications.productDeleted.error.title,
+			// 	description: dict.kanban.notifications.productDeleted.error.description,
+			// 	variant: 'destructive',
+			// });
 		}
 	};
 
@@ -141,9 +167,21 @@ export function KanbanBoard({ dict }: { dict: any }) {
 			<DragDropContext onDragEnd={onDragEnd}>
 				<div className='flex-1 overflow-x-auto'>
 					<div className='flex gap-4 h-full'>
-						<KanbanColumn title={dict.kanban.columns.notStarted} id='notStarted' products={products.notStarted} onDelete={onDelete} />
-						<KanbanColumn title={dict.kanban.columns.inProgress} id='inProgress' products={products.inProgress} onDelete={onDelete} />
-						<KanbanColumn title={dict.kanban.columns.done} id='done' products={products.done} onDelete={onDelete} />
+						<KanbanColumn id='notStarted' title={dict.adminsSection.kanban.columns.notStarted} badgeColor='bg-red-500' products={products.notStarted} onDelete={onDelete} />
+						<KanbanColumn
+							id='inProgress'
+							title={dict.adminsSection.kanban.columns.inProgress}
+							badgeColor='bg-yellow-400'
+							products={products.inProgress}
+							onDelete={onDelete}
+						/>
+						<KanbanColumn
+							id='done'
+							title={dict.adminsSection.kanban.columns.done}
+							badgeColor='bg-green-500'
+							products={products.done}
+							onDelete={onDelete}
+						/>
 					</div>
 				</div>
 			</DragDropContext>

@@ -6,11 +6,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { cn } from '@/lib/utils';
 
 interface DataTableColumnHeaderProps<TData, TValue> extends React.HTMLAttributes<HTMLDivElement> {
+	dict: any;
 	column: Column<TData, TValue>;
 	title: string;
 }
 
-export function DataTableColumnHeader<TData, TValue>({ column, title, className }: DataTableColumnHeaderProps<TData, TValue>) {
+export function DataTableColumnHeader<TData, TValue>({ dict, column, title, className }: DataTableColumnHeaderProps<TData, TValue>) {
 	if (!column.getCanSort()) {
 		return <div className={cn(className)}>{title}</div>;
 	}
@@ -27,16 +28,16 @@ export function DataTableColumnHeader<TData, TValue>({ column, title, className 
 				<DropdownMenuContent align='start'>
 					<DropdownMenuItem onClick={() => column.toggleSorting(false)}>
 						<ArrowUp className='h-3.5 w-3.5 text-muted-foreground/70' />
-						Asc
+						{dict.general.table.header.asc}
 					</DropdownMenuItem>
 					<DropdownMenuItem onClick={() => column.toggleSorting(true)}>
 						<ArrowDown className='h-3.5 w-3.5 text-muted-foreground/70' />
-						Desc
+						{dict.general.table.header.desc}
 					</DropdownMenuItem>
 					<DropdownMenuSeparator />
 					<DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
 						<EyeOff className='h-3.5 w-3.5 text-muted-foreground/70' />
-						Hide
+						{dict.general.table.header.hide}
 					</DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>

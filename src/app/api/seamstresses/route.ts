@@ -1,19 +1,15 @@
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/client';
-import { auth } from '@clerk/nextjs/server';
+import { checkAuth } from '@/lib/utils/auth';
 import { NextResponse } from 'next/server';
 
-// Retrieves all seamstresses
+// Get all seamstresses
 export async function GET() {
-	const { userId } = await auth();
-
-	if (!userId) {
-		return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-	}
+	await checkAuth();
 
 	const supabase = await createClerkSupabaseClientSsr();
 
 	try {
-		const { data, error } = await supabase.from('users').select('*');
+		const { data, error } = await supabase.from('users').select('*').eq('role', 'seamstress');
 
 		if (error) {
 			throw new Error(error.message);
