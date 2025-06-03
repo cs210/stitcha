@@ -21,7 +21,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { toast, Toaster } from 'sonner';
 import { z } from 'zod';
 
 const PROGRESS_LEVEL_VALUES = ['Not Started', 'In Progress', 'Done'] as const satisfies readonly ProgressLevel[];
@@ -31,8 +31,8 @@ const formSchema = z.object({
 	product_type: z.string().min(1, { message: 'Product type is required' }),
 	name: z.string().min(1, { message: 'Name is required' }),
 	system_code: z.string().min(1, { message: 'System code is required' }),
-	inmetro_cert_number: z.string().optional(),
-	barcode: z.string().optional(),
+	inmetro_cert_number: z.string().optional().nullable(),
+	barcode: z.string().optional().nullable(),
 	description: z.string().min(1, { message: 'Description is required' }),
 	weight: z.number().positive({ message: 'Weight must be positive' }),
 	width: z.number().positive({ message: 'Width must be positive' }),
@@ -42,7 +42,8 @@ const formSchema = z.object({
 		.number()
 		.min(0, { message: 'Percent pieces lost must be 0 or greater' })
 		.max(100, { message: 'Percent pieces lost must be 100 or less' })
-		.optional(),
+		.optional()
+		.nullable(),
 	image_urls: z.array(z.instanceof(File)).min(1, { message: 'At least one product image is required' }).nullable(),
 	status: PROGRESS_LEVEL_SCHEMA,
 	materials: z
@@ -56,11 +57,12 @@ const formSchema = z.object({
 					.min(0.01, { message: 'Purchase price must be at least 0.01' })
 					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
 				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
-				units: z.string().optional(),
+				units: z.string().optional().nullable(),
 				total_cost: z.number(),
 			})
 		)
-		.optional(),
+		.optional()
+		.nullable(),
 	packaging_materials: z
 		.array(
 			z.object({
@@ -72,11 +74,12 @@ const formSchema = z.object({
 					.min(0.01, { message: 'Purchase price must be at least 0.01' })
 					.refine((val) => Number(val.toFixed(2)) === val, { message: 'Purchase price can only have up to 2 decimal places' }),
 				unit_consumption: z.number().positive({ message: 'Unit consumption must be greater than 0' }),
-				units: z.string().optional(),
+				units: z.string().optional().nullable(),
 				total_cost: z.number(),
 			})
 		)
-		.optional(),
+		.optional()
+		.nullable(),
 	labor: z
 		.array(
 			z.object({
@@ -94,7 +97,8 @@ const formSchema = z.object({
 				total_cost: z.number(),
 			})
 		)
-		.optional(),
+		.optional()
+		.nullable(),
 	general_expenses: z
 		.number()
 		.min(0, { message: 'General expenses must be 0 or greater' })
@@ -152,8 +156,8 @@ export default function Page() {
 			height: 0,
 			total_units: 1,
 			percent_pieces_lost: 0,
-			image_urls: null,
-			status: 'Not Started',
+			image_urls: [],
+			status: 'Not Started' as ProgressLevel,
 			materials: [],
 			packaging_materials: [],
 			labor: [],
@@ -253,7 +257,6 @@ export default function Page() {
 								console.error('Error fetching technical sheet:', error);
 							}
 						}
-						console.log('Technical sheet:', technicalSheet);
 
 
 						// Final form reset with transformed arrays
@@ -264,6 +267,7 @@ export default function Page() {
 							selling_price: Number(data.costs.selling_price),
 							general_expenses: Number(data.costs.general_expenses),
 							royalties: Number(data.costs.royalties),
+							status: data.progress_level as ProgressLevel,
 							materials,
 							packaging_materials: packagingMaterials,
 							labor,
@@ -427,28 +431,47 @@ export default function Page() {
 				formData.append('technical_sheet', values.technical_sheet);
 			}
 
-			const response = await fetch('/api/products', {
-				method: 'POST',
+			const url = isEdit && productId ? `/api/products/${productId}` : '/api/products';
+			const method = isEdit ? 'PATCH' : 'POST';
+
+			const response = await fetch(url, {
+				method,
 				body: formData,
 			});
 
 			const result = await response.json();
 
 			if (response.status === 409) {
-				toast.error(result.message || 'Product already exists. Please delete it before creating a new one.');
+				toast.error(
+					<div className="flex flex-col gap-2">
+						<p>A product with this system code already exists.</p>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => {
+								router.push(`/dashboard/products?search=${values.system_code}`);
+							}}
+						>
+							View Existing Product
+						</Button>
+					</div>,
+					{
+						duration: 5000,
+					}
+				);
 				return; // Don't proceed with navigation
 			}
 
 			if (!response.ok) {
-				throw new Error(result.message || result.error || 'Failed to create product');
+				throw new Error(result.message || result.error || `Failed to ${isEdit ? 'update' : 'create'} product`);
 			}
 
-			toast.success('Product created successfully');
+			toast.success(`Product ${isEdit ? 'updated' : 'created'} successfully`);
 
 			router.push('/dashboard/products');
 		} catch (error) {
 			console.error('Error submitting form:', error);
-			toast.error(error instanceof Error ? error.message : 'Failed to create product');
+			toast.error(error instanceof Error ? error.message : `Failed to ${isEdit ? 'update' : 'create'} product`);
 		} finally {
 			setLoading(false);
 			setIsPending(false);
@@ -459,6 +482,7 @@ export default function Page() {
 
 	return (
 		<div className='flex flex-col min-h-0'>
+			<Toaster richColors position="top-center" />
 			<HeaderContainer>
 				<H2>New Product</H2>
 				<P className='mt-2'>Create a new product.</P>
@@ -1831,7 +1855,7 @@ export default function Page() {
 							render={({ field }) => (
 								<FormItem>
 									<FormLabel>Status</FormLabel>
-									<Select onValueChange={field.onChange} defaultValue={field.value}>
+									<Select onValueChange={field.onChange} value={field.value}>
 										<FormControl>
 											<SelectTrigger>
 												<SelectValue placeholder='Select status' />

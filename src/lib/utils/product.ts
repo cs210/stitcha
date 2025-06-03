@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Product } from '../schemas/global.types';
+import { deleteProductFiles, uploadProductImages, uploadTechnicalSheet } from './supabase';
 
 // Convert empty strings to null
 function emptyToNull(value: any) {
@@ -70,31 +71,21 @@ export async function getProduct(id: string, supabase: SupabaseClient) {
 }
 
 // Handle deleting a product
-export const deleteProduct = async (id: string, supabase: SupabaseClient) => {
+export async function deleteProduct(supabase: SupabaseClient, id: string): Promise<void> {
 	try {
-		const { data, error } = await supabase.from('products').delete().eq('id', id);
+		// 1. Delete all files from storage
+		await deleteProductFiles(supabase, id);
 
-		if (error) {
-			throw new Error(error.message);
+		// 2. Delete the product record
+		const { error: deleteError } = await supabase.from('products').delete().eq('id', id);
+
+		if (deleteError) {
+			throw new Error(`Failed to delete product: ${deleteError.message}`);
 		}
-
-		const { error: productStorageError } = await supabase.storage.from('products').remove([`${id}`]);
-
-		if (productStorageError) {
-			throw new Error(productStorageError.message);
-		}
-
-		const { error: technicalSheetStorageError } = await supabase.storage.from('technical-sheets').remove([`${id}`]);
-
-		if (technicalSheetStorageError) {
-			throw new Error(technicalSheetStorageError.message);
-		}
-
-		return data;
-	} catch (error: any) {
-		throw new Error(error.message);
+	} catch (error) {
+		throw new Error(`Failed to delete product: ${error instanceof Error ? error.message : String(error)}`);
 	}
-};
+}
 
 // Insert the product costs into the product_costs table
 export async function insertProductCost(productId: string, supabase: SupabaseClient, formData: FormData) {
@@ -113,7 +104,7 @@ export async function insertProductCost(productId: string, supabase: SupabaseCli
 	// Insert the product costs into the product_costs table
 	const { data: productCostsData, error: productCostsError } = await supabase
 		.from('costs')
-		.insert({
+		.upsert({
 			raw_material_cost: productCosts.raw_material_cost,
 			packaging_cost: productCosts.packaging_material_cost,
 			total_material_cost: productCosts.total_material_cost,
@@ -124,6 +115,8 @@ export async function insertProductCost(productId: string, supabase: SupabaseCli
 			selling_price: productCosts.selling_price,
 			margin: productCosts.margin,
 			product_id: productId,
+		}, {
+			onConflict: 'product_id',
 		})
 		.select()
 		.single();
@@ -133,6 +126,68 @@ export async function insertProductCost(productId: string, supabase: SupabaseCli
 	}
 
 	return productCostsData.id;
+}
+
+export async function upsertProduct(formData: FormData, supabase: SupabaseClient, productId: string) {
+	const productData: any = {
+		name: JSON.parse(formData.get('name') as string),
+		system_code: JSON.parse(formData.get('system_code') as string),
+		inmetro_cert_number: JSON.parse((formData.get('inmetro_cert_number') as string)?.trim() || 'null'),
+		barcode: JSON.parse((formData.get('barcode') as string)?.trim() || 'null'),
+		description: JSON.parse((formData.get('description') as string)?.trim() || 'null'),
+		weight: JSON.parse(formData.get('weight') as string),
+		width: JSON.parse(formData.get('width') as string),
+		height: JSON.parse(formData.get('height') as string),
+		percent_pieces_lost: JSON.parse(formData.get('percent_pieces_lost') as string),
+		product_type: JSON.parse((formData.get('product_type') as string)?.trim() || 'null'),
+		progress_level: JSON.parse(formData.get('status') as string),
+		total_units: JSON.parse(formData.get('total_units') as string),
+	};
+
+	let image_urls: string[] = [];
+	let technical_sheet: string | null = null;
+
+	// Delete existing files before uploading new ones
+	await deleteProductFiles(supabase, productId);
+
+	const imageFiles = formData.getAll('image_urls') as File[];
+
+	try {
+		image_urls = await uploadProductImages(supabase, productId, imageFiles);
+	} catch (error: any) {
+		throw new Error(`Failed to process product images: ${error.message}`);
+	}
+
+	const technical_sheet_url = formData.get('technical_sheet') as File;
+
+	try {
+		technical_sheet = await uploadTechnicalSheet(supabase, productId, technical_sheet_url);
+	} catch (error: any) {
+		throw new Error(`Failed to process technical sheet: ${error.message}`);
+	}
+
+	// Create the product object with empty string handling
+	const product = {
+		...productData,
+		id: productId,
+		system_code: emptyToNull(productData.system_code),
+		inmetro_cert_number: emptyToNull(productData.inmetro_cert_number),
+		barcode: emptyToNull(productData.barcode),
+		description: emptyToNull(productData.description),
+		product_type: emptyToNull(productData.product_type),
+		image_urls,
+		technical_sheet: emptyToNull(technical_sheet),
+	};
+
+	const { data: updatedProduct, error: upsertError } = await supabase.from('products').upsert(product, {
+		onConflict: 'id',
+	}).select().single();
+
+	if (upsertError) {
+		throw new Error(`Failed to upsert product: ${upsertError.message}`);
+	}
+
+	return updatedProduct;
 }
 
 // Insert the product into the product table
@@ -152,8 +207,8 @@ export async function insertProduct(formData: FormData, supabase: SupabaseClient
 		total_units: JSON.parse(formData.get('total_units') as string),
 	};
 
-	const image_urls: string[] = [];
-	let technical_sheet: string = '';
+	let image_urls: string[] = [];
+	let technical_sheet: string | null = null;
 
 	// Create the product object with empty string handling
 	const product = {
@@ -164,16 +219,18 @@ export async function insertProduct(formData: FormData, supabase: SupabaseClient
 		description: emptyToNull(productData.description),
 		product_type: emptyToNull(productData.product_type),
 		image_urls,
-		technical_sheet,
+		technical_sheet: emptyToNull(technical_sheet),
 	};
 
 	// Insert the product
 	// First, check if a product with the same system_code exists
 	const { data: existingProduct } = await supabase.from('products').select('id').eq('system_code', product.system_code).maybeSingle();
 
-	// If it exists, delete it first
+	// If it exists, throw an error that can be caught to show a toast message
 	if (existingProduct) {
-		await supabase.from('products').delete().eq('id', existingProduct.id);
+		const err = new Error(`A product with code ${product.system_code} already exists. Please delete it first.`);
+		err.name = 'DuplicateProductError';
+		throw err;
 	}
 
 	// Now insert the new product
@@ -186,32 +243,12 @@ export async function insertProduct(formData: FormData, supabase: SupabaseClient
 	const productId = insertedProduct.id;
 	const imageFiles = formData.getAll('image_urls') as File[];
 
-	if (imageFiles && imageFiles.length > 0) {
-		// Process each file and upload to storage
-		for (const file of imageFiles) {
-			const fileExt = file.name.split('.').pop();
-			const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-			const filePath = `${productId}/${fileName}`;
+	try {
+		image_urls = await uploadProductImages(supabase, productId, imageFiles);
 
-			// Convert file to ArrayBuffer for upload
-			const arrayBuffer = await file.arrayBuffer();
-			const fileBuffer = new Uint8Array(arrayBuffer);
+	} catch (error: any) {
 
-			// Upload to Supabase storage
-			const { error } = await supabase.storage.from('products').upload(filePath, fileBuffer, {
-				contentType: file.type,
-				upsert: false,
-			});
-
-			if (error) {
-				throw new Error(`Error uploading file: ${error.message}`);
-			}
-
-			// Get the public URL for the uploaded file
-			const { data: urlData } = await supabase.storage.from('products').createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year expiration
-
-			image_urls.push(urlData?.signedUrl || '');
-		}
+		throw new Error(`Failed to process product images: ${error.message}`);
 	}
 
 	// Update the product with the image URLs
@@ -219,46 +256,32 @@ export async function insertProduct(formData: FormData, supabase: SupabaseClient
 
 	// if image update fails
 	if (updateError) {
-		throw new Error(`Failed to update product: ${updateError.message}`);
+		throw new Error(`Failed to update product with image urls: ${updateError.message}`);
 	}
+
 
 	const technical_sheet_url = formData.get('technical_sheet') as File;
 
-	// Update the technical sheet
-	if (technical_sheet_url) {
-		const fileExt = technical_sheet_url.name.split('.').pop();
-		const fileName = `${productId}_${Date.now()}.${fileExt}`;
-		const filePath = `${productId}/${fileName}`;
-
-		// Upload the file to Supabase Storage
-		const { error: uploadError } = await supabase.storage.from('technical-sheets').upload(filePath, technical_sheet_url, {
-			cacheControl: '3600',
-			upsert: true,
-		});
-
-		if (uploadError) {
-			throw new Error(`Failed to upload technical sheet: ${uploadError.message}`);
-		}
-
-		// Get the public URL for the uploaded file
-		const { data: urlData } = await supabase.storage.from('technical-sheets').createSignedUrl(filePath, 60 * 60 * 24 * 7); // 7 days expiration
-
-		// Check if the URL was successfully generated
-		if (!urlData || !urlData.signedUrl) {
-			throw new Error('Failed to generate public URL for technical sheet');
-		}
-
-		technical_sheet = urlData.signedUrl;
+	try {
+		technical_sheet = await uploadTechnicalSheet(supabase, productId, technical_sheet_url);
+	} catch (error: any) {
+		throw new Error(`Failed to process technical sheet: ${error.message}`);
 	}
 
-	// Update the technical_sheets table with the new technical sheet
-	const { data: productWithTechnicalSheet, error: insertErrorTechnicalSheet } = await supabase.from('products').update({ technical_sheet }).eq('id', productId).select().single();
+	// Update the product with the technical sheet URL
+	const { data: productWithTechnicalSheet, error: insertErrorTechnicalSheet } = await supabase
+		.from('products')
+		.update({ technical_sheet })
+		.eq('id', productId)
+		.select()
+		.single();
 
 	if (insertErrorTechnicalSheet) {
 		throw new Error(`Failed to insert technical sheet record: ${insertErrorTechnicalSheet.message}`);
 	}
 
 	return productWithTechnicalSheet;
+
 }
 
 // Update the labor from the product
@@ -441,5 +464,46 @@ export async function removeSeamstressFromProduct(product: Product, seamstressId
 		setAssignedSeamstresses(data);
 	} catch (error) {
 		throw new Error(error.message);
+	}
+}
+
+/**
+ * Deletes all related records for a product from junction tables
+ * @param productId - The ID of the product to delete related records for
+ * @throws Error if deletion fails
+ */
+export async function deleteProductRelations(productId: string, supabase: any) {
+	try {
+		// Delete from products_labor
+		const { error: laborError } = await supabase
+			.from('products_labor')
+			.delete()
+			.eq('product_id', productId);
+
+		if (laborError) {
+			throw new Error(`Failed to delete labor records: ${laborError.message}`);
+		}
+
+		// Delete from products_packaging_materials
+		const { error: packagingError } = await supabase
+			.from('products_packaging_materials')
+			.delete()
+			.eq('product_id', productId);
+
+		if (packagingError) {
+			throw new Error(`Failed to delete packaging material records: ${packagingError.message}`);
+		}
+
+		// Delete from products_raw_materials
+		const { error: rawMaterialsError } = await supabase
+			.from('products_raw_materials')
+			.delete()
+			.eq('product_id', productId);
+
+		if (rawMaterialsError) {
+			throw new Error(`Failed to delete raw material records: ${rawMaterialsError.message}`);
+		}
+	} catch (error) {
+		throw new Error(`Failed to delete product relations: ${error.message}`);
 	}
 }
