@@ -164,7 +164,7 @@ export default function Page() {
 			general_expenses: 0,
 			royalties: 0,
 			selling_price: 0,
-			technical_sheet: null,
+			technical_sheet: undefined,
 		},
 	});
 
@@ -263,7 +263,7 @@ export default function Page() {
 						form.reset({
 							...data,
 							image_urls: imageFiles,
-							technical_sheet: technicalSheet,
+							technical_sheet: technicalSheet || undefined,
 							selling_price: Number(data.costs.selling_price),
 							general_expenses: Number(data.costs.general_expenses),
 							royalties: Number(data.costs.royalties),
@@ -271,6 +271,9 @@ export default function Page() {
 							materials,
 							packaging_materials: packagingMaterials,
 							labor,
+							inmetro_cert_number: data.inmetro_cert_number || '',
+							barcode: data.barcode || '',
+							percent_pieces_lost: data.percent_pieces_lost || 0
 						});
 					} else {
 						console.error('Failed to fetch product:', result.error);
@@ -456,7 +459,7 @@ export default function Page() {
 						</Button>
 					</div>,
 					{
-						duration: 5000,
+						duration: 10000,
 					}
 				);
 				return; // Don't proceed with navigation
@@ -1735,7 +1738,7 @@ export default function Page() {
 															variant="ghost"
 															size="sm"
 															onClick={() => {
-																onChange(null);
+																onChange(undefined);
 															}}
 														>
 															Remove
