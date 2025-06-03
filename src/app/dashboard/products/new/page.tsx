@@ -17,7 +17,7 @@ import { Labor, PackagingMaterial, ProgressLevel, RawMaterial } from '@/lib/sche
 import { handleLaborChange, handleMaterialCodeChange, handleMaterialNameChange, handlePackagingMaterialCodeChange, handlePackagingMaterialNameChange } from '@/lib/utils/product-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import * as React from 'react';
 import { useContext, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -113,6 +113,9 @@ const formSchema = z.object({
 
 export default function Page() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const isEdit = searchParams.get('edit') === 'true';
+	const productId = searchParams.get('product_id');
 	const { lang, setLang } = useContext(LangContext);
 	const [dict, setDict] = useState<any>();
 	const [loading, setLoading] = useState<boolean>(true);
@@ -166,6 +169,114 @@ export default function Page() {
 			const dict = await getDictionary(lang);
 
 			setDict(dict);
+		}
+
+		// Fetch product data if in edit mode
+		async function fetchProduct() {
+			if (isEdit && productId) {
+				try {
+					const response = await fetch(`/api/products/${productId}`);
+					const result = await response.json();
+					console.log(result);
+
+					if (response.ok && result.data) {
+						const data = result.data;
+
+						// Handle raw materials transformation
+						const rawMaterialEntries = Array.isArray(data.raw_materials) ? data.raw_materials : [];
+						const materials = rawMaterialEntries.map((entry: any) => {
+							const material = entry.raw_materials;
+							return {
+								code: material.code,
+								name: material.name,
+								purchase_price: Number(material.purchase_price),
+								unit_consumption: Number(entry.unit_consumption),
+								units: material.units,
+								total_cost: Number(entry.total_cost),
+							};
+						});
+
+						// Handle packaging materials transformation
+						const packagingEntries = Array.isArray(data.packaging_materials) ? data.packaging_materials : [];
+						const packagingMaterials = packagingEntries.map((entry: any) => {
+							const material = entry.packaging_materials;
+							return {
+								code: material.code,
+								name: material.name,
+								purchase_price: Number(material.purchase_price),
+								unit_consumption: Number(entry.unit_consumption),
+								units: material.units,
+								total_cost: Number(entry.total_cost),
+							};
+						});
+
+						// Handle labor transformation
+						const laborEntries = Array.isArray(data.labor) ? data.labor : [];
+						const labor = laborEntries.map((entry: any) => {
+							const task = entry.labor;
+							return {
+								task: task.task,
+								time_per_unit: Number(entry.time_per_unit),
+								conversion: Number(entry.conversion),
+								rework: Number(entry.rework),
+								cost_per_minute: Number(task.cost_per_minute),
+								total_cost: Number(entry.total_cost),
+							};
+						});
+
+						// Handle image URLs transformation to File objects
+						const imageFiles = await Promise.all(
+							(data.image_urls || []).map(async (url: string) => {
+								try {
+									const response = await fetch(url);
+									const blob = await response.blob();
+									// Extract filename from URL
+									const filename = url.split('/').pop() || 'image.jpg';
+									return new File([blob], filename, { type: blob.type });
+								} catch (error) {
+									console.error('Error fetching image:', error);
+									return null;
+								}
+							})
+						).then(files => files.filter((file): file is File => file !== null));
+
+						// Handle technical sheet transformation if it exists
+
+						let technicalSheet: File | undefined = undefined;
+						if (data.technical_sheet) {
+							try {
+								const response = await fetch(data.technical_sheet);
+								const blob = await response.blob();
+								const filename = data.technical_sheet.split('/').pop() || 'technical_sheet.pdf';
+								technicalSheet = new File([blob], filename, { type: blob.type });
+							} catch (error) {
+								console.error('Error fetching technical sheet:', error);
+							}
+						}
+						console.log('Technical sheet:', technicalSheet);
+
+
+						// Final form reset with transformed arrays
+						form.reset({
+							...data,
+							image_urls: imageFiles,
+							technical_sheet: technicalSheet,
+							selling_price: Number(data.costs.selling_price),
+							general_expenses: Number(data.costs.general_expenses),
+							royalties: Number(data.costs.royalties),
+							materials,
+							packaging_materials: packagingMaterials,
+							labor,
+						});
+					} else {
+						console.error('Failed to fetch product:', result.error);
+						toast.error('Failed to load product data');
+					}
+				} catch (error) {
+					console.error('Error fetching product:', error);
+					toast.error('Error loading product data');
+				}
+			}
 		}
 
 		// Fetch materials from the database
@@ -263,6 +374,7 @@ export default function Page() {
 		}
 
 		fetchDict();
+		fetchProduct();
 		fetchMaterials();
 		fetchPackagingMaterials();
 		fetchLabor();
@@ -548,7 +660,7 @@ export default function Page() {
 								</Button>
 							</div>
 
-							{(form.watch('materials') || []).map((material, index) => (
+							{(Array.isArray(form.watch('materials')) ? form.watch('materials') : []).map((material: any, index: number) => (
 								<Card
 									key={index}
 									className='cursor-pointer'
@@ -806,7 +918,8 @@ export default function Page() {
 								<span>
 									R${' '}
 									{(() => {
-										const baseCost = form.watch('materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+										const materials = Array.isArray(form.watch('materials')) ? form.watch('materials') : [];
+										const baseCost = materials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 										const percentLost = form.watch('percent_pieces_lost') || 0;
 										return (baseCost * (1 + percentLost / 100)).toFixed(2);
 									})()}
@@ -841,7 +954,7 @@ export default function Page() {
 								</Button>
 							</div>
 
-							{(form.watch('packaging_materials') || []).map((material, index) => (
+							{(Array.isArray(form.watch('packaging_materials')) ? form.watch('packaging_materials') : []).map((material: any, index: number) => (
 								<Card
 									key={index}
 									className='cursor-pointer'
@@ -1068,10 +1181,10 @@ export default function Page() {
 								<span>Total Packaging Material Cost:</span>
 								<span>
 									R${' '}
-									{form
-										.watch('packaging_materials')
-										?.reduce((sum, material) => sum + (material.total_cost || 0), 0)
-										.toFixed(2)}
+									{(() => {
+										const packagingMaterials = Array.isArray(form.watch('packaging_materials')) ? form.watch('packaging_materials') : [];
+										return packagingMaterials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0).toFixed(2);
+									})()}
 								</span>
 							</div>
 						</div>
@@ -1084,15 +1197,18 @@ export default function Page() {
 									R${' '}
 									{(() => {
 										const rawMaterialCost = (() => {
-											const baseCost = form.watch('materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+											const materials = Array.isArray(form.watch('materials')) ? form.watch('materials') : [];
+											const baseCost = materials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 											const percentLost = form.watch('percent_pieces_lost') || 0;
 											return baseCost * (1 + percentLost / 100);
 										})();
-										const packagingCost = form.watch('packaging_materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+										const packagingMaterials = Array.isArray(form.watch('packaging_materials')) ? form.watch('packaging_materials') : [];
+										const packagingCost = packagingMaterials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 										const totalMaterialCost = rawMaterialCost + packagingCost;
 
 										// Calculate total labor cost
-										const laborCost = form.watch('labor')?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+										const labors = Array.isArray(form.watch('labor')) ? form.watch('labor') : [];
+										const laborCost = labors.reduce((sum: number, labor: any) => sum + (labor.total_cost || 0), 0);
 
 										// Get general expenses
 										const generalExpenses = form.watch('general_expenses') || 0;
@@ -1132,7 +1248,7 @@ export default function Page() {
 								</Button>
 							</div>
 
-							{(form.watch('labor') || []).map((labor, index) => (
+							{(Array.isArray(form.watch('labor')) ? form.watch('labor') : []).map((labor: any, index: number) => (
 								<Card
 									key={index}
 									className='cursor-pointer'
@@ -1382,10 +1498,10 @@ export default function Page() {
 								<span>Total Labor Cost:</span>
 								<span>
 									R${' '}
-									{form
-										.watch('labor')
-										?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0)
-										.toFixed(2)}
+									{(() => {
+										const labors = Array.isArray(form.watch('labor')) ? form.watch('labor') : [];
+										return labors.reduce((sum: number, labor: any) => sum + (labor.total_cost || 0), 0).toFixed(2);
+									})()}
 								</span>
 							</div>
 						</div>
@@ -1456,15 +1572,18 @@ export default function Page() {
 									{(() => {
 										// Calculate total material cost (raw + packaging, including losses)
 										const rawMaterialCost = (() => {
-											const baseCost = form.watch('materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+											const materials = Array.isArray(form.watch('materials')) ? form.watch('materials') : [];
+											const baseCost = materials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 											const percentLost = form.watch('percent_pieces_lost') || 0;
 											return baseCost * (1 + percentLost / 100);
 										})();
-										const packagingCost = form.watch('packaging_materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+										const packagingMaterials = Array.isArray(form.watch('packaging_materials')) ? form.watch('packaging_materials') : [];
+										const packagingCost = packagingMaterials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 										const totalMaterialCost = rawMaterialCost + packagingCost;
 
 										// Calculate total labor cost
-										const laborCost = form.watch('labor')?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+										const labors = Array.isArray(form.watch('labor')) ? form.watch('labor') : [];
+										const laborCost = labors.reduce((sum: number, labor: any) => sum + (labor.total_cost || 0), 0);
 
 										// Get general expenses
 										const generalExpenses = form.watch('general_expenses') || 0;
@@ -1519,12 +1638,14 @@ export default function Page() {
 										{(() => {
 											const totalCost = (() => {
 												const rawMaterialCost = (() => {
-													const baseCost = form.watch('materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
+													const materials = Array.isArray(form.watch('materials')) ? form.watch('materials') : [];
+													const baseCost = materials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
 													const percentLost = form.watch('percent_pieces_lost') || 0;
 													return baseCost * (1 + percentLost / 100);
 												})();
-												const packagingCost = form.watch('packaging_materials')?.reduce((sum, material) => sum + (material.total_cost || 0), 0) || 0;
-												const laborCost = form.watch('labor')?.reduce((sum, labor) => sum + (labor.total_cost || 0), 0) || 0;
+												const packagingMaterials = Array.isArray(form.watch('packaging_materials')) ? form.watch('packaging_materials') : [];
+												const packagingCost = packagingMaterials.reduce((sum: number, material: any) => sum + (material.total_cost || 0), 0);
+												const laborCost = (Array.isArray(form.watch('labor')) ? form.watch('labor') : []).reduce((sum: number, labor: any) => sum + (labor.total_cost || 0), 0);
 												const generalExpenses = form.watch('general_expenses') || 0;
 												return rawMaterialCost + packagingCost + laborCost + generalExpenses;
 											})();
@@ -1544,42 +1665,59 @@ export default function Page() {
 						<div className='mt-4'>
 							<FormField
 								control={form.control}
-								name='technical_sheet'
-								render={({ field: { value, onChange, ...field } }) => (
+								name="technical_sheet"
+								render={({ field: { value, onChange } }) => (
 									<FormItem>
 										<FormLabel>Technical Sheet (PDF)</FormLabel>
 										<FormControl>
-											<div className='relative'>
-												<Input
-													type='file'
-													accept='.pdf'
-													onChange={(e) => {
-														const file = e.target.files?.[0];
-														if (file && file.type === 'application/pdf') {
-															onChange(file);
-														}
-													}}
-													{...field}
-												/>
-												{value && (
+											<div>
+												<div className="flex items-center gap-3">
 													<Button
-														type='button'
-														variant='ghost'
-														size='sm'
-														className='absolute right-2 top-1/2 -translate-y-1/2 h-7 px-2 text-muted-foreground hover:text-foreground'
-														onClick={(e) => {
-															e.preventDefault();
-															onChange(null);
-															// Reset the file input
-															const fileInput = e.currentTarget.parentElement?.querySelector('input[type="file"]') as HTMLInputElement;
-															if (fileInput) {
-																fileInput.value = '';
-															}
+														type="button"
+														variant="outline"
+														onClick={() => {
+															const fileInput = document.createElement('input');
+															fileInput.type = 'file';
+															fileInput.accept = 'application/pdf';
+															fileInput.onchange = (e) => {
+																const file = (e.target as HTMLInputElement).files?.[0];
+																if (file) {
+																	onChange(file);
+																}
+															};
+															fileInput.click();
 														}}
 													>
-														Remove
+														Choose File
 													</Button>
-												)}
+
+													{/* If a file exists, make its name a link to preview */}
+													{value ? (
+														<a
+															href={URL.createObjectURL(value)}
+															target="_blank"
+															rel="noopener noreferrer"
+															className="text-sm text-blue-600 underline truncate max-w-[200px]"
+														>
+															{value.name}
+														</a>
+													) : (
+														<span className="text-sm text-muted-foreground">No file chosen</span>
+													)}
+
+													{value && (
+														<Button
+															type="button"
+															variant="ghost"
+															size="sm"
+															onClick={() => {
+																onChange(null);
+															}}
+														>
+															Remove
+														</Button>
+													)}
+												</div>
 											</div>
 										</FormControl>
 										<FormDescription>Upload technical sheet in PDF format</FormDescription>
@@ -1587,6 +1725,8 @@ export default function Page() {
 									</FormItem>
 								)}
 							/>
+
+
 						</div>
 
 						<div className='grid gap-4 md:grid-cols-3'>
@@ -1709,6 +1849,12 @@ export default function Page() {
 								</FormItem>
 							)}
 						/>
+
+						<div className="flex justify-end mt-8">
+							<Button type="submit" disabled={isPending}>
+								{isPending ? 'Saving...' : isEdit ? 'Update Product' : 'Create Product'}
+							</Button>
+						</div>
 					</form>
 				</Form>
 			</div>
