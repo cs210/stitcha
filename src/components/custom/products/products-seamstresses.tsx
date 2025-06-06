@@ -27,6 +27,8 @@ const assignSeamstressFormSchema = z.object({
 
 const sendWhatsappMessageFormSchema = z.object({
 	seamstress: z.string({ required_error: 'Seamstress is required' }),
+	phone_number: z.string({ required_error: 'Phone number is required' })
+		.regex(/^\d+$/, 'Phone number must contain only digits'),
 	message: z.string({ required_error: 'Message is required' }),
 });
 
@@ -46,7 +48,12 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 	});
 
 	const sendWhatsappMessageForm = useForm<z.infer<typeof sendWhatsappMessageFormSchema>>({
-		resolver: zodResolver(sendWhatsappMessageFormSchema)
+		resolver: zodResolver(sendWhatsappMessageFormSchema),
+		defaultValues: {
+			seamstress: '',
+			phone_number: '',
+			message: ''
+		}
 	});
 	
 	useEffect(() => {
@@ -113,21 +120,19 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 	// Send a WhatsApp message to a seamstress
 	const onWhatsappMessageSubmit = async (values: z.infer<typeof sendWhatsappMessageFormSchema>) => {
 		try {
-			const response = await fetch('/api/whatsapp', {
-				method: 'POST',
-				body: JSON.stringify(values),
-			});
-			const data = await response.json();
+			// Remove any non-digit characters from phone number
+			const cleanPhoneNumber = values.phone_number.replace(/\D/g, '');
 			
-			if (data.success) {
-				// toast({
-				// 	title: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.success.title,
-				// 	description: dict.adminsSection.product.seamstresses.sendWhatsappMessage.notifications.success.description,
-				// });
-			} else {
-				throw new Error(data.error);
-			}
+			// Properly encode the message for URL
+			const encodedMessage = encodeURIComponent(values.message.trim());
+			
+			// Construct WhatsApp URL with proper formatting
+			const whatsappUrl = `https://wa.me/${cleanPhoneNumber}?text=${encodedMessage}`;
+			
+			// Open WhatsApp in a new tab
+			window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
 
+			// Reset form after successful submission
 			sendWhatsappMessageForm.reset();
 		} catch (error) {
 			// toast({
@@ -250,6 +255,19 @@ export function ProductsSeamstresses({ dict, product }: { dict: any, product: Pr
 													))}
 												</SelectContent>
 											</Select>
+											<FormMessage />
+										</FormItem>
+									)}
+								/>
+								<FormField
+									control={sendWhatsappMessageForm.control}
+									name='phone_number'
+									render={({ field }) => (
+										<FormItem>
+											<FormLabel>{dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.phone_number?.label || 'Phone Number'}</FormLabel>
+											<FormControl>
+												<Input {...field} placeholder={dict.adminsSection.products.product.seamstresses.sendWhatsappMessage.phone_number?.placeholder || 'Enter phone number with country code'} />
+											</FormControl>
 											<FormMessage />
 										</FormItem>
 									)}
