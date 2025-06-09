@@ -48,7 +48,7 @@ files:
     adminsSection.products.product.details.height: eec6c4bdbd339edf8cbea68becb85244
     adminsSection.products.product.details.weight: 8c489d0946f66d17d73f26366a4bf620
     adminsSection.products.product.progress.unitsCompleted: bed969379f7f9f32d6ca110e38e5f903
-    adminsSection.products.product.progress.noProgressUpdatesYet: d92986bc3aa97a52c8f36566e4e4268a
+    adminsSection.products.product.progress.noProgressUpdates: d92986bc3aa97a52c8f36566e4e4268a
     adminsSection.seamstresses.title: 9e91116c7f0918c4c3e50e73f6dba966
     adminsSection.seamstresses.description: 017e755c8a3fe072212624e99dd3c7c5
     adminsSection.seamstresses.seamstress.products: 068f80c7519d0528fb08e82137a72131

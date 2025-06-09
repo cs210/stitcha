@@ -246,7 +246,8 @@
         },
         "progress": {
           "noProgressUpdatesYet": "Nenhuma atualização de progresso ainda",
-          "unitsCompleted": "unidades concluídas"
+          "unitsCompleted": "unidades concluídas",
+          "noProgressUpdates": "Ainda sem atualizações de progresso"
         }
       }
     },

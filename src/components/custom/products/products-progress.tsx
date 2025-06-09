@@ -13,7 +13,7 @@ export function ProductsProgress({ dict, product }: { dict: any, product: Produc
 					))}
 				</div>
 			) : (
-				<P>{dict.adminsSection.product.progress.noProgressUpdatesYet}</P>
+				<P>{dict.adminsSection.products.product.progress.noProgressUpdates}</P>
 			)}
 		</div>
 	);

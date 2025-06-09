@@ -76,7 +76,7 @@
 				},
 				"progress": {
 					"unitsCompleted": "units completed",
-					"noProgressUpdatesYet": "No progress updates yet"
+					"noProgressUpdates": "No progress updates yet"
 				}
 			}
 		},

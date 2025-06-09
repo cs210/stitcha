@@ -214,14 +214,14 @@ export type Database = {
           {
             foreignKeyName: "products_and_labor_product_id_fkey"
             columns: ["product_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
             foreignKeyName: "products_and_labor_task_id_fkey"
             columns: ["task_id"]
-            isOneToOne: true
+            isOneToOne: false
             referencedRelation: "labor"
             referencedColumns: ["id"]
           },
@@ -269,21 +269,21 @@ export type Database = {
       products_raw_materials: {
         Row: {
           id: string
-          material_code: string | null
+          material_code: string
           product_id: string
           total_cost: number
           unit_consumption: number
         }
         Insert: {
           id?: string
-          material_code?: string | null
+          material_code: string
           product_id: string
           total_cost: number
           unit_consumption: number
         }
         Update: {
           id?: string
-          material_code?: string | null
+          material_code?: string
           product_id?: string
           total_cost?: number
           unit_consumption?: number

@@ -113,6 +113,16 @@ export async function createProgressUpdate(seamstressId: string, supabase: Supab
 			throw new Error(error.message);
 		}
 
+		const { error: updateError } = await supabase
+			.from('products_users')
+			.update({ units_completed: formData.get('units_completed') })
+			.eq('user_id', seamstressId)
+			.eq('product_id', formData.get('product'));
+
+		if (updateError) {
+			throw new Error(`Error updating products_users: ${updateError.message}`);
+		}
+
 		return data;
 	} catch (error: any) {
 		throw new Error(error.message);
